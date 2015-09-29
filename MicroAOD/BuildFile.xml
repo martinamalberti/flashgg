@@ -1,3 +1,5 @@
+<use name="TrackingTools/TransientTrack"/>
+<use name="TrackingTools/Records"/>
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="FWCore/PluginManager"/>

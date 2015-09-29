@@ -11,18 +11,19 @@ from flashgg.MicroAOD.flashggFinalEGamma_cfi import flashggFinalEGamma
 from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedMuons,flashggSelectedElectrons
 from flashgg.MicroAOD.flashggMicroAODGenSequence_cff import *
 
-eventCount = cms.EDProducer("EventCountProducer")
-weightsCount = cms.EDProducer("WeightsCountProducer",
-                              generator=cms.InputTag("generator"),
-                              pileupInfo=cms.InputTag("addPileupInfo"),
-                              doObsPileup=cms.untracked.bool(True),
-                              minObsPileup=cms.double(-0.5),
-                              maxObsPileup=cms.double(100.5),
-                              nbinsObsPileup=cms.int32(101),
-                              )
+#eventCount = cms.EDProducer("EventCountProducer")
+#weightsCount = cms.EDProducer("WeightsCountProducer",
+#                              generator=cms.InputTag("generator"),
+#                              pileupInfo=cms.InputTag("addPileupInfo"),
+#                              doObsPileup=cms.untracked.bool(True),
+#                              minObsPileup=cms.double(-0.5),
+#                              maxObsPileup=cms.double(100.5),
+#                              nbinsObsPileup=cms.int32(101),
+#                              )
 
-flashggMicroAODSequence = cms.Sequence(eventCount+weightsCount
-                                       +flashggVertexMapUnique+flashggVertexMapNonUnique
+flashggMicroAODSequence = cms.Sequence(#eventCount+weightsCount
+                                       #+
+                                       flashggVertexMapUnique+flashggVertexMapNonUnique
                                        +flashggElectrons*flashggSelectedElectrons
                                        +flashggMuons*flashggSelectedMuons
                                        +flashggMicroAODGenSequence
