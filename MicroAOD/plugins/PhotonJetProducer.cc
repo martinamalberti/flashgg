@@ -9,6 +9,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "flashgg/DataFormats/interface/PhotonJetCandidate.h"
 #include "flashgg/MicroAOD/interface/PhotonIdUtils.h"
 
@@ -22,6 +23,7 @@
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 
 
+#include "TLorentzVector.h"
 #include <map>
 
 using namespace edm;
@@ -119,12 +121,21 @@ namespace flashgg {
             for( unsigned int j = 0 ; j < jets->size() ; j++ ) {
                 Ptr<pat::Jet> jet = jets->ptrAt( j );
                 if ( jet->pt() < minJetPt_ ) continue;
+                if ( jet->eta() < 2.5 ) continue;
                 // -- check that the jet is not overlapping with the photon
                 float dR = reco::deltaR(photon->eta(), photon->phi(), jet->eta(), jet->phi());
                 if ( dR < 0.4 ) continue;
-                // ... other selections on the jet ????
-                // ....
-             
+                // -- check sumPttracks > 30 
+                /*
+                TLorentzVector pTrks(0.,0.,0.,0.);
+                for (unsigned int icand = 0; icand < jet->numberOfDaughters(); icand++){
+                    reco::Candidate jetconst = jet->daughter(icand);
+                    if ( jetconst->charge()==0 ) continue;
+                    TLorentzVector pTrk(jetconst->px(), jetconst->py(), jetconst->pz(), jetconst->energy());
+                    pTrks+=pTrk;
+                }
+                if (pTrks.Pt()<30) continue;
+                */
 
                 // -- now build gamma+jet candidate 
 
