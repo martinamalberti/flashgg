@@ -121,24 +121,23 @@ namespace flashgg {
             for( unsigned int j = 0 ; j < jets->size() ; j++ ) {
                 Ptr<pat::Jet> jet = jets->ptrAt( j );
                 if ( jet->pt() < minJetPt_ ) continue;
-                if ( jet->eta() < 2.5 ) continue;
+                if ( fabs(jet->eta()) > 2.5 ) continue;
                 // -- check that the jet is not overlapping with the photon
                 float dR = reco::deltaR(photon->eta(), photon->phi(), jet->eta(), jet->phi());
                 if ( dR < 0.4 ) continue;
                 // -- check sumPttracks > 30 
-                /*
                 TLorentzVector pTrks(0.,0.,0.,0.);
                 for (unsigned int icand = 0; icand < jet->numberOfDaughters(); icand++){
-                    reco::Candidate jetconst = jet->daughter(icand);
+                    const reco::Candidate *jetconst = jet->daughter(icand);
+                    //std::cout << jetconst->charge() << " " << jetconst->px()<< " "<< jetconst->py() << " " << jetconst->pz()<<std::endl;
                     if ( jetconst->charge()==0 ) continue;
                     TLorentzVector pTrk(jetconst->px(), jetconst->py(), jetconst->pz(), jetconst->energy());
                     pTrks+=pTrk;
                 }
+                //std::cout << "track sum pt = "<< pTrks.Pt() <<std::endl;
                 if (pTrks.Pt()<30) continue;
-                */
-
+                
                 // -- now build gamma+jet candidate 
-
                 Ptr<reco::Vertex> pvx = vertexSelector_->select( photon, jet, primaryVertices->ptrs(), *vertexCandidateMap, conversions->ptrs(), conversionsSingleLeg->ptrs(),
                                                                  vertexPoint, useSingleLeg_ );
 
@@ -153,6 +152,7 @@ namespace flashgg {
 
                 PhotonJetCandidate photonjet( photon, jet, pvx );
                 photonjet.setVertexIndex( ivtx );
+                photonjet.setDZfromRecoPV(pvx->position().z() - primaryVertices->ptrAt(0)->position().z());
 
                 // Obviously the last selection has to be for this diphoton or this is wrong
                 vertexSelector_->writeInfoFromLastSelectionTo( photonjet );

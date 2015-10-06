@@ -13,8 +13,8 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100) )
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 5000 ) )
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 10 )
 
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 
@@ -28,7 +28,8 @@ if current_gt.count("::All"):
 # Spring15
 #process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/RunIISpring15DR74/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/70000/0232BC3C-01FF-E411-8779-0025907B4FC2.root"))
 process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(
-        "/store/mc/RunIISpring15DR74/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/70000/9038945A-6E0C-E511-91E9-02163E010FE8.root"
+        "/store/mc/RunIISpring15DR74/GJet_Pt-15To6000_TuneCUETP8M1-Flat_13TeV_pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v3/00000/00BB8CCC-9208-E511-8A90-0025905B857C.root"
+        #"/store/mc/RunIISpring15DR74/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v2/70000/9038945A-6E0C-E511-91E9-02163E010FE8.root"
         #"/store/mc/RunIISpring15DR74/GluGluHToGG_M-125_13TeV_powheg_pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/30000/54ECB9A4-912E-E511-BB7D-002590A831CA.root"
         ))
 process.MessageLogger.cerr.threshold = 'ERROR' # can't get suppressWarning to work: disable all warnings for now
