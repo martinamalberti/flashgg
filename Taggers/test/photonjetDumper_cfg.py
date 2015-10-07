@@ -46,7 +46,8 @@ cfgTools.addCategories(process.photonjetDumper,
                                   "jetEta                   :=jet.eta",
                                   "pt",
                                   "logSumPt2","ptBal","ptAsym","nConv",
-                                  "dZfromRecoPV" 
+                                  "dZfromRecoPV", 
+                                  "photonjetPt"
                                   ],
                        ## histograms to be plotted. 
                        ## the variables need to be defined first
