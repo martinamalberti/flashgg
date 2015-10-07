@@ -52,9 +52,6 @@ namespace flashgg {
 
         double minJetPt_;
         double minPhotonPt_;
-        double minPhotonIdMvaEB_;
-        double minPhotonIdMvaEE_;
-
     };
 
     PhotonJetProducer::PhotonJetProducer( const ParameterSet &iConfig ) :
@@ -113,9 +110,18 @@ namespace flashgg {
         for ( unsigned int i = 0 ; i < photons->size() ; i++ ){
             Ptr<flashgg::Photon> photon = photons->ptrAt( i );
             if (photon->pt() < minPhotonPt_) continue;
-            //if (photon->phoIdMvaDWrtVtx(vtx) < minPhtonIdMva_) continue;
-            // ... add also some isolation cut ...?
-            
+            // photon ID cut based - medium
+            if ( photon->isEB() ){
+                if ( photon->hadronicOverEm() > 0.05 )  continue;
+                if ( photon->full5x5_sigmaIetaIeta() > 0.01) continue;
+                // ... add isolation cuts
+            }
+            if ( photon->isEE() ){
+                if ( photon->hadronicOverEm() > 0.05 )  continue;
+                if ( photon->full5x5_sigmaIetaIeta() > 0.0267) continue;
+                // ... add isolation cuts
+            }
+                        
             // -- loop over jets
             //float jetTracksPtSum = 0; // .. da implementare ..
             for( unsigned int j = 0 ; j < jets->size() ; j++ ) {
@@ -154,6 +160,17 @@ namespace flashgg {
                 photonjet.setVertexIndex( ivtx );
                 photonjet.setDZfromRecoPV(pvx->position().z() - primaryVertices->ptrAt(0)->position().z());
 
+                
+                TVector3 Photon1Dir;
+                TVector3 Photon1Dir_uv;
+                TLorentzVector p1, p2;
+                Photon1Dir.SetXYZ( photon->superCluster()->position().x() - pvx->position().x(), photon->superCluster()->position().y() - pvx->position().y(),
+                                   photon->superCluster()->position().z() - pvx->position().z() );
+                Photon1Dir_uv = Photon1Dir.Unit() * photon->superCluster()->rawEnergy();
+                p1.SetPxPyPzE( Photon1Dir_uv.x(), Photon1Dir_uv.y(), Photon1Dir_uv.z(), photon->superCluster()->rawEnergy() );
+                p2.SetPxPyPzE( jet->px(), jet->py(), jet->pz(), jet->energy());
+                photonjet.setPhotonJetPt((p1+p2).Pt());
+                
                 // Obviously the last selection has to be for this diphoton or this is wrong
                 vertexSelector_->writeInfoFromLastSelectionTo( photonjet );
 
