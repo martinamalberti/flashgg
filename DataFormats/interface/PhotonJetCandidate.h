@@ -10,6 +10,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "flashgg/DataFormats/interface/WeightedObject.h"
 
+#include "TLorentzVector.h"
 
 namespace flashgg {
 
@@ -38,6 +39,9 @@ namespace flashgg {
         void setDZ2( float val ) { dZ2_ = val; }
         void setVtxProbMVA( float val ) { vtxprobmva_ = val; }
         void setVertexIndex( int val ) { vertex_index_ = val; }
+        void setDZfromRecoPV( float val) { dZfromRecoPV_ = val;}
+        void setPhotonJetPt( float val ) { photonjetPt_ = val; }
+
 
         void setVLogSumPt2( std::vector<float> vval ) { vlogsumpt2_ = vval; }
         void setVPtBal( std::vector<float> vval ) { vptbal_ = vval; }
@@ -64,6 +68,9 @@ namespace flashgg {
         {
             return ( photon()->pt() + jet()->pt() );
         }
+        float dZfromRecoPV() const {return dZfromRecoPV_; }
+        float photonjetPt() const {return photonjetPt_; }
+
         int vertexIndex() const { return vertex_index_; }
 
         unsigned int nVtxInfoSize() const { return ( vlogsumpt2_.size() ) ;}
@@ -100,6 +107,8 @@ namespace flashgg {
         float dZ1_;
         float dZ2_;
         float vtxprobmva_;
+        float dZfromRecoPV_;
+        float photonjetPt_;
 
         std::vector<float> vlogsumpt2_;
         std::vector<float> vptbal_;
