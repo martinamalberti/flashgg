@@ -34,28 +34,35 @@ using namespace flashgg;
 // define the structures used to create tree branches and fill the trees
 
 struct eventInfo {
-  float weight;
-  
-  int npu;
-  int nvtx;
-  
-  float pho1_pt;
-  float pho1_eta;
-  float pho1_phi;
+    float weight;
+    
+    int npu;
+    int nvtx;
+    
+    float pho1_pt;
+    float pho1_eta;
+    float pho1_phi;
+    float pho1_idmva;
 
-  float pho2_pt;
-  float pho2_eta;
-  float pho2_phi;
+    float pho2_pt;
+    float pho2_eta;
+    float pho2_phi;
+    float pho2_idmva;
 
-  float dipho_m;
-  float dipho_pt;
-  float dipho_mva;
+    float dipho_m;
+    float dipho_pt;
+    float dipho_mva;
+    
+    vector<float> jet_pt;
+    vector<float> jet_eta;
+    vector<float> jet_phi;
+    vector<float> jet_pujetid;
+    vector<float> jet_bdiscriminant;
+    vector<int>   jet_isMatchedToGen;
 
-  vector<float> jet_pt;
-  vector<float> jet_eta;
-  vector<float> jet_phi;
-  vector<float> jet_pujetid;
-  vector<float> jet_bdiscriminant;
+    
+    
+
 
 };
 // **********************************************************************
@@ -81,6 +88,7 @@ private:
     EDGetTokenT<View<DiPhotonCandidate> > diphotonToken_;
     EDGetTokenT<View<DiPhotonMVAResult> > mvaResultToken_;
     std::vector<edm::InputTag> inputTagJets_;
+    EDGetTokenT<View<reco::GenJet> > genJetToken_;
 
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
 
@@ -97,7 +105,8 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     vertexToken_( consumes<View<reco::Vertex> >( iConfig.getParameter<InputTag> ( "VertexTag" ) ) ),
     diphotonToken_( consumes<View<flashgg::DiPhotonCandidate> >( iConfig.getParameter<InputTag> ( "DiPhotonTag" ) ) ),
     mvaResultToken_( consumes<View<flashgg::DiPhotonMVAResult> >( iConfig.getParameter<InputTag> ( "MVAResultTag" ) ) ),
-    inputTagJets_( iConfig.getParameter<std::vector<edm::InputTag> >( "inputTagJets" ) )
+    inputTagJets_( iConfig.getParameter<std::vector<edm::InputTag> >( "inputTagJets" ) ),
+    genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) )
 {
     jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
     bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
@@ -130,6 +139,11 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         iEvent.getByLabel( inputTagJets_[j], Jets[j] );
     }
     
+    Handle<View<reco::GenJet> > genJets;
+    iEvent.getByToken( genJetToken_, genJets );
+
+
+
     // initialize tree
     initEventStructure();
     
@@ -152,10 +166,12 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         evInfo.pho1_pt  = dipho->leadingPhoton()->pt();
         evInfo.pho1_eta = dipho->leadingPhoton()->eta();
         evInfo.pho1_phi = dipho->leadingPhoton()->phi();
+        evInfo.pho1_idmva = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
         
         evInfo.pho2_pt  = dipho->subLeadingPhoton()->pt();
         evInfo.pho2_eta = dipho->subLeadingPhoton()->eta();
         evInfo.pho2_phi = dipho->subLeadingPhoton()->phi();
+        evInfo.pho2_idmva = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
         
         evInfo.dipho_pt  = dipho->pt();
         evInfo.dipho_m   = dipho->mass();
@@ -181,14 +197,28 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             float dRJetPhoSubLead = sqrt( dEtaSublead * dEtaSublead + dPhiSublead * dPhiSublead );
             
             if( dRJetPhoLead < 0.5 || dRJetPhoSubLead < 0.5 ) { continue; } // ?? can change to 0.4???
+            if( !jet->passesJetID( flashgg::Loose ) ) continue;// pass jet id (reject surios detector noise)
+            if( !jet->passesPuJetId(diphotons->ptrAt( candIndex ))){ continue;} // pass PU jet id
             if( jet->pt() < jetPtThreshold_ ) { continue; }
             
             njets++;
+            
+            // matching to gen jets
+            int isMatchedToGen = 0; 
+            if( ! iEvent.isRealData() ) {
+                for( unsigned int jg = 0 ; jg < genJets->size() ; jg++ ) {
+                    float dr = deltaR(jet->eta(), jet->phi(), genJets->ptrAt( jg )->eta() , genJets->ptrAt( jg )->phi() );
+                    if (dr > 0.4) continue;
+                    isMatchedToGen = 1;
+                }
+            }
+
             evInfo.jet_pt.push_back(jet->pt());
             evInfo.jet_eta.push_back(jet->eta());
             evInfo.jet_phi.push_back(jet->phi());
             //evInfo.jet_pujetid.push_back( ?? );
             evInfo.jet_bdiscriminant.push_back(jet->bDiscriminator( bTag_ ));
+            evInfo.jet_isMatchedToGen.push_back(isMatchedToGen);
         }      
         
         // fill the tree
@@ -208,12 +238,17 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "weight", &evInfo.weight, "weight/F" );
   eventTree->Branch( "npu", &evInfo.npu, "npu/I" );
   eventTree->Branch( "nvtx", &evInfo.nvtx, "nvtx/I" );
+
   eventTree->Branch( "pho1_pt", &evInfo.pho1_pt, "pho1_pt/F" );
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
   eventTree->Branch( "pho1_phi", &evInfo.pho1_phi, "pho1_phi/F" );
+  eventTree->Branch( "pho1_idmva", &evInfo.pho1_idmva, "pho1_idmva/F" );
+
   eventTree->Branch( "pho2_pt", &evInfo.pho2_pt, "pho2_pt/F" );
   eventTree->Branch( "pho2_eta", &evInfo.pho2_eta, "pho2_eta/F" );
   eventTree->Branch( "pho2_phi", &evInfo.pho2_phi, "pho2_phi/F" );
+  eventTree->Branch( "pho2_idmva", &evInfo.pho1_idmva, "pho2_idmva/F" );
+
   eventTree->Branch( "dipho_pt", &evInfo.dipho_pt, "dipho_pt/F" );
   eventTree->Branch( "dipho_m", &evInfo.dipho_m, "dipho_m/F" );
   eventTree->Branch( "dipho_mva", &evInfo.dipho_mva, "dipho_mva/F" );
@@ -223,6 +258,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "jet_phi", &evInfo.jet_phi);
   eventTree->Branch( "jet_pujetid", &evInfo.jet_pujetid);
   eventTree->Branch( "jet_bdiscriminant", &evInfo.jet_bdiscriminant);
+  eventTree->Branch( "jet_isMatchedToGen", &evInfo.jet_isMatchedToGen);
 
 }
 // ******************************************************************************************
@@ -249,10 +285,13 @@ tthOptimizationTreeMaker::initEventStructure()
   evInfo.pho1_pt  = -999.;
   evInfo.pho1_eta = -999.;
   evInfo.pho1_phi = -999.;
+  evInfo.pho1_idmva = -999.;
+
   evInfo.pho2_pt  = -999.;
   evInfo.pho2_eta = -999.;
   evInfo.pho2_phi = -999.;
-  
+  evInfo.pho2_idmva = -999.;
+
   evInfo.dipho_pt   = -999.;
   evInfo.dipho_m    = -999.;
   evInfo.dipho_mva  = -999.;
@@ -262,6 +301,7 @@ tthOptimizationTreeMaker::initEventStructure()
   evInfo.jet_phi .clear();
   evInfo.jet_pujetid .clear();
   evInfo.jet_bdiscriminant .clear();
+  evInfo.jet_isMatchedToGen .clear();
 };
 // ******************************************************************************************
 

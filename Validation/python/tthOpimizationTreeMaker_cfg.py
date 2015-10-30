@@ -25,6 +25,7 @@ process.treeMaker = cms.EDAnalyzer('FlashggtthOptimizationTreeMaker',
                                    DiPhotonTag = cms.InputTag('flashggDiPhotons'),
                                    MVAResultTag=cms.InputTag('flashggDiPhotonMVA'),
                                    inputTagJets= UnpackedJetCollectionVInputTag,
+                                   GenJetTag=cms.InputTag( "slimmedGenJets"),
                                    jetPtThreshold = cms.untracked.double(20.),
                                    bTag = cms.untracked.string("pfCombinedInclusiveSecondaryVertexV2BJetTags")
                                   )
