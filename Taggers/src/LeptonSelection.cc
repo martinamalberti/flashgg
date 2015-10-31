@@ -157,7 +157,7 @@ namespace flashgg {
 
             Ptr<reco::Vertex> vtx = vertices[vtxi];
 
-            if( vtx_dz > elec->gsfTrack()->dz( vtx->position() ) ) {
+            if( fabs(vtx_dz) > fabs(elec->gsfTrack()->dz( vtx->position() )) ) {
 
                 vtx_dz = elec->gsfTrack()->dz( vtx->position() );
                 min_dz_vtx = vtxi;
