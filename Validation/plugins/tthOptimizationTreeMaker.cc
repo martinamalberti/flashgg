@@ -12,6 +12,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Common/interface/RefToPtr.h"
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
@@ -21,8 +22,16 @@
 #include "flashgg/DataFormats/interface/DiPhotonMVAResult.h"
 #include "flashgg/DataFormats/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "flashgg/DataFormats/interface/Electron.h"
+#include "flashgg/DataFormats/interface/Muon.h"
+#include "flashgg/Taggers/interface/LeptonSelection.h"
+
+#include "DataFormats/Math/interface/deltaR.h"
 
 #include "TTree.h"
+
+#include <vector>
+#include <string>
 
 using namespace std;
 using namespace edm;
@@ -60,8 +69,22 @@ struct eventInfo {
     vector<float> jet_bdiscriminant;
     vector<int>   jet_isMatchedToGen;
 
+    vector<float> ele_pt;
+    vector<float> ele_eta;
+    vector<float> ele_phi;
+    vector<float> ele_idmva;
+    vector<float> ele_iso;
+    vector<float> ele_dz;
+    vector<float> ele_d0;
     
-    
+    vector<float> mu_pt;
+    vector<float> mu_eta;
+    vector<float> mu_phi;
+    vector<float> mu_iso;
+    vector<bool> mu_isTight;
+    vector<bool> mu_isMedium;
+    vector<bool> mu_isLoose;
+
 
 
 };
@@ -80,7 +103,7 @@ private:
     virtual void analyze( const edm::Event &, const edm::EventSetup & ) override;
     virtual void endJob() override;
     void initEventStructure();
-   
+
     TTree *eventTree;
     eventInfo evInfo;
     
@@ -89,11 +112,16 @@ private:
     EDGetTokenT<View<DiPhotonMVAResult> > mvaResultToken_;
     std::vector<edm::InputTag> inputTagJets_;
     EDGetTokenT<View<reco::GenJet> > genJetToken_;
+    EDGetTokenT<View<Electron> > electronToken_;
+    EDGetTokenT<View<Muon> > muonToken_;
 
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
 
+    double electronPtThreshold_;
+    double muonPtThreshold_;
     double jetPtThreshold_;
     string bTag_;
+
 };
 // ******************************************************************************************
 
@@ -106,10 +134,14 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     diphotonToken_( consumes<View<flashgg::DiPhotonCandidate> >( iConfig.getParameter<InputTag> ( "DiPhotonTag" ) ) ),
     mvaResultToken_( consumes<View<flashgg::DiPhotonMVAResult> >( iConfig.getParameter<InputTag> ( "MVAResultTag" ) ) ),
     inputTagJets_( iConfig.getParameter<std::vector<edm::InputTag> >( "inputTagJets" ) ),
-    genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) )
+    genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) ),
+    electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag>( "ElectronTag" ) ) ),
+    muonToken_( consumes<View<flashgg::Muon> >( iConfig.getParameter<InputTag>( "MuonTag" ) ) )
 {
     jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
     bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
+    electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 20. );
+    muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
 }
 
 tthOptimizationTreeMaker::~tthOptimizationTreeMaker()
@@ -125,8 +157,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 {
     
     // access edm objects
-    Handle<View<reco::Vertex> > primaryVertices;
-    iEvent.getByToken( vertexToken_, primaryVertices );
+    Handle<View<reco::Vertex> > vertices;
+    iEvent.getByToken( vertexToken_, vertices );
 
     Handle<View<flashgg::DiPhotonCandidate> > diphotons;
     iEvent.getByToken( diphotonToken_, diphotons );
@@ -142,7 +174,11 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     Handle<View<reco::GenJet> > genJets;
     iEvent.getByToken( genJetToken_, genJets );
 
+    Handle<View<flashgg::Electron> > electrons;
+    iEvent.getByToken( electronToken_, electrons );
 
+    Handle<View<flashgg::Muon> > muons;
+    iEvent.getByToken( muonToken_, muons );
 
     // initialize tree
     initEventStructure();
@@ -154,8 +190,9 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         // event weight
         // boh???
         
+        
         // number of vertices
-        evInfo.nvtx = primaryVertices->size() ;
+        evInfo.nvtx = vertices->size() ;
 
         // -- photons
         // take the diphoton candidate with index = 0 (--> highest pt1+pt2)... to be checked..
@@ -187,15 +224,9 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             
             Ptr<flashgg::Jet> jet  = Jets[jetCollectionIndex]->ptrAt( ijet );
             
-            float dEtaLead = jet->eta() - dipho->leadingPhoton()->eta();
-            float dEtaSublead = jet->eta() - dipho->subLeadingPhoton()->eta();
-            
-            float dPhiLead = deltaPhi( jet->phi(), dipho->leadingPhoton()->phi() );
-            float dPhiSublead = deltaPhi( jet->phi(), dipho->subLeadingPhoton()->phi() );
-            
-            float dRJetPhoLead = sqrt( dEtaLead * dEtaLead + dPhiLead * dPhiLead );
-            float dRJetPhoSubLead = sqrt( dEtaSublead * dEtaSublead + dPhiSublead * dPhiSublead );
-            
+            float dRJetPhoLead = deltaR(jet->eta(), jet->phi(), dipho->leadingPhoton()->eta(), dipho->leadingPhoton()->phi());
+            float dRJetPhoSubLead = deltaR(jet->eta(), jet->phi(), dipho->subLeadingPhoton()->eta(), dipho->subLeadingPhoton()->phi());
+
             if( dRJetPhoLead < 0.5 || dRJetPhoSubLead < 0.5 ) { continue; } // ?? can change to 0.4???
             if( !jet->passesJetID( flashgg::Loose ) ) continue;// pass jet id (reject surios detector noise)
             if( !jet->passesPuJetId(diphotons->ptrAt( candIndex ))){ continue;} // pass PU jet id
@@ -212,18 +243,70 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
                     isMatchedToGen = 1;
                 }
             }
-
+            
             evInfo.jet_pt.push_back(jet->pt());
             evInfo.jet_eta.push_back(jet->eta());
             evInfo.jet_phi.push_back(jet->phi());
-            //evInfo.jet_pujetid.push_back( ?? );
             evInfo.jet_bdiscriminant.push_back(jet->bDiscriminator( bTag_ ));
             evInfo.jet_isMatchedToGen.push_back(isMatchedToGen);
-        }      
+        }
         
-        // fill the tree
-        if ( njets > 0. )
-            eventTree->Fill();
+        // -- leptons (e, mu)
+        for (UInt_t iele = 0 ; iele < electrons->size(); iele++){
+            edm::Ptr<flashgg::Electron> electron = electrons->ptrAt( iele );
+            if (fabs(electron->eta()) > 2.4) { continue; }
+            if (electron->pt()  < electronPtThreshold_) { continue; }
+            if( electron->hasMatchedConversion() ) { continue; } // remove conversions
+            // missing hits: from cut-based selection: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+            if( electron->isEB() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 2 ) { continue; } 
+            if( electron->isEE() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 1 ) { continue; }
+
+            Ptr<reco::Vertex> ele_vtx = chooseElectronVertex( electron,  vertices->ptrs() );
+            float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
+            float dz = electron->gsfTrack()->dz( ele_vtx->position() );
+            float isol = -99.; /// fix isolation computation
+
+            evInfo.ele_pt.push_back(electron->pt());
+            evInfo.ele_eta.push_back(electron->eta());
+            evInfo.ele_phi.push_back(electron->phi());
+            evInfo.ele_idmva.push_back(electron->nonTrigMVA());
+            evInfo.ele_iso.push_back(isol);
+            evInfo.ele_d0.push_back(d0);
+            evInfo.ele_dz.push_back(dz);
+        }       
+
+
+        for (UInt_t imu = 0 ; imu < muons->size(); imu++){
+            edm::Ptr<flashgg::Muon> muon = muons->ptrAt( imu );
+            if (fabs(muon->eta()) > 2.4) { continue; }
+            if (muon->pt()  < muonPtThreshold_) { continue; }
+            // muon ID and isolation: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2
+            float muPFCombRelIso = ( muon->pfIsolationR04().sumChargedHadronPt + max( 0.,muon->pfIsolationR04().sumNeutralHadronEt + muon->pfIsolationR04().sumPhotonEt - 0.5 * muon->pfIsolationR04().sumPUPt ) ) / ( muon->pt() );
+
+            int vtxInd = 0;
+            double dzmin = 9999;
+            for( size_t ivtx = 0 ; ivtx < vertices->size(); ivtx++ ) {
+                Ptr<reco::Vertex> vtx = vertices->ptrAt(ivtx);
+                if( !muon->innerTrack() ) { continue; }
+                if( fabs( muon->innerTrack()->vz() - vtx->position().z() ) < dzmin ) {
+                    dzmin = fabs( muon->innerTrack()->vz() - vtx->position().z() );
+                    vtxInd = ivtx;
+                }
+            }
+            Ptr<reco::Vertex> muonVtx = vertices->ptrAt(vtxInd);
+
+            evInfo.mu_pt.push_back(muon->pt());
+            evInfo.mu_eta.push_back(muon->eta());
+            evInfo.mu_phi.push_back(muon->phi());
+            evInfo.mu_iso.push_back(muPFCombRelIso);
+            evInfo.mu_isTight.push_back(muon::isTightMuon( *muon, *muonVtx ));
+            evInfo.mu_isMedium.push_back(muon::isMediumMuon( *muon ));
+            evInfo.mu_isLoose.push_back(muon::isLooseMuon( *muon ));
+        }
+        
+        // --- fill the tree
+        //if ( njets > 0. ) // fill only if min number of jets?
+        eventTree->Fill();
     }
 }
 // ******************************************************************************************
@@ -260,6 +343,22 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "jet_bdiscriminant", &evInfo.jet_bdiscriminant);
   eventTree->Branch( "jet_isMatchedToGen", &evInfo.jet_isMatchedToGen);
 
+  eventTree->Branch( "ele_pt", &evInfo.ele_pt);
+  eventTree->Branch( "ele_eta", &evInfo.ele_eta);
+  eventTree->Branch( "ele_phi", &evInfo.ele_phi);
+  eventTree->Branch( "ele_idmva", &evInfo.ele_idmva);
+  eventTree->Branch( "ele_iso", &evInfo.ele_iso);
+  eventTree->Branch( "ele_dz", &evInfo.ele_dz);
+  eventTree->Branch( "ele_d0", &evInfo.ele_d0);
+
+  eventTree->Branch( "mu_pt", &evInfo.mu_pt);
+  eventTree->Branch( "mu_eta", &evInfo.mu_eta);
+  eventTree->Branch( "mu_phi", &evInfo.mu_phi);
+  eventTree->Branch( "mu_iso", &evInfo.mu_iso);
+  eventTree->Branch( "mu_isTight", &evInfo.mu_isTight);
+  eventTree->Branch( "mu_isMedium", &evInfo.mu_isMedium);
+  eventTree->Branch( "mu_isLoose", &evInfo.mu_isLoose);
+
 }
 // ******************************************************************************************
 
@@ -277,32 +376,49 @@ tthOptimizationTreeMaker::endJob()
 void
 tthOptimizationTreeMaker::initEventStructure()
 {
-  // per-event tree:
-  evInfo.weight = -999.;
-  evInfo.npu = -999;
-  evInfo.nvtx = -999;
-  
-  evInfo.pho1_pt  = -999.;
-  evInfo.pho1_eta = -999.;
-  evInfo.pho1_phi = -999.;
-  evInfo.pho1_idmva = -999.;
+    // per-event tree:
+    evInfo.weight = -999.;
+    evInfo.npu = -999;
+    evInfo.nvtx = -999;
+    
+    evInfo.pho1_pt  = -999.;
+    evInfo.pho1_eta = -999.;
+    evInfo.pho1_phi = -999.;
+    evInfo.pho1_idmva = -999.;
+    
+    evInfo.pho2_pt  = -999.;
+    evInfo.pho2_eta = -999.;
+    evInfo.pho2_phi = -999.;
+    evInfo.pho2_idmva = -999.;
+    
+    evInfo.dipho_pt   = -999.;
+    evInfo.dipho_m    = -999.;
+    evInfo.dipho_mva  = -999.;
+    
+    evInfo.jet_pt .clear();
+    evInfo.jet_eta .clear();
+    evInfo.jet_phi .clear();
+    evInfo.jet_pujetid .clear();
+    evInfo.jet_bdiscriminant .clear();
+    evInfo.jet_isMatchedToGen .clear();
+    
+    evInfo.ele_pt .clear();
+    evInfo.ele_eta .clear();
+    evInfo.ele_phi .clear();
+    evInfo.ele_idmva .clear();
+    evInfo.ele_iso .clear();
+    evInfo.ele_dz .clear();
+    evInfo.ele_d0 .clear();
 
-  evInfo.pho2_pt  = -999.;
-  evInfo.pho2_eta = -999.;
-  evInfo.pho2_phi = -999.;
-  evInfo.pho2_idmva = -999.;
+    evInfo.mu_pt .clear();
+    evInfo.mu_eta .clear();
+    evInfo.mu_phi .clear();
+    evInfo.mu_iso .clear();
+    evInfo.mu_isTight .clear();
+    evInfo.mu_isMedium .clear();
+    evInfo.mu_isLoose .clear();
 
-  evInfo.dipho_pt   = -999.;
-  evInfo.dipho_m    = -999.;
-  evInfo.dipho_mva  = -999.;
-
-  evInfo.jet_pt .clear();
-  evInfo.jet_eta .clear();
-  evInfo.jet_phi .clear();
-  evInfo.jet_pujetid .clear();
-  evInfo.jet_bdiscriminant .clear();
-  evInfo.jet_isMatchedToGen .clear();
-};
+}
 // ******************************************************************************************
 
 
