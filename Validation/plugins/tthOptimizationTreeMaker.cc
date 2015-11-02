@@ -25,6 +25,8 @@
 #include "flashgg/DataFormats/interface/Electron.h"
 #include "flashgg/DataFormats/interface/Muon.h"
 #include "flashgg/Taggers/interface/LeptonSelection.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -43,6 +45,7 @@ using namespace flashgg;
 // define the structures used to create tree branches and fill the trees
 
 struct eventInfo {
+
     float weight;
     
     int npu;
@@ -86,7 +89,6 @@ struct eventInfo {
     vector<bool> mu_isLoose;
 
 
-
 };
 // **********************************************************************
 
@@ -114,6 +116,8 @@ private:
     EDGetTokenT<View<reco::GenJet> > genJetToken_;
     EDGetTokenT<View<Electron> > electronToken_;
     EDGetTokenT<View<Muon> > muonToken_;
+    EDGetTokenT<GenEventInfoProduct> genInfoToken_;
+    EDGetTokenT<edm::View<PileupSummaryInfo> >  PileUpToken_;
 
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
 
@@ -122,6 +126,7 @@ private:
     double jetPtThreshold_;
     string bTag_;
 
+    double lumiWeight_;
 };
 // ******************************************************************************************
 
@@ -136,12 +141,15 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     inputTagJets_( iConfig.getParameter<std::vector<edm::InputTag> >( "inputTagJets" ) ),
     genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) ),
     electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag>( "ElectronTag" ) ) ),
-    muonToken_( consumes<View<flashgg::Muon> >( iConfig.getParameter<InputTag>( "MuonTag" ) ) )
+    muonToken_( consumes<View<flashgg::Muon> >( iConfig.getParameter<InputTag>( "MuonTag" ) ) ),
+    genInfoToken_(consumes<GenEventInfoProduct>( iConfig.getParameter<InputTag> ( "generatorInfo" ) ) ),
+    PileUpToken_(consumes<View<PileupSummaryInfo> >( iConfig.getParameter<InputTag> ( "PileUpTag" ) ) ) 
 {
     jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
     bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
     electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 20. );
     muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
+    lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb
 }
 
 tthOptimizationTreeMaker::~tthOptimizationTreeMaker()
@@ -182,16 +190,41 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 
     // initialize tree
     initEventStructure();
-    
-    // fill variables for photons, jets, etcc...
-    
-    
+       
     if (diphotons->size() > 0) {
-        // event weight
-        // boh???
         
+        // -- event weight (Lumi x cross section x gen weight)
+        float w = 1.;
+        if( ! iEvent.isRealData() ) {
+            edm::Handle<GenEventInfoProduct> genInfo;
+            iEvent.getByToken( genInfoToken_, genInfo );
+
+            w = lumiWeight_;
+            
+            if( genInfo.isValid() ) {
+                const auto &weights = genInfo->weights();
+                if( ! weights.empty() ) {
+                    w *= weights[0];
+                }
+            }
+        }
+        evInfo.weight = w;
+
+        // -- number of pileup
+        float pu = 0; 
+        if( ! iEvent.isRealData() ) {
+            Handle<View< PileupSummaryInfo> > PileupInfos;
+            iEvent.getByToken( PileUpToken_, PileupInfos );
+            for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
+                Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
+                if( pu_bunchcrossing == 0 ) {
+                    pu = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
+                }
+            }
+        }
+        evInfo.npu = pu;
         
-        // number of vertices
+        // -- number of reco vertices
         evInfo.nvtx = vertices->size() ;
 
         // -- photons
