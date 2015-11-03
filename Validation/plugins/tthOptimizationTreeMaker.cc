@@ -229,6 +229,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 
         // -- photons
         // take the diphoton candidate with index = 0 (--> highest pt1+pt2)... to be checked..
+        // maybe better to put a idmva minimum cut at least and then choose the pair with highest sumpT
         int candIndex = 0;
         edm::Ptr<flashgg::DiPhotonMVAResult> mvares = mvaResults->ptrAt( candIndex );
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( candIndex );
@@ -241,7 +242,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         evInfo.pho2_pt  = dipho->subLeadingPhoton()->pt();
         evInfo.pho2_eta = dipho->subLeadingPhoton()->eta();
         evInfo.pho2_phi = dipho->subLeadingPhoton()->phi();
-        evInfo.pho2_idmva = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
+        evInfo.pho2_idmva = dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
         
         evInfo.dipho_pt  = dipho->pt();
         evInfo.dipho_m   = dipho->mass();
@@ -363,7 +364,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "pho2_pt", &evInfo.pho2_pt, "pho2_pt/F" );
   eventTree->Branch( "pho2_eta", &evInfo.pho2_eta, "pho2_eta/F" );
   eventTree->Branch( "pho2_phi", &evInfo.pho2_phi, "pho2_phi/F" );
-  eventTree->Branch( "pho2_idmva", &evInfo.pho1_idmva, "pho2_idmva/F" );
+  eventTree->Branch( "pho2_idmva", &evInfo.pho2_idmva, "pho2_idmva/F" );
 
   eventTree->Branch( "dipho_pt", &evInfo.dipho_pt, "dipho_pt/F" );
   eventTree->Branch( "dipho_m", &evInfo.dipho_m, "dipho_m/F" );
