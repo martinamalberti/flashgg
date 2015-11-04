@@ -23,6 +23,7 @@
 #include "flashgg/DataFormats/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "flashgg/DataFormats/interface/Electron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "flashgg/DataFormats/interface/Muon.h"
 #include "flashgg/Taggers/interface/LeptonSelection.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -108,8 +109,15 @@ float electronIsolation(edm::Ptr<flashgg::Electron> electron, double rho){
     if( eta >= 2.3   && eta < 2.4 )   { Aeff = 0.2243; }
     if( eta >= 2.4 )                  { Aeff = 0.2687; }
 
-    float iso = electron->chargedHadronIso() + std::max( electron->neutralHadronIso() + electron->photonIso() - rho * Aeff, 0. );
-    
+    //float iso = electron->chargedHadronIso() + std::max( electron->neutralHadronIso() + electron->photonIso() - rho * Aeff, 0. );  //???? 
+    reco::GsfElectron::PflowIsolationVariables pfIso = electron->pfIsolationVariables();
+    float iso = pfIso.sumChargedHadronPt + std::max( pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - rho * Aeff, 0. );
+
+    //cout << electron->chargedHadronIso() << "  " <<  pfIso.sumChargedHadronPt << "   pt = " << electron->pt() << endl; 
+    //cout << electron->neutralHadronIso() << "  " << pfIso.sumNeutralHadronEt << endl;
+    //cout << electron->photonIso() << "  " << pfIso.sumPhotonEt <<endl;
+    //cout << electron->chargedHadronIso() + std::max( electron->neutralHadronIso() + electron->photonIso() - rho * Aeff, 0. ) << "   "<< iso<< endl;
+
     return (iso/ electron->pt());
     
 }
