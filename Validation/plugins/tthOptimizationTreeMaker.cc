@@ -90,10 +90,32 @@ struct eventInfo {
 
 
 };
-// **********************************************************************
+// ******************************************************************************************
 
 
-// **********************************************************************
+// ******************************************************************************************
+float electronIsolation(edm::Ptr<flashgg::Electron> electron, double rho){
+    // -- compute combined relative isolation: IsoCh + max( 0.0, IsoNh + IsoPh - PU ) )/pT, PU = rho * Aeff 
+    // https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+    // effetive areas:  https://indico.cern.ch/event/369239/contribution/4/attachments/1134761/1623262/talk_effective_areas_25ns.pdf
+    float Aeff = 0;
+    float eta = fabs(electron->eta());
+    if( eta <  1.0 )                  { Aeff = 0.1752; }
+    if( eta >= 1.0   && eta < 1.479 ) { Aeff = 0.1862; }
+    if( eta >= 1.479 && eta < 2.0 )   { Aeff = 0.1411; }
+    if( eta >= 2.0   && eta < 2.2 )   { Aeff = 0.1534; }
+    if( eta >= 2.2   && eta < 2.3 )   { Aeff = 0.1903; }
+    if( eta >= 2.3   && eta < 2.4 )   { Aeff = 0.2243; }
+    if( eta >= 2.4 )                  { Aeff = 0.2687; }
+
+    float iso = electron->chargedHadronIso() + std::max( electron->neutralHadronIso() + electron->photonIso() - rho * Aeff, 0. );
+    
+    return (iso/ electron->pt());
+    
+}
+// ******************************************************************************************
+
+// ******************************************************************************************
 class tthOptimizationTreeMaker : public edm::EDAnalyzer
 {
 public:
@@ -105,6 +127,8 @@ private:
     virtual void analyze( const edm::Event &, const edm::EventSetup & ) override;
     virtual void endJob() override;
     void initEventStructure();
+
+    //float electronIsolation(edm::Ptr<flashgg::Electron> electron, double rho);
 
     TTree *eventTree;
     eventInfo evInfo;
@@ -120,6 +144,8 @@ private:
     EDGetTokenT<edm::View<PileupSummaryInfo> >  PileUpToken_;
 
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
+
+    edm::InputTag rhoFixedGrid_;
 
     double electronPtThreshold_;
     double muonPtThreshold_;
@@ -150,6 +176,7 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 20. );
     muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
     lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb
+    rhoFixedGrid_  = iConfig.getParameter<edm::InputTag>( "rhoFixedGridCollection" );
 }
 
 tthOptimizationTreeMaker::~tthOptimizationTreeMaker()
@@ -165,6 +192,10 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 {
     
     // access edm objects
+    Handle<double> rhoHandle;
+    iEvent.getByLabel( rhoFixedGrid_, rhoHandle );
+    double rho = *( rhoHandle.product() );
+
     Handle<View<reco::Vertex> > vertices;
     iEvent.getByToken( vertexToken_, vertices );
 
@@ -188,10 +219,28 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     Handle<View<flashgg::Muon> > muons;
     iEvent.getByToken( muonToken_, muons );
 
-    // initialize tree
+    // -- initialize tree
     initEventStructure();
        
-    if (diphotons->size() > 0) {
+    // -- pre-select best di-photon pair
+    //    * pt cut, id mva cut on leading and subleading photons 
+    //    * if more then one di-photon candidate, take the one with highest sumpt = pt_lead+pt_sublead (DiPhotonCandidates are ordered by decreasing sumpt) 
+    int bestIndex = -1;
+    for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
+        edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( idipho );        
+        // - pt threshold
+        if (dipho->leadingPhoton()->pt() < dipho->mass()/3 ) continue;
+        if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4 ) continue;
+        // - photon id mva cut (~99% efficient on signal photons)
+        if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
+        if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
+        bestIndex = idipho;
+        break;
+    }
+    
+    // -- analyze event if there is at least one good di-photon candidate
+    
+    if ( bestIndex > -1) {
         
         // -- event weight (Lumi x cross section x gen weight)
         float w = 1.;
@@ -210,8 +259,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         }
         evInfo.weight = w;
 
-        // -- number of pileup
-        float pu = 0; 
+        // -- number of pileup events
+        float pu = 0.; 
         if( ! iEvent.isRealData() ) {
             Handle<View< PileupSummaryInfo> > PileupInfos;
             iEvent.getByToken( PileUpToken_, PileupInfos );
@@ -228,11 +277,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         evInfo.nvtx = vertices->size() ;
 
         // -- photons
-        // take the diphoton candidate with index = 0 (--> highest pt1+pt2)... to be checked..
-        // maybe better to put a idmva minimum cut at least and then choose the pair with highest sumpT
-        int candIndex = 0;
-        edm::Ptr<flashgg::DiPhotonMVAResult> mvares = mvaResults->ptrAt( candIndex );
-        edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( candIndex );
+        edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( bestIndex );
+        edm::Ptr<flashgg::DiPhotonMVAResult> mvares = mvaResults->ptrAt( bestIndex );
         
         evInfo.pho1_pt  = dipho->leadingPhoton()->pt();
         evInfo.pho1_eta = dipho->leadingPhoton()->eta();
@@ -250,7 +296,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         
         // -- jets
         // take the jets corresponding to the diphoton candidate
-        unsigned int jetCollectionIndex = diphotons->ptrAt( candIndex )->jetCollectionIndex();
+        unsigned int jetCollectionIndex = diphotons->ptrAt( bestIndex )->jetCollectionIndex();
         
         int njets = 0;
         
@@ -263,7 +309,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 
             if( dRJetPhoLead < 0.5 || dRJetPhoSubLead < 0.5 ) { continue; } // ?? can change to 0.4???
             if( !jet->passesJetID( flashgg::Loose ) ) continue;// pass jet id (reject surios detector noise)
-            if( !jet->passesPuJetId(diphotons->ptrAt( candIndex ))){ continue;} // pass PU jet id
+            if( !jet->passesPuJetId(diphotons->ptrAt( bestIndex ))){ continue;} // pass PU jet id (always = 1, not implemented yet)
             if( jet->pt() < jetPtThreshold_ ) { continue; }
             
             njets++;
@@ -298,7 +344,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             Ptr<reco::Vertex> ele_vtx = chooseElectronVertex( electron,  vertices->ptrs() );
             float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
             float dz = electron->gsfTrack()->dz( ele_vtx->position() );
-            float isol = -99.; /// fix isolation computation
+            float isol = electronIsolation(electron, rho); 
 
             evInfo.ele_pt.push_back(electron->pt());
             evInfo.ele_eta.push_back(electron->eta());
@@ -454,6 +500,7 @@ tthOptimizationTreeMaker::initEventStructure()
 
 }
 // ******************************************************************************************
+
 
 
 typedef tthOptimizationTreeMaker FlashggtthOptimizationTreeMaker;
