@@ -29,6 +29,9 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "TTree.h"
@@ -48,6 +51,8 @@ using namespace flashgg;
 struct eventInfo {
 
     float weight;
+
+    int passHLT; 
     
     int npu;
     int nvtx;
@@ -80,6 +85,7 @@ struct eventInfo {
     vector<float> ele_iso;
     vector<float> ele_dz;
     vector<float> ele_d0;
+    vector<int> ele_isMatchedToGen;
     
     vector<float> mu_pt;
     vector<float> mu_eta;
@@ -88,6 +94,7 @@ struct eventInfo {
     vector<bool> mu_isTight;
     vector<bool> mu_isMedium;
     vector<bool> mu_isLoose;
+    vector<int> mu_isMatchedToGen;
 
 
 };
@@ -122,6 +129,42 @@ float electronIsolation(edm::Ptr<flashgg::Electron> electron, double rho){
     
 }
 // ******************************************************************************************
+int electronMatchingToGen(edm::Ptr<flashgg::Electron> electron,  Handle<View<reco::GenParticle> > genParticles){
+
+    int mcmatch = 0;
+    for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
+        Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
+        if ( fabs((*gen).pdgId()) != 11 ) continue;
+        if ( !(*gen).isPromptFinalState()) continue;
+        float dR = deltaR( electron->eta(), electron->phi(), gen->eta(), gen->phi() );
+        if (dR < 0.1){ //??? 0.1 ok???
+            mcmatch = 1;
+        }
+    }
+    return (mcmatch);
+}
+// ******************************************************************************************
+
+
+// ******************************************************************************************
+int muonMatchingToGen(edm::Ptr<flashgg::Muon> muon, Handle<View<reco::GenParticle> > genParticles){
+
+    int mcmatch = 0;
+    for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
+        Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
+        cout << " pdgId = "<< (*gen).pdgId()<< " prompt final state = "<< (*gen).isPromptFinalState() << "  status = " << (*gen).status() <<endl;
+        if ( fabs((*gen).pdgId()) != 13 ) continue;
+        if ( !(*gen).isPromptFinalState()) continue;
+        float dR = deltaR( muon->eta(), muon->phi(), gen->eta(), gen->phi() );
+        cout << "dR = " << dR <<endl;
+        if (dR < 0.1){ //??? 0.1 ok???
+            mcmatch = 1;
+        }
+    }
+    return (mcmatch);
+}
+// ******************************************************************************************
+
 
 // ******************************************************************************************
 class tthOptimizationTreeMaker : public edm::EDAnalyzer
@@ -141,6 +184,9 @@ private:
     TTree *eventTree;
     eventInfo evInfo;
     
+    EDGetTokenT<View<reco::GenParticle> > genParticleToken_;
+    EDGetTokenT<GenEventInfoProduct> genInfoToken_;
+    EDGetTokenT<edm::View<PileupSummaryInfo> >  PileUpToken_;
     EDGetTokenT<View<reco::Vertex> > vertexToken_;
     EDGetTokenT<View<DiPhotonCandidate> > diphotonToken_;
     EDGetTokenT<View<DiPhotonMVAResult> > mvaResultToken_;
@@ -148,13 +194,12 @@ private:
     EDGetTokenT<View<reco::GenJet> > genJetToken_;
     EDGetTokenT<View<Electron> > electronToken_;
     EDGetTokenT<View<Muon> > muonToken_;
-    EDGetTokenT<GenEventInfoProduct> genInfoToken_;
-    EDGetTokenT<edm::View<PileupSummaryInfo> >  PileUpToken_;
-
+    EDGetTokenT<edm::TriggerResults> triggerBitsToken_;
+    
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
-
+    
     edm::InputTag rhoFixedGrid_;
-
+    
     double electronPtThreshold_;
     double muonPtThreshold_;
     double jetPtThreshold_;
@@ -169,6 +214,9 @@ private:
 // constructors and destructor
 //
 tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iConfig ):
+    genParticleToken_( consumes<View<reco::GenParticle> >( iConfig.getParameter<InputTag>( "genParticleTag" ) ) ),
+    genInfoToken_(consumes<GenEventInfoProduct>( iConfig.getParameter<InputTag> ( "generatorInfo" ) ) ),
+    PileUpToken_(consumes<View<PileupSummaryInfo> >( iConfig.getParameter<InputTag> ( "PileUpTag" ) ) ), 
     vertexToken_( consumes<View<reco::Vertex> >( iConfig.getParameter<InputTag> ( "VertexTag" ) ) ),
     diphotonToken_( consumes<View<flashgg::DiPhotonCandidate> >( iConfig.getParameter<InputTag> ( "DiPhotonTag" ) ) ),
     mvaResultToken_( consumes<View<flashgg::DiPhotonMVAResult> >( iConfig.getParameter<InputTag> ( "MVAResultTag" ) ) ),
@@ -176,8 +224,7 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) ),
     electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag>( "ElectronTag" ) ) ),
     muonToken_( consumes<View<flashgg::Muon> >( iConfig.getParameter<InputTag>( "MuonTag" ) ) ),
-    genInfoToken_(consumes<GenEventInfoProduct>( iConfig.getParameter<InputTag> ( "generatorInfo" ) ) ),
-    PileUpToken_(consumes<View<PileupSummaryInfo> >( iConfig.getParameter<InputTag> ( "PileUpTag" ) ) ) 
+    triggerBitsToken_( consumes<edm::TriggerResults>( iConfig.getParameter<InputTag>( "triggerBits" ) ) )
 {
     jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
     bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
@@ -200,10 +247,13 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 {
     
     // access edm objects
+    Handle<edm::TriggerResults> triggerBits;
+    iEvent.getByToken( triggerBitsToken_, triggerBits );
+    
     Handle<double> rhoHandle;
     iEvent.getByLabel( rhoFixedGrid_, rhoHandle );
     double rho = *( rhoHandle.product() );
-
+    
     Handle<View<reco::Vertex> > vertices;
     iEvent.getByToken( vertexToken_, vertices );
 
@@ -217,9 +267,6 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     for( size_t j = 0; j < inputTagJets_.size(); ++j ) {
         iEvent.getByLabel( inputTagJets_[j], Jets[j] );
     }
-    
-    Handle<View<reco::GenJet> > genJets;
-    iEvent.getByToken( genJetToken_, genJets );
 
     Handle<View<flashgg::Electron> > electrons;
     iEvent.getByToken( electronToken_, electrons );
@@ -227,18 +274,43 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     Handle<View<flashgg::Muon> > muons;
     iEvent.getByToken( muonToken_, muons );
 
+    // only if MC
+    Handle<GenEventInfoProduct> genInfo;
+    Handle<View<reco::GenJet> > genJets;
+    Handle<View< PileupSummaryInfo> > PileupInfos;
+    Handle<View<reco::GenParticle> > genParticles;
+    if ( !iEvent.isRealData() ) {
+        iEvent.getByToken( genInfoToken_, genInfo );
+        iEvent.getByToken( genJetToken_, genJets );
+        iEvent.getByToken( PileUpToken_, PileupInfos );
+        iEvent.getByToken( genParticleToken_, genParticles );
+    }
+    
+    
+    
     // -- initialize tree
     initEventStructure();
+    
+    // -- check if event passes HLT: "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1"  
+    const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
+    vector<std::string> const &names = triggerNames.triggerNames();  
+    for( unsigned index = 0; index < triggerNames.size(); ++index ) {
+        if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95") ) {
+            cout << TString::Format((triggerNames.triggerName( index )).c_str()) << " " << triggerBits->accept( index ) << endl;
+            evInfo.passHLT =  triggerBits->accept( index );
+        }
+    }
        
     // -- pre-select best di-photon pair
     //    * pt cut, id mva cut on leading and subleading photons 
     //    * if more then one di-photon candidate, take the one with highest sumpt = pt_lead+pt_sublead (DiPhotonCandidates are ordered by decreasing sumpt) 
+    //    * di-pho mva cut not applied, needs optimization
     int bestIndex = -1;
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( idipho );        
         // - pt threshold
-        if (dipho->leadingPhoton()->pt() < dipho->mass()/3 ) continue;
-        if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4 ) continue;
+        if (dipho->leadingPhoton()->pt() < dipho->mass()/3. ) continue;
+        if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4. ) continue;
         // - photon id mva cut (~99% efficient on signal photons)
         if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
         if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
@@ -253,11 +325,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         // -- event weight (Lumi x cross section x gen weight)
         float w = 1.;
         if( ! iEvent.isRealData() ) {
-            edm::Handle<GenEventInfoProduct> genInfo;
-            iEvent.getByToken( genInfoToken_, genInfo );
-
             w = lumiWeight_;
-            
             if( genInfo.isValid() ) {
                 const auto &weights = genInfo->weights();
                 if( ! weights.empty() ) {
@@ -270,8 +338,6 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         // -- number of pileup events
         float pu = 0.; 
         if( ! iEvent.isRealData() ) {
-            Handle<View< PileupSummaryInfo> > PileupInfos;
-            iEvent.getByToken( PileUpToken_, PileupInfos );
             for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
                 Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
                 if( pu_bunchcrossing == 0 ) {
@@ -353,6 +419,9 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
             float dz = electron->gsfTrack()->dz( ele_vtx->position() );
             float isol = electronIsolation(electron, rho); 
+            int mcMatch = -1;
+            if( ! iEvent.isRealData() )
+                mcMatch = electronMatchingToGen(electron, genParticles); 
 
             evInfo.ele_pt.push_back(electron->pt());
             evInfo.ele_eta.push_back(electron->eta());
@@ -361,6 +430,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             evInfo.ele_iso.push_back(isol);
             evInfo.ele_d0.push_back(d0);
             evInfo.ele_dz.push_back(dz);
+            evInfo.ele_isMatchedToGen.push_back(mcMatch);
         }       
 
 
@@ -383,6 +453,9 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             }
             Ptr<reco::Vertex> muonVtx = vertices->ptrAt(vtxInd);
 
+            int mcMatch =  -1;
+            if( ! iEvent.isRealData() ) mcMatch = muonMatchingToGen(muon, genParticles); 
+
             evInfo.mu_pt.push_back(muon->pt());
             evInfo.mu_eta.push_back(muon->eta());
             evInfo.mu_phi.push_back(muon->phi());
@@ -390,6 +463,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             evInfo.mu_isTight.push_back(muon::isTightMuon( *muon, *muonVtx ));
             evInfo.mu_isMedium.push_back(muon::isMediumMuon( *muon ));
             evInfo.mu_isLoose.push_back(muon::isLooseMuon( *muon ));
+            evInfo.mu_isMatchedToGen.push_back(mcMatch); 
         }
         
         // --- fill the tree
@@ -407,6 +481,7 @@ tthOptimizationTreeMaker::beginJob()
   // per-event tree
   eventTree = fs_->make<TTree>( "event", "event" );
   eventTree->Branch( "weight", &evInfo.weight, "weight/F" );
+  eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
   eventTree->Branch( "npu", &evInfo.npu, "npu/I" );
   eventTree->Branch( "nvtx", &evInfo.nvtx, "nvtx/I" );
 
@@ -438,6 +513,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "ele_iso", &evInfo.ele_iso);
   eventTree->Branch( "ele_dz", &evInfo.ele_dz);
   eventTree->Branch( "ele_d0", &evInfo.ele_d0);
+  eventTree->Branch( "ele_isMatchedToGen", &evInfo.ele_isMatchedToGen);
 
   eventTree->Branch( "mu_pt", &evInfo.mu_pt);
   eventTree->Branch( "mu_eta", &evInfo.mu_eta);
@@ -446,6 +522,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "mu_isTight", &evInfo.mu_isTight);
   eventTree->Branch( "mu_isMedium", &evInfo.mu_isMedium);
   eventTree->Branch( "mu_isLoose", &evInfo.mu_isLoose);
+  eventTree->Branch( "mu_isMatchedToGen", &evInfo.mu_isMatchedToGen);
 
 }
 // ******************************************************************************************
@@ -468,6 +545,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.weight = -999.;
     evInfo.npu = -999;
     evInfo.nvtx = -999;
+    evInfo.passHLT = -1;
     
     evInfo.pho1_pt  = -999.;
     evInfo.pho1_eta = -999.;
@@ -497,6 +575,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.ele_iso .clear();
     evInfo.ele_dz .clear();
     evInfo.ele_d0 .clear();
+    evInfo.ele_isMatchedToGen .clear();
 
     evInfo.mu_pt .clear();
     evInfo.mu_eta .clear();
@@ -505,6 +584,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.mu_isTight .clear();
     evInfo.mu_isMedium .clear();
     evInfo.mu_isLoose .clear();
+    evInfo.mu_isMatchedToGen .clear();
 
 }
 // ******************************************************************************************
