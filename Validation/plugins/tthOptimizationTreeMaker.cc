@@ -76,6 +76,7 @@ struct eventInfo {
     vector<float> jet_phi;
     vector<float> jet_pujetid;
     vector<float> jet_bdiscriminant;
+    vector<int>   jet_flavour;
     vector<int>   jet_isMatchedToGen;
 
     vector<float> ele_pt;
@@ -134,8 +135,9 @@ int electronMatchingToGen(edm::Ptr<flashgg::Electron> electron,  Handle<View<rec
     int mcmatch = 0;
     for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
         Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
-        if ( fabs((*gen).pdgId()) != 11 ) continue;
-        if ( !(*gen).isPromptFinalState()) continue;
+        if ( fabs(gen->pdgId()) != 11 ) continue;
+        //if ( !(gen->isPromptFinalState())) continue;c// this is always  = 0 ??????? --> check
+        if ( !(gen->statusFlags().isPrompt())) continue;
         float dR = deltaR( electron->eta(), electron->phi(), gen->eta(), gen->phi() );
         if (dR < 0.1){ //??? 0.1 ok???
             mcmatch = 1;
@@ -152,9 +154,9 @@ int muonMatchingToGen(edm::Ptr<flashgg::Muon> muon, Handle<View<reco::GenParticl
     int mcmatch = 0;
     for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
         Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
-        cout << " pdgId = "<< (*gen).pdgId()<< " prompt final state = "<< (*gen).isPromptFinalState() << "  status = " << (*gen).status() <<endl;
-        if ( fabs((*gen).pdgId()) != 13 ) continue;
-        if ( !(*gen).isPromptFinalState()) continue;
+        if ( fabs(gen->pdgId()) != 13 ) continue;
+        //if ( !(*gen).isPromptFinalState()) continue;// this is always  = 0 ??????? --> check 
+        if ( !(gen->statusFlags().isPrompt()) ) continue;
         float dR = deltaR( muon->eta(), muon->phi(), gen->eta(), gen->phi() );
         cout << "dR = " << dR <<endl;
         if (dR < 0.1){ //??? 0.1 ok???
@@ -286,7 +288,10 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         iEvent.getByToken( genParticleToken_, genParticles );
     }
     
-    
+    //for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
+    //    Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
+    //    cout << " pdgId = "<< gen->pdgId()<< " prompt final state = "<< gen->isPromptFinalState() << "  status = " << gen->status() << "   isPrompt = " << gen->statusFlags().isPrompt() <<endl;
+    //}    
     
     // -- initialize tree
     initEventStructure();
@@ -304,6 +309,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     // -- pre-select best di-photon pair
     //    * pt cut, id mva cut on leading and subleading photons 
     //    * if more then one di-photon candidate, take the one with highest sumpt = pt_lead+pt_sublead (DiPhotonCandidates are ordered by decreasing sumpt) 
+    //    * missing: di-photon preselection
     //    * di-pho mva cut not applied, needs optimization
     int bestIndex = -1;
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
@@ -402,6 +408,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             evInfo.jet_eta.push_back(jet->eta());
             evInfo.jet_phi.push_back(jet->phi());
             evInfo.jet_bdiscriminant.push_back(jet->bDiscriminator( bTag_ ));
+            evInfo.jet_flavour.push_back(jet->partonFlavour());
             evInfo.jet_isMatchedToGen.push_back(isMatchedToGen);
         }
         
@@ -504,6 +511,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "jet_phi", &evInfo.jet_phi);
   eventTree->Branch( "jet_pujetid", &evInfo.jet_pujetid);
   eventTree->Branch( "jet_bdiscriminant", &evInfo.jet_bdiscriminant);
+  eventTree->Branch( "jet_flavour", &evInfo.jet_flavour);
   eventTree->Branch( "jet_isMatchedToGen", &evInfo.jet_isMatchedToGen);
 
   eventTree->Branch( "ele_pt", &evInfo.ele_pt);
@@ -566,6 +574,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.jet_phi .clear();
     evInfo.jet_pujetid .clear();
     evInfo.jet_bdiscriminant .clear();
+    evInfo.jet_flavour .clear();
     evInfo.jet_isMatchedToGen .clear();
     
     evInfo.ele_pt .clear();
