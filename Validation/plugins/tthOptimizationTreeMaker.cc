@@ -76,7 +76,8 @@ struct eventInfo {
     vector<float> jet_phi;
     vector<float> jet_pujetid;
     vector<float> jet_bdiscriminant;
-    vector<int>   jet_flavour;
+    vector<int>   jet_hadronFlavour;
+    vector<int>   jet_partonFlavour;
     vector<int>   jet_isMatchedToGen;
 
     vector<float> ele_pt;
@@ -408,7 +409,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             evInfo.jet_eta.push_back(jet->eta());
             evInfo.jet_phi.push_back(jet->phi());
             evInfo.jet_bdiscriminant.push_back(jet->bDiscriminator( bTag_ ));
-            evInfo.jet_flavour.push_back(jet->partonFlavour());
+            evInfo.jet_partonFlavour.push_back(jet->partonFlavour());
+            evInfo.jet_hadronFlavour.push_back(jet->hadronFlavour());
             evInfo.jet_isMatchedToGen.push_back(isMatchedToGen);
         }
         
@@ -511,7 +513,8 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "jet_phi", &evInfo.jet_phi);
   eventTree->Branch( "jet_pujetid", &evInfo.jet_pujetid);
   eventTree->Branch( "jet_bdiscriminant", &evInfo.jet_bdiscriminant);
-  eventTree->Branch( "jet_flavour", &evInfo.jet_flavour);
+  eventTree->Branch( "jet_partonFlavour", &evInfo.jet_partonFlavour);
+  eventTree->Branch( "jet_hadronFlavour", &evInfo.jet_hadronFlavour);
   eventTree->Branch( "jet_isMatchedToGen", &evInfo.jet_isMatchedToGen);
 
   eventTree->Branch( "ele_pt", &evInfo.ele_pt);
@@ -574,7 +577,8 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.jet_phi .clear();
     evInfo.jet_pujetid .clear();
     evInfo.jet_bdiscriminant .clear();
-    evInfo.jet_flavour .clear();
+    evInfo.jet_partonFlavour .clear();
+    evInfo.jet_hadronFlavour .clear();
     evInfo.jet_isMatchedToGen .clear();
     
     evInfo.ele_pt .clear();
