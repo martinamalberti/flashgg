@@ -61,11 +61,13 @@ struct eventInfo {
     float pho1_eta;
     float pho1_phi;
     float pho1_idmva;
+    int pho1_genMatchType;
 
     float pho2_pt;
     float pho2_eta;
     float pho2_phi;
     float pho2_idmva;
+    int pho2_genMatchType;
 
     float dipho_m;
     float dipho_pt;
@@ -166,6 +168,38 @@ int muonMatchingToGen(edm::Ptr<flashgg::Muon> muon, Handle<View<reco::GenParticl
     }
     return (mcmatch);
 }
+// ******************************************************************************************
+
+
+// ******************************************************************************************
+/*bool passDiphotonPreselection(edm::Ptr<flashgg::DiPhotonCandidate> dipho){
+    
+    bool passPresel = false;
+
+    if (dipho->leadingPhoton()->pt() < 30.) return false;
+    if (dipho->subLeadingPhoton()->pt() < 20.) return false;
+    if (fabs(dipho->leadingPhoton()-> superCluster()->eta()) > 2.5) return false;
+    if (fabs(dipho->subLeadingPhoton()-> superCluster()->eta()) > 2.5) return false;
+    if (dipho->mass() < 95.) return false;
+    if (dipho->leadingPhoton()->hadronicOverEm() > 0.08 ) return false;
+    if (dipho->subLeadingPhoton()->hadronicOverEm() > 0.08 ) return false;
+
+    if ( dipho->leadingPhoton()->isEB() && dipho->subLeadingPhoton()->isEB() &&
+        (dipho->leadingPhoton()->ful5x5_r9()>0.85 || dipho->subLeadingPhoton()->ful5x5_r9()>0.85 ) ){
+        if ( dipho->leadingPhoton()->ful5x5_r9()>0.85 )
+            {
+                if (dipho->leadingPhoton()->full5x5_sigmaIetaIeta())
+            }
+        if ( dipho->subLeadingPhoton()->ful5x5_r9()>0.85 ){
+            
+        }
+    }
+
+    
+
+    }*/
+
+
 // ******************************************************************************************
 
 
@@ -365,12 +399,14 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         evInfo.pho1_eta = dipho->leadingPhoton()->eta();
         evInfo.pho1_phi = dipho->leadingPhoton()->phi();
         evInfo.pho1_idmva = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
+        evInfo.pho1_genMatchType = dipho->leadingPhoton()->genMatchType();
         
         evInfo.pho2_pt  = dipho->subLeadingPhoton()->pt();
         evInfo.pho2_eta = dipho->subLeadingPhoton()->eta();
         evInfo.pho2_phi = dipho->subLeadingPhoton()->phi();
         evInfo.pho2_idmva = dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
-        
+        evInfo.pho2_genMatchType = dipho->subLeadingPhoton()->genMatchType();
+                
         evInfo.dipho_pt  = dipho->pt();
         evInfo.dipho_m   = dipho->mass();
         evInfo.dipho_mva = mvares->result ;
@@ -498,11 +534,13 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
   eventTree->Branch( "pho1_phi", &evInfo.pho1_phi, "pho1_phi/F" );
   eventTree->Branch( "pho1_idmva", &evInfo.pho1_idmva, "pho1_idmva/F" );
+  eventTree->Branch( "pho1_genMatchType", &evInfo.pho1_genMatchType, "pho1_genMatchType/I" );
 
   eventTree->Branch( "pho2_pt", &evInfo.pho2_pt, "pho2_pt/F" );
   eventTree->Branch( "pho2_eta", &evInfo.pho2_eta, "pho2_eta/F" );
   eventTree->Branch( "pho2_phi", &evInfo.pho2_phi, "pho2_phi/F" );
   eventTree->Branch( "pho2_idmva", &evInfo.pho2_idmva, "pho2_idmva/F" );
+  eventTree->Branch( "pho2_genMatchType", &evInfo.pho2_genMatchType, "pho2_genMatchType/I" );
 
   eventTree->Branch( "dipho_pt", &evInfo.dipho_pt, "dipho_pt/F" );
   eventTree->Branch( "dipho_m", &evInfo.dipho_m, "dipho_m/F" );
@@ -562,12 +600,14 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.pho1_eta = -999.;
     evInfo.pho1_phi = -999.;
     evInfo.pho1_idmva = -999.;
+    evInfo.pho1_genMatchType = -999.;
     
     evInfo.pho2_pt  = -999.;
     evInfo.pho2_eta = -999.;
     evInfo.pho2_phi = -999.;
     evInfo.pho2_idmva = -999.;
-    
+    evInfo.pho2_genMatchType = -999.;
+
     evInfo.dipho_pt   = -999.;
     evInfo.dipho_m    = -999.;
     evInfo.dipho_mva  = -999.;
