@@ -139,8 +139,7 @@ int electronMatchingToGen(edm::Ptr<flashgg::Electron> electron,  Handle<View<rec
     for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
         Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
         if ( fabs(gen->pdgId()) != 11 ) continue;
-        //if ( !(gen->isPromptFinalState())) continue;c// this is always  = 0 ??????? --> check
-        if ( !(gen->statusFlags().isPrompt())) continue;
+        if ( !(gen->isPromptFinalState())) continue;
         float dR = deltaR( electron->eta(), electron->phi(), gen->eta(), gen->phi() );
         if (dR < 0.1){ //??? 0.1 ok???
             mcmatch = 1;
@@ -158,10 +157,11 @@ int muonMatchingToGen(edm::Ptr<flashgg::Muon> muon, Handle<View<reco::GenParticl
     for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
         Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
         if ( fabs(gen->pdgId()) != 13 ) continue;
-        //if ( !(*gen).isPromptFinalState()) continue;// this is always  = 0 ??????? --> check 
-        if ( !(gen->statusFlags().isPrompt()) ) continue;
+        if ( !(gen)->isPromptFinalState()) continue;
         float dR = deltaR( muon->eta(), muon->phi(), gen->eta(), gen->phi() );
-        cout << "dR = " << dR <<endl;
+        //cout << " *** Found muon:  ***"<<endl;
+        //cout << " pdgId = "<< gen->pdgId()<< " prompt final state = "<< gen->isPromptFinalState() << "  status = " << gen->status() << "   isPrompt = " << gen->statusFlags().isPrompt() <<endl;
+        //cout << "dR = " << dR <<endl;
         if (dR < 0.1){ //??? 0.1 ok???
             mcmatch = 1;
         }
@@ -172,34 +172,79 @@ int muonMatchingToGen(edm::Ptr<flashgg::Muon> muon, Handle<View<reco::GenParticl
 
 
 // ******************************************************************************************
-/*bool passDiphotonPreselection(edm::Ptr<flashgg::DiPhotonCandidate> dipho){
-    
-    bool passPresel = false;
+float getPhotonEffectiveArea(float eta){
+    float effectiveArea = 0;
 
+    if (fabs(eta) < 1. ) effectiveArea = 0.0725;
+    if (fabs(eta) > 1.000 && fabs(eta) < 1.479) effectiveArea = 0.0604;
+    if (fabs(eta) > 1.479 && fabs(eta) < 2.000) effectiveArea = 0.0320;
+    if (fabs(eta) > 2.000 && fabs(eta) < 2.000) effectiveArea = 0.0512;
+    if (fabs(eta) > 2.200 && fabs(eta) < 2.300) effectiveArea = 0.0766;
+    if (fabs(eta) > 2.300 && fabs(eta) < 2.400) effectiveArea = 0.0949;
+    if (fabs(eta) > 2.400) effectiveArea = 0.1160; 
+
+    return effectiveArea;
+}
+
+// ******************************************************************************************
+
+
+// ******************************************************************************************
+bool passDiphotonPreselection(edm::Ptr<flashgg::DiPhotonCandidate> dipho, double rho){
+    
     if (dipho->leadingPhoton()->pt() < 30.) return false;
     if (dipho->subLeadingPhoton()->pt() < 20.) return false;
     if (fabs(dipho->leadingPhoton()-> superCluster()->eta()) > 2.5) return false;
     if (fabs(dipho->subLeadingPhoton()-> superCluster()->eta()) > 2.5) return false;
+    if (fabs(dipho->leadingPhoton()-> superCluster()->eta()) > 1.4442 && fabs(dipho->leadingPhoton()-> superCluster()->eta()) < 1.566) return false; // EB-EE gap veto
+    if (fabs(dipho->subLeadingPhoton()-> superCluster()->eta()) > 1.4442 && fabs(dipho->subLeadingPhoton()-> superCluster()->eta()) < 1.566) return false; // EB-EE gap veto
     if (dipho->mass() < 95.) return false;
     if (dipho->leadingPhoton()->hadronicOverEm() > 0.08 ) return false;
     if (dipho->subLeadingPhoton()->hadronicOverEm() > 0.08 ) return false;
+    if (!dipho->leadingPhoton()->passElectronVeto()) return false;
+    if (!dipho->subLeadingPhoton()->passElectronVeto()) return false;
 
-    if ( dipho->leadingPhoton()->isEB() && dipho->subLeadingPhoton()->isEB() &&
-        (dipho->leadingPhoton()->ful5x5_r9()>0.85 || dipho->subLeadingPhoton()->ful5x5_r9()>0.85 ) ){
-        if ( dipho->leadingPhoton()->ful5x5_r9()>0.85 )
-            {
-                if (dipho->leadingPhoton()->full5x5_sigmaIetaIeta())
+    // if at least one photon is low R9 (cat1,cat3) --> additional cuts on the low R9 leg  
+    if ( (dipho->leadingPhoton()->isEB() && dipho->leadingPhoton()->full5x5_r9()<0.85) || 
+         (dipho->subLeadingPhoton()->isEB() && dipho->subLeadingPhoton()->full5x5_r9()<0.85) ||
+         (dipho->leadingPhoton()->isEE() && dipho->leadingPhoton()->full5x5_r9()<0.90) ||
+         (dipho->subLeadingPhoton()->isEE() && dipho->subLeadingPhoton()->full5x5_r9()<0.90) )
+        {
+            if ( dipho->leadingPhoton()->isEB() && dipho->leadingPhoton()->full5x5_r9()<0.85 ){
+                if (dipho->leadingPhoton()->full5x5_r9() < 0.5) return false;
+                if (dipho->leadingPhoton()->full5x5_sigmaIetaIeta() > 0.015) return false;
+                float pfPhoIso = dipho->leadingPhoton()->pfPhoIso03() - rho*getPhotonEffectiveArea(dipho->leadingPhoton()-> superCluster()->eta());
+                if (pfPhoIso > 4.  ) return false;
+                if (dipho->leadingPhoton()->trkSumPtHollowConeDR03() > 6. ) return false;
             }
-        if ( dipho->subLeadingPhoton()->ful5x5_r9()>0.85 ){
-            
+
+            if (dipho->subLeadingPhoton()->isEB() && dipho->subLeadingPhoton()->full5x5_r9()<0.85){
+                if (dipho->subLeadingPhoton()->full5x5_r9() < 0.5) return false;
+                if (dipho->subLeadingPhoton()->full5x5_sigmaIetaIeta() > 0.015) return false;
+                float pfPhoIso = dipho->subLeadingPhoton()->pfPhoIso03() - rho*getPhotonEffectiveArea(dipho->subLeadingPhoton()-> superCluster()->eta());
+                if (pfPhoIso > 4.  ) return false;
+                if (dipho->subLeadingPhoton()->trkSumPtHollowConeDR03() > 6. ) return false;
+            }
+
+            if (dipho->leadingPhoton()->isEE() && dipho->leadingPhoton()->full5x5_r9()<0.90){
+                if (dipho->leadingPhoton()->full5x5_r9() < 0.8) return false;
+                if (dipho->leadingPhoton()->full5x5_sigmaIetaIeta() > 0.035) return false;
+                float pfPhoIso = dipho->leadingPhoton()->pfPhoIso03() - rho*getPhotonEffectiveArea(dipho->leadingPhoton()-> superCluster()->eta());
+                if (pfPhoIso > 4.  ) return false;
+                if (dipho->leadingPhoton()->trkSumPtHollowConeDR03() > 6. ) return false;
+            }
+
+            if (dipho->subLeadingPhoton()->isEE() && dipho->subLeadingPhoton()->full5x5_r9()<0.90){
+                if (dipho->subLeadingPhoton()->full5x5_r9() < 0.8) return false;
+                if (dipho->subLeadingPhoton()->full5x5_sigmaIetaIeta() > 0.035) return false;
+                float pfPhoIso = dipho->subLeadingPhoton()->pfPhoIso03() - rho*getPhotonEffectiveArea(dipho->subLeadingPhoton()-> superCluster()->eta());
+                if (pfPhoIso > 4.  ) return false;
+                if (dipho->subLeadingPhoton()->trkSumPtHollowConeDR03() > 6. ) return false;
+            }
         }
-    }
-
     
-
-    }*/
-
-
+    return true;
+}
 // ******************************************************************************************
 
 
@@ -216,11 +261,12 @@ private:
     virtual void endJob() override;
     void initEventStructure();
 
-    //float electronIsolation(edm::Ptr<flashgg::Electron> electron, double rho);
-
     TTree *eventTree;
     eventInfo evInfo;
-    
+    int ngen;
+    int npre;
+    int nfullpre;
+
     EDGetTokenT<View<reco::GenParticle> > genParticleToken_;
     EDGetTokenT<GenEventInfoProduct> genInfoToken_;
     EDGetTokenT<edm::View<PileupSummaryInfo> >  PileUpToken_;
@@ -349,15 +395,22 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     int bestIndex = -1;
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( idipho );        
+        if (dipho->leadingPhoton()->genMatchType()!=1  || dipho->subLeadingPhoton()->genMatchType()!=1 ) continue;
+        ngen++;
+        if (! passDiphotonPreselection(dipho, rho)) continue; 
+        npre++;
         // - pt threshold
         if (dipho->leadingPhoton()->pt() < dipho->mass()/3. ) continue;
         if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4. ) continue;
-        // - photon id mva cut (~99% efficient on signal photons)
+        // - photon id mva cut (~99% efficient on signal photons after preselection)
         if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
         if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
+        nfullpre++;
         bestIndex = idipho;
         break;
     }
+
+    
     
     // -- analyze event if there is at least one good di-photon candidate
     
@@ -523,13 +576,17 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 void
 tthOptimizationTreeMaker::beginJob()
 {
+  ngen = 0;
+  npre = 0;
+  nfullpre =0 ;
+
   // per-event tree
   eventTree = fs_->make<TTree>( "event", "event" );
   eventTree->Branch( "weight", &evInfo.weight, "weight/F" );
   eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
   eventTree->Branch( "npu", &evInfo.npu, "npu/I" );
   eventTree->Branch( "nvtx", &evInfo.nvtx, "nvtx/I" );
-
+  
   eventTree->Branch( "pho1_pt", &evInfo.pho1_pt, "pho1_pt/F" );
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
   eventTree->Branch( "pho1_phi", &evInfo.pho1_phi, "pho1_phi/F" );
@@ -581,7 +638,8 @@ tthOptimizationTreeMaker::beginJob()
 void
 tthOptimizationTreeMaker::endJob()
 {
-
+    cout << "ngen = "<< ngen << "  npre = "<< npre<< "   nfullpre = "<< nfullpre << endl;
+ 
 } // end of endJob
 // ******************************************************************************************
 
