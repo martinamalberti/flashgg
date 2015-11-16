@@ -28,6 +28,7 @@
 #include "flashgg/Taggers/interface/LeptonSelection.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "flashgg/Taggers/interface/GlobalVariablesDumper.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -51,6 +52,7 @@ using namespace flashgg;
 struct eventInfo {
 
     float weight;
+    float puweight;
 
     int passHLT; 
     
@@ -289,6 +291,8 @@ private:
     string bTag_;
 
     double lumiWeight_;
+
+    GlobalVariablesDumper *globalVarsDumper_;
 };
 // ******************************************************************************************
 
@@ -315,6 +319,7 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
     lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb
     rhoFixedGrid_  = iConfig.getParameter<edm::InputTag>( "rhoFixedGridCollection" );
+    globalVarsDumper_ = new GlobalVariablesDumper( iConfig.getParameter<edm::ParameterSet>( "globalVariables" ) );
 }
 
 tthOptimizationTreeMaker::~tthOptimizationTreeMaker()
@@ -428,6 +433,11 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             }
         }
         evInfo.weight = w;
+
+        // -- pileup weights
+        if( globalVarsDumper_->puReWeight() ) {
+            evInfo.puweight = globalVarsDumper_->cache().puweight;
+        }
 
         // -- number of pileup events
         float pu = 0.; 
@@ -582,10 +592,12 @@ tthOptimizationTreeMaker::beginJob()
 
   // per-event tree
   eventTree = fs_->make<TTree>( "event", "event" );
+
   eventTree->Branch( "weight", &evInfo.weight, "weight/F" );
   eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
   eventTree->Branch( "npu", &evInfo.npu, "npu/I" );
   eventTree->Branch( "nvtx", &evInfo.nvtx, "nvtx/I" );
+  eventTree->Branch( "puweight", &evInfo.puweight,"puweight/F");
   
   eventTree->Branch( "pho1_pt", &evInfo.pho1_pt, "pho1_pt/F" );
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
@@ -650,6 +662,7 @@ tthOptimizationTreeMaker::initEventStructure()
 {
     // per-event tree:
     evInfo.weight = -999.;
+    evInfo.puweight = -999.;
     evInfo.npu = -999;
     evInfo.nvtx = -999;
     evInfo.passHLT = -1;

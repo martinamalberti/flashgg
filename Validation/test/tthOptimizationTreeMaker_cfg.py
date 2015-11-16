@@ -25,24 +25,28 @@ process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 
+from flashgg.Taggers.globalVariables_cff import globalVariables
+
 process.analysisTree = cms.EDAnalyzer('FlashggtthOptimizationTreeMaker',
-                                   lumiWeight=cms.untracked.double(1000.),
-                                   generatorInfo = cms.InputTag('generator'),  
-                                   genParticleTag = cms.InputTag( "flashggPrunedGenParticles" ),
-                                   PileUpTag = cms.InputTag('slimmedAddPileupInfo'),
-                                   rhoFixedGridCollection = cms.InputTag('fixedGridRhoAll'),
-                                   VertexTag=cms.InputTag('offlineSlimmedPrimaryVertices'),
-                                   DiPhotonTag = cms.InputTag('flashggDiPhotons'),
-                                   #DiPhotonTag = cms.InputTag('flashggPreselectedDiPhotons'),
-                                   MVAResultTag=cms.InputTag('flashggDiPhotonMVA'),
-                                   inputTagJets= UnpackedJetCollectionVInputTag,
-                                   GenJetTag=cms.InputTag( "slimmedGenJets"),
-                                   ElectronTag=cms.InputTag('flashggSelectedElectrons'),
-                                   MuonTag=cms.InputTag('flashggSelectedMuons'),
-                                   jetPtThreshold = cms.untracked.double(20.),
-                                   bTag = cms.untracked.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
-                                   triggerBits = cms.InputTag('TriggerResults::HLT')
-                                  )
+                                      lumiWeight=cms.untracked.double(1000.),
+                                      generatorInfo = cms.InputTag('generator'),  
+                                      genParticleTag = cms.InputTag( "flashggPrunedGenParticles" ),
+                                      PileUpTag = cms.InputTag('slimmedAddPileupInfo'),
+                                      rhoFixedGridCollection = cms.InputTag('fixedGridRhoAll'),
+                                      VertexTag=cms.InputTag('offlineSlimmedPrimaryVertices'),
+                                      DiPhotonTag = cms.InputTag('flashggDiPhotons'),
+                                      #DiPhotonTag = cms.InputTag('flashggPreselectedDiPhotons'),
+                                      MVAResultTag=cms.InputTag('flashggDiPhotonMVA'),
+                                      inputTagJets= UnpackedJetCollectionVInputTag,
+                                      GenJetTag=cms.InputTag( "slimmedGenJets"),
+                                      ElectronTag=cms.InputTag('flashggSelectedElectrons'),
+                                      MuonTag=cms.InputTag('flashggSelectedMuons'),
+                                      jetPtThreshold = cms.untracked.double(20.),
+                                      bTag = cms.untracked.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
+                                      triggerBits = cms.InputTag('TriggerResults::HLT'),
+                                      globalVariables = globalVariables
+                                      )
+
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("mytree.root")
