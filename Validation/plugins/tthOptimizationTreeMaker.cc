@@ -435,6 +435,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         evInfo.weight = w;
 
         // -- pileup weights
+        globalVarsDumper_->fill( iEvent );
         if( globalVarsDumper_->puReWeight() ) {
             evInfo.puweight = globalVarsDumper_->cache().puweight;
         }
