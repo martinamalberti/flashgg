@@ -399,7 +399,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     int bestIndex = -1;
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( idipho );        
-        if (dipho->leadingPhoton()->genMatchType()!=1  || dipho->subLeadingPhoton()->genMatchType()!=1 ) continue;
+        //if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()!=1  || dipho->subLeadingPhoton()->genMatchType()!=1 )) continue;
         ngen++;
         if (! passDiphotonPreselection(dipho, rho)) continue; 
         npre++;
