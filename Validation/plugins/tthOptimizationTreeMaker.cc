@@ -393,9 +393,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     }
        
     // -- pre-select best di-photon pair
-    //    * pt cut, id mva cut on leading and subleading photons 
+    //    * pt cut, diphoton preselection, id mva cut on leading and subleading photons 
     //    * if more then one di-photon candidate, take the one with highest sumpt = pt_lead+pt_sublead (DiPhotonCandidates are ordered by decreasing sumpt) 
-    //    * missing: di-photon preselection
     //    * di-pho mva cut not applied, needs optimization
     int bestIndex = -1;
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
@@ -488,7 +487,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             float dRJetPhoLead = deltaR(jet->eta(), jet->phi(), dipho->leadingPhoton()->eta(), dipho->leadingPhoton()->phi());
             float dRJetPhoSubLead = deltaR(jet->eta(), jet->phi(), dipho->subLeadingPhoton()->eta(), dipho->subLeadingPhoton()->phi());
 
-            if( dRJetPhoLead < 0.5 || dRJetPhoSubLead < 0.5 ) { continue; } // ?? can change to 0.4???
+            if( dRJetPhoLead < 0.4 || dRJetPhoSubLead < 0.4 ) { continue; }
             if( !jet->passesJetID( flashgg::Loose ) ) continue;// pass jet id (reject surios detector noise)
             if( !jet->passesPuJetId(diphotons->ptrAt( bestIndex ))){ continue;} // pass PU jet id (always = 1, not implemented yet)
             if( jet->pt() < jetPtThreshold_ ) { continue; }
@@ -515,6 +514,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         }
         
         // -- leptons (e, mu)
+
+        // -- electrons
         for (UInt_t iele = 0 ; iele < electrons->size(); iele++){
             edm::Ptr<flashgg::Electron> electron = electrons->ptrAt( iele );
             if (fabs(electron->eta()) > 2.4) { continue; }
@@ -524,6 +525,8 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             if( electron->isEB() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 2 ) { continue; } 
             if( electron->isEE() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 1 ) { continue; }
 
+            // add dr photon - gsf track
+            
             Ptr<reco::Vertex> ele_vtx = chooseElectronVertex( electron,  vertices->ptrs() );
             float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
             float dz = electron->gsfTrack()->dz( ele_vtx->position() );
@@ -651,7 +654,9 @@ tthOptimizationTreeMaker::beginJob()
 void
 tthOptimizationTreeMaker::endJob()
 {
-    cout << "ngen = "<< ngen << "  npre = "<< npre<< "   nfullpre = "<< nfullpre << endl;
+    cout << "Total nuber of events before preselection = "<< ngen << endl;
+    cout << "Number of events after preselection       = "<< npre << endl;
+    cout << "Number of events after full preselection  = "<< nfullpre << endl;
  
 } // end of endJob
 // ******************************************************************************************
