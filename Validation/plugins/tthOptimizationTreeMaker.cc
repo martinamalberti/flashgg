@@ -54,10 +54,14 @@ struct eventInfo {
     float weight;
     float puweight;
 
-    int passHLT; 
+    int run;
+    int event;
+    int lumi;
     
-    int npu;
     int nvtx;
+    int npu;
+
+    int passHLT; 
     
     float pho1_pt;
     float pho1_eta;
@@ -435,9 +439,14 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 
         // -- pileup weights
         globalVarsDumper_->fill( iEvent );
+        evInfo.run = globalVarsDumper_->cache().run;
+        evInfo.lumi = globalVarsDumper_->cache().lumi;
+        evInfo.event = globalVarsDumper_->cache().event;
+
         if( globalVarsDumper_->puReWeight() ) {
             evInfo.puweight = globalVarsDumper_->cache().puweight;
         }
+
 
         // -- number of pileup events
         float pu = 0.; 
@@ -597,11 +606,17 @@ tthOptimizationTreeMaker::beginJob()
   // per-event tree
   eventTree = fs_->make<TTree>( "event", "event" );
 
+  eventTree->Branch( "run", &evInfo.run, "run/I" );
+  eventTree->Branch( "lumi", &evInfo.lumi, "lumi/I" );
+  eventTree->Branch( "event", &evInfo.event, "event/I" );
+
   eventTree->Branch( "weight", &evInfo.weight, "weight/F" );
-  eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
+  eventTree->Branch( "puweight", &evInfo.puweight,"puweight/F");
+
   eventTree->Branch( "npu", &evInfo.npu, "npu/I" );
   eventTree->Branch( "nvtx", &evInfo.nvtx, "nvtx/I" );
-  eventTree->Branch( "puweight", &evInfo.puweight,"puweight/F");
+
+  eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
   
   eventTree->Branch( "pho1_pt", &evInfo.pho1_pt, "pho1_pt/F" );
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
@@ -669,6 +684,11 @@ tthOptimizationTreeMaker::initEventStructure()
     // per-event tree:
     evInfo.weight = -999.;
     evInfo.puweight = -999.;
+
+    evInfo.run = -999;
+    evInfo.lumi = -999.;
+    evInfo.event = -999.;
+
     evInfo.npu = -999;
     evInfo.nvtx = -999;
     evInfo.passHLT = -1;
