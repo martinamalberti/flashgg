@@ -48,7 +48,7 @@ rediscoveryHLTcutsV1 = cms.VPSet(
                      rhocorr=phoEffArea,
                      ),
             cms.PSet(max=cms.string("6.0")),
-            cms.PSet(max=cms.string("0.015")),
+            cms.PSet(max=cms.string("0.035")),
             cms.PSet(min=cms.string("0.8"))
             ),
              )
@@ -65,6 +65,9 @@ flashggPreselectedDiPhotons = cms.EDFilter(
         " && (leadingPhoton.hadronicOverEm < 0.08 && subLeadingPhoton.hadronicOverEm < 0.08)"
         " && (leadingPhoton.pt >30.0 && subLeadingPhoton.pt > 20.0)"
         " && (abs(leadingPhoton.superCluster.eta) < 2.5 && abs(subLeadingPhoton.superCluster.eta) < 2.5)"
+        " && (abs(leadingPhoton.superCluster.eta) < 1.4442 || abs(leadingPhoton.superCluster.eta) > 1.566)"
+        " && (abs(subLeadingPhoton.superCluster.eta) < 1.4442 || abs(subLeadingPhoton.superCluster.eta) > 1.566)"
+        " && (leadingPhoton.passElectronVeto) && (subLeadingPhoton.passElectronVeto)"
         ),
     variables = rediscoveryHLTvariables,
     categories = rediscoveryHLTcutsV1
