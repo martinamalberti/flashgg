@@ -404,15 +404,19 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
     for ( unsigned int idipho = 0; idipho < diphotons->size(); idipho++){
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( idipho );        
         //if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()!=1  || dipho->subLeadingPhoton()->genMatchType()!=1 )) continue;
-        ngen++;
-        if (! passDiphotonPreselection(dipho, rho)) continue; 
-        npre++;
+        //ngen++;
+        //if (! passDiphotonPreselection(dipho, rho)) continue; 
+        //npre++;
+        if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()==1 && dipho->subLeadingPhoton()->genMatchType()==1 )){
+            ngen++;
+            npre++;
+        }
         // - pt threshold
         if (dipho->leadingPhoton()->pt() < dipho->mass()/3. ) continue;
         if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4. ) continue;
         // - photon id mva cut (~99% efficient on signal photons after preselection)
-        if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
-        if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.984 ) continue;
+        if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
+        if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
         nfullpre++;
         bestIndex = idipho;
         break;
