@@ -63,12 +63,14 @@ struct eventInfo {
 
     int passHLT; 
     
+    float pho1_e;
     float pho1_pt;
     float pho1_eta;
     float pho1_phi;
     float pho1_idmva;
     int pho1_genMatchType;
 
+    float pho2_e;
     float pho2_pt;
     float pho2_eta;
     float pho2_phi;
@@ -79,6 +81,7 @@ struct eventInfo {
     float dipho_pt;
     float dipho_mva;
     
+    vector<float> jet_e;
     vector<float> jet_pt;
     vector<float> jet_eta;
     vector<float> jet_phi;
@@ -88,6 +91,7 @@ struct eventInfo {
     vector<int>   jet_partonFlavour;
     vector<int>   jet_isMatchedToGen;
 
+    vector<float> ele_e;
     vector<float> ele_pt;
     vector<float> ele_eta;
     vector<float> ele_phi;
@@ -471,12 +475,14 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         edm::Ptr<flashgg::DiPhotonCandidate> dipho = diphotons->ptrAt( bestIndex );
         edm::Ptr<flashgg::DiPhotonMVAResult> mvares = mvaResults->ptrAt( bestIndex );
         
+        evInfo.pho1_e  = dipho->leadingPhoton()->energy();
         evInfo.pho1_pt  = dipho->leadingPhoton()->pt();
         evInfo.pho1_eta = dipho->leadingPhoton()->eta();
         evInfo.pho1_phi = dipho->leadingPhoton()->phi();
         evInfo.pho1_idmva = dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
         evInfo.pho1_genMatchType = dipho->leadingPhoton()->genMatchType();
         
+        evInfo.pho2_e  = dipho->subLeadingPhoton()->energy();
         evInfo.pho2_pt  = dipho->subLeadingPhoton()->pt();
         evInfo.pho2_eta = dipho->subLeadingPhoton()->eta();
         evInfo.pho2_phi = dipho->subLeadingPhoton()->phi();
@@ -517,6 +523,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
                 }
             }
             
+            evInfo.jet_e.push_back(jet->energy());
             evInfo.jet_pt.push_back(jet->pt());
             evInfo.jet_eta.push_back(jet->eta());
             evInfo.jet_phi.push_back(jet->phi());
@@ -548,6 +555,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             if( ! iEvent.isRealData() )
                 mcMatch = electronMatchingToGen(electron, genParticles); 
 
+            evInfo.ele_e.push_back(electron->energy());
             evInfo.ele_pt.push_back(electron->pt());
             evInfo.ele_eta.push_back(electron->eta());
             evInfo.ele_phi.push_back(electron->phi());
@@ -622,12 +630,14 @@ tthOptimizationTreeMaker::beginJob()
 
   eventTree->Branch( "passHLT", &evInfo.passHLT, "passHLT/I" );
   
+  eventTree->Branch( "pho1_e", &evInfo.pho1_e, "pho1_e/F" );
   eventTree->Branch( "pho1_pt", &evInfo.pho1_pt, "pho1_pt/F" );
   eventTree->Branch( "pho1_eta", &evInfo.pho1_eta, "pho1_eta/F" );
   eventTree->Branch( "pho1_phi", &evInfo.pho1_phi, "pho1_phi/F" );
   eventTree->Branch( "pho1_idmva", &evInfo.pho1_idmva, "pho1_idmva/F" );
   eventTree->Branch( "pho1_genMatchType", &evInfo.pho1_genMatchType, "pho1_genMatchType/I" );
 
+  eventTree->Branch( "pho2_e", &evInfo.pho2_e, "pho2_e/F" );
   eventTree->Branch( "pho2_pt", &evInfo.pho2_pt, "pho2_pt/F" );
   eventTree->Branch( "pho2_eta", &evInfo.pho2_eta, "pho2_eta/F" );
   eventTree->Branch( "pho2_phi", &evInfo.pho2_phi, "pho2_phi/F" );
@@ -638,6 +648,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "dipho_m", &evInfo.dipho_m, "dipho_m/F" );
   eventTree->Branch( "dipho_mva", &evInfo.dipho_mva, "dipho_mva/F" );
 
+  eventTree->Branch( "jet_e", &evInfo.jet_e);
   eventTree->Branch( "jet_pt", &evInfo.jet_pt);
   eventTree->Branch( "jet_eta", &evInfo.jet_eta);
   eventTree->Branch( "jet_phi", &evInfo.jet_phi);
@@ -647,6 +658,7 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "jet_hadronFlavour", &evInfo.jet_hadronFlavour);
   eventTree->Branch( "jet_isMatchedToGen", &evInfo.jet_isMatchedToGen);
 
+  eventTree->Branch( "ele_e", &evInfo.ele_e);
   eventTree->Branch( "ele_pt", &evInfo.ele_pt);
   eventTree->Branch( "ele_eta", &evInfo.ele_eta);
   eventTree->Branch( "ele_phi", &evInfo.ele_phi);
@@ -697,12 +709,14 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.nvtx = -999;
     evInfo.passHLT = -1;
     
+    evInfo.pho1_e  = -999.;
     evInfo.pho1_pt  = -999.;
     evInfo.pho1_eta = -999.;
     evInfo.pho1_phi = -999.;
     evInfo.pho1_idmva = -999.;
     evInfo.pho1_genMatchType = -999.;
     
+    evInfo.pho2_e  = -999.;
     evInfo.pho2_pt  = -999.;
     evInfo.pho2_eta = -999.;
     evInfo.pho2_phi = -999.;
@@ -713,6 +727,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.dipho_m    = -999.;
     evInfo.dipho_mva  = -999.;
     
+    evInfo.jet_e .clear();
     evInfo.jet_pt .clear();
     evInfo.jet_eta .clear();
     evInfo.jet_phi .clear();
@@ -722,6 +737,7 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.jet_hadronFlavour .clear();
     evInfo.jet_isMatchedToGen .clear();
     
+    evInfo.ele_e .clear();
     evInfo.ele_pt .clear();
     evInfo.ele_eta .clear();
     evInfo.ele_phi .clear();
