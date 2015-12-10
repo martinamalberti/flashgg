@@ -268,8 +268,26 @@ void Photon::shiftAllMvaValuesBy( float val ) {
     }
     for(auto key = keys.begin() ; key != keys.end() ; ++key ) {
         phoIdMvaD_[*key] += val;
+        if (phoIdMvaD_[*key] > 1.) phoIdMvaD_[*key] = 1.;
+        if (phoIdMvaD_[*key] < -1.) phoIdMvaD_[*key] = -1.;
     }
 }
+
+//sigmaEOverE systematycs
+void Photon::shiftSigmaEOverEValueBy( float val ) {
+    const LorentzVector pho_p4 = p4(regression_type);
+    float energyError = getCorrectedEnergyError(regression_type);
+    setP4(regression_type, pho_p4, energyError*(1.+val), false);
+}
+
+
+
+//void Photon::setSigEOverE(){
+//        sigEOverE_ = getCorrectedEnergyError( regression_type ) / getCorrectedEnergy( regression_type ) ;
+//}
+    
+
+
 
 float const Photon::sigEOverE() const
 {
