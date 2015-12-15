@@ -61,6 +61,8 @@ namespace flashgg {
         void setESEffSigmaRR( float val ) {ESEffSigmaRR_ = val;};
         void setPhoIdMvaD( std::map<edm::Ptr<reco::Vertex>, float> valmap ) {  phoIdMvaD_ = valmap; };  // concept: pass the pre-computed map when calling this in the producer
         void updateEnergy( std::string key, float val );
+        void shiftAllMvaValuesBy( float val );
+        void shiftSigmaEOverEValueBy( float val );
         //    void setSigEOverE(float val) { sigEOverE_ = val; };
 
         // define which regression from reco we use - only this one is valid as of 74X

@@ -56,7 +56,8 @@ namespace flashgg {
         virtual void analyze( const edm::Event &, const edm::EventSetup & ) override;
         virtual void endJob() override;
 
-        edm::EDGetTokenT<edm::OwnVector<flashgg::DiPhotonTagBase> > TagSorterToken_;
+        edm::EDGetTokenT<edm::View<flashgg::DiPhotonTagBase> > TagSorterToken_;
+        bool expectMultiples_;
     };
 
 // ******************************************************************************************
@@ -74,7 +75,8 @@ namespace flashgg {
 // constructors and destructor
 //
     TagTestAnalyzer::TagTestAnalyzer( const edm::ParameterSet &iConfig ):
-        TagSorterToken_( consumes<edm::OwnVector<flashgg::DiPhotonTagBase> >( iConfig.getParameter<InputTag> ( "TagSorter" ) ) )
+        TagSorterToken_( consumes<edm::View<flashgg::DiPhotonTagBase> >( iConfig.getParameter<InputTag> ( "TagSorter" ) ) ),
+        expectMultiples_( iConfig.getUntrackedParameter<bool>( "ExpectMultiples", false) )
     {
     }
 
@@ -90,18 +92,25 @@ namespace flashgg {
         // ********************************************************************************
         // access edm objects
 
-        Handle<edm::OwnVector<flashgg::DiPhotonTagBase> > TagSorter;
+        Handle<edm::View<flashgg::DiPhotonTagBase> > TagSorter;
         iEvent.getByToken( TagSorterToken_, TagSorter );
 
-        if( TagSorter.product()->size() > 0 ) {
-            const flashgg::DiPhotonTagBase *chosenTag = &*( TagSorter.product()->begin() );
+        if (!expectMultiples_) {
+            assert (TagSorter.product()->size() <= 1);
+            if ( TagSorter.product()->size() == 0) std::cout << "[NO TAG]" << std::endl;
+        } else {
+            std::cout << "Multiple tags allowed and we have a total of " << TagSorter.product()->size() << std::endl;
+        }
+
+        for ( auto tag = TagSorter.product()->begin() ; tag != TagSorter.product()->end() ; tag++ ) {
+            const flashgg::DiPhotonTagBase *chosenTag = &*( tag );
 
             const	UntaggedTag *untagged = dynamic_cast<const UntaggedTag *>( chosenTag );
             if( untagged != NULL ) {
                 std::cout << "[UNTAGGED] category " << untagged->categoryNumber() << " mass=" << untagged->diPhoton()->mass() <<
                           ", systLabel " << untagged->systLabel() <<  std::endl;
                 if( untagged->tagTruth().isNonnull() ) {
-                    std::cout << "\t[UNTAGGED TRUTH]: genPV=" << untagged->tagTruth()->genPV() << std::endl;
+                    std::cout << "\t[UNTAGGED TRUTH]: genPV=" << untagged->diPhoton()->genPV() << std::endl;
                 }
             }
 
@@ -115,6 +124,7 @@ namespace flashgg {
                     const VBFTagTruth *truth = dynamic_cast<const VBFTagTruth *>( &*vbftag->tagTruth() );
                     assert( truth != NULL );  // If we stored a VBFTag with a nonnull pointer, we either have VBFTagTruth or a nutty bug
                     std::cout << "\t[VBF TRUTH]: genPV=" << truth->genPV() << std::endl;
+                    std::cout << "\t[VBF DIPHOTON]: genPV=" << vbftag->diPhoton()->genPV() << std::endl;
                     std::cout << "\t\t------------------------------------------" << std::endl;
                     if( truth->closestGenJetToLeadingJet().isNonnull() ) {
                         std::cout << "\t\tclosestGenJetToLeadingJet pt eta " << truth->closestGenJetToLeadingJet()->pt() << " " << truth->closestGenJetToLeadingJet()->eta() <<
@@ -147,16 +157,16 @@ namespace flashgg {
                                   << " " << truth->closestParticleToSubLeadingPhoton()->pdgId() << std::endl;
                     }
                     std::cout << "\t\t------------------------------------------" << std::endl;
-                    if( truth->leadingQuark().isNonnull() ) {
-                        std::cout << "\t\tleadingQuark pt eta id " << truth->leadingQuark()->pt() << " " << truth->leadingQuark()->eta()
-                                  << " " << truth->leadingQuark()->pdgId() << std::endl;
+                    if( truth->leadingParton().isNonnull() ) {
+                        std::cout << "\t\tleadingParton pt eta id " << truth->leadingParton()->pt() << " " << truth->leadingParton()->eta()
+                                  << " " << truth->leadingParton()->pdgId() << std::endl;
                     }
-                    if( truth->subLeadingQuark().isNonnull() ) {
-                        std::cout << "\t\tsubLeadingQuark pt eta id "  << truth->subLeadingQuark()->pt() << " " << truth->subLeadingQuark()->eta()
-                                  << " " << truth->subLeadingQuark()->pdgId() << std::endl;
+                    if( truth->subLeadingParton().isNonnull() ) {
+                        std::cout << "\t\tsubLeadingQuark pt eta id "  << truth->subLeadingParton()->pt() << " " << truth->subLeadingParton()->eta()
+                                  << " " << truth->subLeadingParton()->pdgId() << std::endl;
                     }
-                    if( truth->leadingQuark().isNonnull() && truth->subLeadingQuark().isNonnull() ) {
-                        std::cout << "\t\tDiquark mass: " << ( truth->leadingQuark()->p4() + truth->subLeadingQuark()->p4() ).mass() << std::endl;
+                    if( truth->leadingParton().isNonnull() && truth->subLeadingParton().isNonnull() ) {
+                        std::cout << "\t\tDiquark mass: " << ( truth->leadingParton()->p4() + truth->subLeadingParton()->p4() ).mass() << std::endl;
                     }
                 }
 
@@ -216,9 +226,7 @@ namespace flashgg {
                 std::cout << "[FAILED TO CONVERT TAG] with SumPt " << chosenTag->sumPt() << std::endl;
             }
 
-        } else { //case where TagSorter[0] doesn't exist
-            std::cout << "[NO TAG]" << std::endl;
-        }
+        } 
     } // analyze
 
     void
