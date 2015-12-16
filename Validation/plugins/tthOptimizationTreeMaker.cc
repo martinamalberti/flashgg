@@ -24,6 +24,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "flashgg/DataFormats/interface/Electron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 #include "flashgg/DataFormats/interface/Muon.h"
 #include "flashgg/Taggers/interface/LeptonSelection.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -110,6 +111,11 @@ struct eventInfo {
     vector<bool> mu_isLoose;
     vector<int> mu_isMatchedToGen;
 
+
+    float met;
+    float metx;
+    float mety;
+    float metphi;
 
 };
 // ******************************************************************************************
@@ -287,6 +293,7 @@ private:
     EDGetTokenT<View<reco::GenJet> > genJetToken_;
     EDGetTokenT<View<Electron> > electronToken_;
     EDGetTokenT<View<Muon> > muonToken_;
+    EDGetTokenT<View<pat::MET> > METToken_;
     EDGetTokenT<edm::TriggerResults> triggerBitsToken_;
     
     typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
@@ -319,6 +326,7 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     genJetToken_( consumes<View<reco::GenJet> >( iConfig.getParameter<InputTag> ( "GenJetTag" ) ) ),
     electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag>( "ElectronTag" ) ) ),
     muonToken_( consumes<View<flashgg::Muon> >( iConfig.getParameter<InputTag>( "MuonTag" ) ) ),
+    METToken_( consumes<View<pat::MET> >( iConfig.getParameter<InputTag> ( "METTag" ) ) ),
     triggerBitsToken_( consumes<edm::TriggerResults>( iConfig.getParameter<InputTag>( "triggerBits" ) ) )
 {
     jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
@@ -369,6 +377,12 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
 
     Handle<View<flashgg::Muon> > muons;
     iEvent.getByToken( muonToken_, muons );
+
+    Handle<View<pat::MET> > METs;
+    iEvent.getByToken( METToken_, METs );
+    if( METs->size() != 1 )
+        { std::cout << "WARNING number of MET is not equal to 1" << std::endl; }
+    Ptr<pat::MET> theMET = METs->ptrAt( 0 );
 
     // only if MC
     Handle<GenEventInfoProduct> genInfo;
@@ -598,6 +612,14 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             evInfo.mu_isLoose.push_back(muon::isLooseMuon( *muon ));
             evInfo.mu_isMatchedToGen.push_back(mcMatch); 
         }
+
+
+        // -- MET 
+        evInfo.met = theMET->pt();
+        evInfo.metx = theMET->px();
+        evInfo.mety = theMET->py();
+        evInfo.metphi = theMET->phi();
+
         
         // --- fill the tree
         //if ( njets > 0. ) // fill only if min number of jets?
@@ -677,6 +699,11 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "mu_isLoose", &evInfo.mu_isLoose);
   eventTree->Branch( "mu_isMatchedToGen", &evInfo.mu_isMatchedToGen);
 
+  eventTree->Branch( "met", &evInfo.met);
+  eventTree->Branch( "metx", &evInfo.metx);
+  eventTree->Branch( "mety", &evInfo.mety);
+  eventTree->Branch( "metphi", &evInfo.metphi);
+
 }
 // ******************************************************************************************
 
@@ -755,6 +782,11 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.mu_isMedium .clear();
     evInfo.mu_isLoose .clear();
     evInfo.mu_isMatchedToGen .clear();
+
+    evInfo.met = -999;
+    evInfo.metx = -999;
+    evInfo.mety = -999;
+    evInfo.metphi = -999;
 
 }
 // ******************************************************************************************
