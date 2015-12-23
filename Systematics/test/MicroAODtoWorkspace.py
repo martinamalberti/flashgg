@@ -81,8 +81,22 @@ if customize.processId.count("h_") or customize.processId.count("vbf_"): # conve
 #                variablesToUse.append("PreselSF%s%s%s01sigma[1,-999999.,999999.] := weight(\"PreselSF%s%s%s01sigma\")" % (r9,region,direction,r9,region,direction))
     systlabels += phosystlabels
     systlabels += jetsystlabels
+elif customize.processId == "Data":
+    print "Data, so turn of all shifts and systematics, except for Photon Scale central value"
+    variablesToUse = minimalNonSignalVariables
+    newvpset = cms.VPSet()
+    for pset in process.flashggDiPhotonSystematics.SystMethods:
+        if pset.Label.value().count("Scale"):
+            pset.NoCentralShift = cms.bool(False) # Turn on central shift for data (it is off for MC)                                                                              
+            pset.NSigmas = cms.vint32() # Do not perform shift
+            newvpset += [pset]
+    process.flashggDiPhotonSystematics.SystMethods = newvpset
+    systprodlist = [process.flashggMuonSystematics,process.flashggElectronSystematics]
+    systprodlist += [getattr(process,"flashggJetSystematics%i"%i) for i in range(len(UnpackedJetCollectionVInputTag))]
+    for systprod in systprodlist:
+        systprod.SystMethods = cms.VPSet() # empty everything
 else:
-    print "Data or background MC, so store mgg and central only"
+    print "Background MC, so store mgg and central only"
     variablesToUse = minimalNonSignalVariables
     vpsetlist = [process.flashggDiPhotonSystematics.SystMethods, process.flashggMuonSystematics.SystMethods, process.flashggElectronSystematics.SystMethods]
     vpsetlist += [getattr(process,"flashggJetSystematics%i"%i).SystMethods for i in range(len(UnpackedJetCollectionVInputTag))] 
@@ -90,11 +104,6 @@ else:
     for vpset in vpsetlist:
         for pset in vpset:
             pset.NSigmas = cms.vint32() # Do not perform shifts if they will not be read, but still do all central values
-
-if customize.processId == "Data":
-    for pset in process.flashggDiPhotonSystematics.SystMethods:
-        if pset.Label.value().count("Scale"):
-            pset.NoCentralShift = cms.bool(False) # Turn on central shift for data (it is off for MC)
 
 print "--- Systematics  with independent collections ---"
 print systlabels
@@ -228,6 +237,15 @@ process.p = cms.Path(process.hltRequirement * process.flashggRandomizedPerPhoton
                      process.flashggSystTagMerger*
 #                     process.flashggTagSystematics*
                      process.tagsDumper)
+
+print "--- Dumping modules that take diphotons as input: ---"
+mns = process.p.moduleNames()
+for mn in mns:
+    module = getattr(process,mn)
+    if hasattr(module,"src") and type(module.src) == type(cms.InputTag("")) and module.src.value().count("DiPhoton"):
+        print str(module),module.src
+    elif hasattr(module,"DiPhotonTag"):
+        print str(module),module.DiPhotonTag
 
 ################################
 ## Dump merged tags to screen ##
