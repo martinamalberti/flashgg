@@ -18,22 +18,25 @@ process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' # keep updated for JEC
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 10 )
 
-process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
-                                                   flashggDiPhotonSystematics = cms.PSet(initialSeed = cms.untracked.uint32(664)),
-                                                   flashggElectronSystematics = cms.PSet(initialSeed = cms.untracked.uint32(11)),
-                                                   flashggMuonSystematics = cms.PSet(initialSeed = cms.untracked.uint32(13)),
-                                                   flashggTagSystematics = cms.PSet(initialSeed = cms.untracked.uint32(999)),
-                                                   flashggRandomizedPerPhotonDiPhotons = cms.PSet(initialSeed = cms.untracked.uint32(281765313))
-                                                  )
+#process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+#                                                   flashggDiPhotonSystematics = cms.PSet(initialSeed = cms.untracked.uint32(664)),
+#                                                   flashggElectronSystematics = cms.PSet(initialSeed = cms.untracked.uint32(11)),
+#                                                   flashggMuonSystematics = cms.PSet(initialSeed = cms.untracked.uint32(13)),
+#                                                   flashggTagSystematics = cms.PSet(initialSeed = cms.untracked.uint32(999)),
+#                                                   flashggRandomizedPerPhotonDiPhotons = cms.PSet(initialSeed = cms.untracked.uint32(281765313))
+#                                                  )
 
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-process.load("flashgg.Systematics.flashggMuonSystematics_cfi")
-process.load("flashgg.Systematics.flashggElectronSystematics_cfi")
+#process.load("flashgg.Systematics.flashggMuonSystematics_cfi")
+#process.load("flashgg.Systematics.flashggElectronSystematics_cfi")
 
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 from flashgg.Systematics.flashggJetSystematics_cfi import createJetSystematics
 jetSystematicsInputTags = createJetSystematics(process,UnpackedJetCollectionVInputTag)
 
+#from JetMETCorrections.Configuration.JetCorrectionServices_cff import ak4PFCHSL1FastL2L3
+#process.ak4PFCHSL1FastL2L3 = ak4PFCHSL1FastL2L3
+process.load("JetMETCorrections.Configuration.JetCorrectionServices_cff")
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
 
 # UnpackedJets has to go in front of the systematics producers, and only needs to be run once
@@ -42,8 +45,8 @@ process.flashggTagSequence.remove(process.flashggUnpackedJets)
 
 from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet,massSearchReplaceAnyInputTag
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggDiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
-massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedElectrons"),cms.InputTag("flashggElectronSystematics"))
-massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedMuons"),cms.InputTag("flashggMuonSystematics"))
+#massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedElectrons"),cms.InputTag("flashggElectronSystematics"))
+#massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedMuons"),cms.InputTag("flashggMuonSystematics"))
 for i in range(len(UnpackedJetCollectionVInputTag)):
     massSearchReplaceAnyInputTag(process.flashggTagSequence,UnpackedJetCollectionVInputTag[i],jetSystematicsInputTags[i])
 
@@ -91,14 +94,14 @@ elif customize.processId == "Data":
             pset.NSigmas = cms.vint32() # Do not perform shift
             newvpset += [pset]
     process.flashggDiPhotonSystematics.SystMethods = newvpset
-    systprodlist = [process.flashggMuonSystematics,process.flashggElectronSystematics]
+    systprodlist = [] #[process.flashggMuonSystematics,process.flashggElectronSystematics]
     systprodlist += [getattr(process,"flashggJetSystematics%i"%i) for i in range(len(UnpackedJetCollectionVInputTag))]
     for systprod in systprodlist:
         systprod.SystMethods = cms.VPSet() # empty everything
 else:
     print "Background MC, so store mgg and central only"
     variablesToUse = minimalNonSignalVariables
-    vpsetlist = [process.flashggDiPhotonSystematics.SystMethods, process.flashggMuonSystematics.SystMethods, process.flashggElectronSystematics.SystMethods]
+    vpsetlist = [process.flashggDiPhotonSystematics.SystMethods] #, process.flashggMuonSystematics.SystMethods, process.flashggElectronSystematics.SystMethods]
     vpsetlist += [getattr(process,"flashggJetSystematics%i"%i).SystMethods for i in range(len(UnpackedJetCollectionVInputTag))] 
     # i.e. process.flashggJetSystematics0.SystMethods, ...
     for vpset in vpsetlist:
@@ -145,6 +148,8 @@ from flashgg.MetaData.samples_utils import SamplesManager
 
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring("file:myMicroAODOutputFile.root"))
+#process.source = cms.Source("PoolSource",
+#                            fileNames = cms.untracked.vstring("/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_0_0-25ns/1_0_0/GluGluHToGG_M-120_13TeV_powheg_pythia8/RunIISpring15-ReMiniAOD-1_0_0-25ns-1_0_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151229_222419/0000/myMicroAODOutputFile_1.root"))
 #process.source = cms.Source("PoolSource",fileNames = cms.untracked.vstring("/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-FinalPrompt-BetaV7-25ns/Spring15#BetaV7/DoubleEG/RunIISpring15-FinalPrompt-BetaV7-25ns-Spring15BetaV7-v0-Run2015D-PromptReco-v4/151124_234634/0000/myMicroAODOutputFile_1.root"))
 #process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/GluGluHToGG_M-125_13TeV_powheg_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152108/0000/myMicroAODOutputFile_2.root"))
 #process.source = cms.Source("PoolSource",   # quickest failure for binning in diphoton pt, after ~11 events you get one with pt > 7000
@@ -201,8 +206,18 @@ for tag in tagList:
           currentVariables = systematicVariables
       
       isBinnedOnly = (systlabel !=  "")
-      dumpPdfWeights = False #(systlabel ==  "")
-      nPdfWeights = 0
+      if customize.processId.count("h_") or customize.processId.count("vbf_") and (systlabel ==  ""):
+          print "Signal MC central value, so dumping PDF weights"
+          dumpPdfWeights = True
+          nPdfWeights = 60
+          nAlphaSWeights = 2
+          nScaleWeights = 9
+      else:
+          print "Data, background MC, or non-central value: no PDF weights"
+          dumpPdfWeights = False
+          nPdfWeights = -1
+          nAlphaSWeights = -1
+          nScaleWeights = -1
       
       cfgTools.addCategory(process.tagsDumper,
                            systlabel,
@@ -213,29 +228,30 @@ for tag in tagList:
                            histograms=minimalHistograms,
                            binnedOnly=isBinnedOnly,
                            dumpPdfWeights=dumpPdfWeights,
-                           nPdfWeights=nPdfWeights
+                           nPdfWeights=nPdfWeights,
+                           nAlphaSWeights=nAlphaSWeights,
+                           nScaleWeights=nScaleWeights
                            )
 
-process.load("flashgg.MicroAOD.flashggRandomizedPerPhotonDiPhotonProducer_cff")
-process.load("flashgg.Systematics.flashggDiPhotonsWithAddedGenZ_cfi")
-
-# to be fixed once randomized photons will be produced at MicroAOD level
-process.flashggDiPhotonSystematics.src = "flashggDiPhotonsWithAddedGenZ" 
+process.flashggDiPhotonSystematics.src = "flashggDiPhotons" 
 
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
 process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1") )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-process.hltRequirement = cms.Sequence()
-if customize.processId == "Data":
-        process.hltRequirement += process.hltHighLevel
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
 
-process.p = cms.Path(process.hltRequirement * process.flashggRandomizedPerPhotonDiPhotons * process.flashggDiPhotonsWithAddedGenZ *
-                (process.flashggDiPhotonSystematics+process.flashggMuonSystematics+process.flashggElectronSystematics)*
+process.dataRequirements = cms.Sequence()
+if customize.processId == "Data":
+        process.dataRequirements += process.hltHighLevel
+        process.dataRequirements += process.eeBadScFilter
+
+process.p = cms.Path(process.dataRequirements*
+                     process.flashggDiPhotonSystematics*
                      (process.flashggUnpackedJets*process.jetSystematicsSequence)*
-                     (process.flashggTagSequence+process.systematicsTagSequences)*
+                     (process.flashggTagSequence*process.systematicsTagSequences)*
                      process.flashggSystTagMerger*
-#                     process.flashggTagSystematics*
                      process.tagsDumper)
 
 print "--- Dumping modules that take diphotons as input: ---"
