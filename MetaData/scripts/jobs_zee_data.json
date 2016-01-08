@@ -1,0 +1,13 @@
+{
+    "processes" : {
+        "data" : [ 
+	         ["/SingleElectron/sethzenz-RunIISpring15-Prompt-1_0_0-25ns-1_0_0-v0-Run2015D-PromptReco-v4-30861f51608c5fc84a12593b94cb87fc/USER", { "njobs" : 50 }],
+		 ["/SingleElectron/sethzenz-RunIISpring15-Prompt-SilverNotGold-1_0_0-25ns-1_0_0-v0-Run2015D-PromptReco-v4-30861f51608c5fc84a12593b94cb87fc/USER", { "njobs" : 10 }],   
+		 ["/SingleElectron/sethzenz-RunIISpring15-ReMiniAOD-1_0_0-25ns-1_0_0-v0-Run2015C_25ns-05Oct2015-v1-f51498f555bc53b29e06b3b8e645c2b6/USER", { "njobs" : 10 }],
+		 ["/SingleElectron/sethzenz-RunIISpring15-ReMiniAOD-1_0_0-25ns-1_0_0-v0-Run2015D-05Oct2015-v1-79b88ebcf3052eb0fed24f7681916d5f/USER" ,{ "njobs" : 30 }],
+		 ["/SingleElectron/sethzenz-RunIISpring15-ReMiniAOD-SilverNotGold-1_0_0-25ns-1_0_0-v1-Run2015D-05Oct2015-v1-79b88ebcf3052eb0fed24f7681916d5f/USER", { "njobs" : 10 }]		 
+		 ]
+     },															                    
+
+     "cmdLine" : "campaign=RunIISpring15-AllSilverIncludingGold-1_0_0-25ns processType='data' "
+}
