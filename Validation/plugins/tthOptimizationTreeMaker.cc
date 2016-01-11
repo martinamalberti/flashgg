@@ -426,6 +426,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         //if (! passDiphotonPreselection(dipho, rho)) continue; 
         //npre++;
         if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()==1 && dipho->subLeadingPhoton()->genMatchType()==1 )){
+            cout << dipho->leadingPhoton()->pt() << "  " << dipho->subLeadingPhoton()-> pt() <<endl;
             ngen++;
             npre++;
         }
@@ -435,8 +436,10 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         // - photon id mva cut (~99% efficient on signal photons after preselection)
         if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
         if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
-        nfullpre++;
         bestIndex = idipho;
+        if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()==1 && dipho->subLeadingPhoton()->genMatchType()==1 )){
+            nfullpre++;
+        }
         break;
     }
 
