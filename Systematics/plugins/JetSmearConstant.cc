@@ -16,15 +16,18 @@ namespace flashgg {
         JetSmearConstant( const edm::ParameterSet &conf );
         void applyCorrection( flashgg::Jet &y, int syst_shift ) override;
         std::string shiftLabel( int ) const override;
-        void setEnergyCorrections ( const JetCorrectorParameters & ) override {}; // NotImplemented in base class --> harmless noop
+        void setJECUncertainty ( const JetCorrectorParameters & ) override {}; // NotImplemented in base class --> harmless noop
+        void setJEC( const JetCorrector*, const edm::Event &, const edm::EventSetup & ) override {}; // NotImplemented in base class --> harmless noop
 
     private:
         selector_type overall_range_;
+        std::string random_label_;
     };
 
     JetSmearConstant::JetSmearConstant( const edm::ParameterSet &conf ) :
-        ObjectSystMethodBinnedByFunctor( conf ),
-        overall_range_( conf.getParameter<std::string>( "OverallRange" ) )
+        ObjectSystMethodBinnedByFunctor( conf ), 
+        overall_range_( conf.getParameter<std::string>( "OverallRange" ) ),
+        random_label_(conf.getParameter<std::string>("RandomLabel"))
         //        exaggerateShiftUp_( conf.getUntrackedParameter<bool>( "ExaggerateShiftUp", false ) )
     {
     }
@@ -62,6 +65,14 @@ namespace flashgg {
                     }
                     y.setP4((newpt/recpt)*y.p4());
                 } else {
+                    if (!y.hasUserFloat(random_label_)) {
+                        throw cms::Exception("Missing embedded random number") << "Could not find key " << random_label_ << " for random numbers embedded in the jet object, please make sure to read the appropriate version of MicroAOD and/or access the correct label and/or run the randomizer on-the-fly";
+                    }
+                    float rnd = y.userFloat(random_label_);       
+                    
+                    if ( debug_ ) {
+                        std::cout << " We do not use it yet, but we have a random number for " << random_label_ << ": " << rnd << std::endl;
+                    }
                     if ( debug_ ) {
                         std::cout << "  " << shiftLabel( syst_shift ) << ": Jet has pt=" << y.pt() << " eta=" << y.eta() << " AND NO GENJET! "
                                   << " ... so we do nothing" << std::endl;

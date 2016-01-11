@@ -2,7 +2,8 @@
 <class name="flashgg::WeightedObject" ClassVersion="10">
   <version ClassVersion="10" checksum="1340095011"/>
 </class>
-<class name="flashgg::PDFWeightObject" ClassVersion="12">
+<class name="flashgg::PDFWeightObject" ClassVersion="13">
+  <version ClassVersion="13" checksum="3868816395"/>
   <version ClassVersion="12" checksum="3929296232"/>
   <version ClassVersion="11" checksum="103726048"/>
   <version ClassVersion="10" checksum="92077144"/>
@@ -155,8 +156,10 @@
 </class>
 <class name="std::pair<edm::Ptr<reco::Vertex>,flashgg::MinimalPileupJetIdentifier>"/>
 <class name="std::map<edm::Ptr<reco::Vertex>,flashgg::MinimalPileupJetIdentifier>"/>
-<class name="flashgg::Jet" ClassVersion="11">
+<class name="flashgg::Jet" ClassVersion="12">
+  <version ClassVersion="12" checksum="1532368094"/>
   <version ClassVersion="11" checksum="3459570589"/>
+  <version ClassVersion="10" checksum="2045570510"/>
 </class>
 <class name="std::vector<flashgg::Jet>"/>
 <class name="edm::Ptr<flashgg::Jet>"/>

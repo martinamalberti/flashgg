@@ -3,9 +3,9 @@ import FWCore.ParameterSet.Config as cms
 microAODDefaultOutputCommand = cms.untracked.vstring("drop *",
                                                      "keep *_flashgg*_*_*",
                                                      "drop *_flashggVertexMap*_*_*", 
-                                                     "drop *_flashggDiPhotons_*_*", # keep preselected only
                                                      ## this part drop all the tools used to build puppi jets
                                                      "drop *_flashggPuppi*_*_*",
+                                                     "drop *_flashggPhotons_*_*", # Only keep the copies with random numbers added
                                                      #
                                                      ""
                                                      "drop patPackedCandidates_*_*_*", # for intermediate PFCHSLeg jet constituents
@@ -16,7 +16,7 @@ microAODDefaultOutputCommand = cms.untracked.vstring("drop *",
                                                      "keep *_reducedEgamma_*PhotonCores_*",
                                                      "keep *_slimmedMETs_*_*",
                                                      "keep *_slimmedMETsNoHF_*_*",
-                                                     "keep *_fixedGridRhoAll_*_*",
+                                                     "keep *_*Rho*_*_*",
                                                      "keep *_offlineBeamSpot_*_*",
                                                      "keep *_TriggerResults_*_*",
                                                      "keep *_eventCount_*_*",

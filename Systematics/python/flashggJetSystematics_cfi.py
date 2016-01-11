@@ -27,6 +27,7 @@ def createJetSystematicsForTag(process,jetInputTag):
   setattr(process,newName,
           cms.EDProducer('FlashggJetSystematicProducer',
                          src = jetInputTag,
+                         DoCentralJEC = cms.bool(False),
                          SystMethods2D = cms.VPSet(),
                          SystMethods = cms.VPSet(cms.PSet( MethodName = cms.string("FlashggJetEnergyCorrector"),
                                                            Label = cms.string("JEC"),
@@ -38,6 +39,7 @@ def createJetSystematicsForTag(process,jetInputTag):
                                                            Label = cms.string("JER"),
                                                            NSigmas = cms.vint32(-1,1),
                                                            OverallRange = cms.string("abs(eta)<5.0"),
+                                                           RandomLabel = cms.string("rnd_g_JER"), # for no-match case
                                                            BinList = smearBins,
                                                            Debug = cms.untracked.bool(False),
                                                            )
@@ -45,7 +47,7 @@ def createJetSystematicsForTag(process,jetInputTag):
                          
                          )
           )
-  setattr(process.RandomNumberGeneratorService,newName,cms.PSet(initialSeed = cms.untracked.uint32(int(num)))) 
+#  setattr(process.RandomNumberGeneratorService,newName,cms.PSet(initialSeed = cms.untracked.uint32(int(num)))) 
   # e.g. process.RandomNumberGeneratorService.flashggJetSystematics3 = cms.PSet(initialSeed = cms.untracked.uint32(3))
   return (getattr(process,newName),cms.InputTag(newName))
   
