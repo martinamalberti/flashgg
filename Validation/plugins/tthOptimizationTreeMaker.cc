@@ -426,7 +426,7 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
         //if (! passDiphotonPreselection(dipho, rho)) continue; 
         //npre++;
         if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()==1 && dipho->subLeadingPhoton()->genMatchType()==1 )){
-            cout << dipho->leadingPhoton()->pt() << "  " << dipho->subLeadingPhoton()-> pt() <<endl;
+            //cout << dipho->leadingPhoton()->pt() << "  " << dipho->subLeadingPhoton()-> pt() <<endl;
             ngen++;
             npre++;
         }
