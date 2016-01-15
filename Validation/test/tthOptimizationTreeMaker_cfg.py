@@ -13,15 +13,22 @@ process.GlobalTag.globaltag = 'POSTLS170_V5::All'
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
-#process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/Spring14miniaod/GluGluToHToGG_M-125_13TeV-powheg-pythia6/MINIAODSIM/PU20bx25_POSTLS170_V5-v2/00000/24926621-F11C-E411-AB9A-02163E008D0B.root"))
-#process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/Spring14miniaod/TTbarH_HToGG_M-125_13TeV_amcatnlo-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/00000/049C0F9C-E61E-E411-9388-D8D385AE8466.root"))                                                                                                                            
 process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(
-        "/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_153138/0000/myMicroAODOutputFile_2.root"
+        #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_153138/0000/myMicroAODOutputFile_2.root"
         #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/GluGluHToGG_M-125_13TeV_powheg_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152108/0000/myMicroAODOutputFile_1.root"
         #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015D-05Oct2015-v1/151021_151712/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_151505/0000/myMicroAODOutputFile_1.root"
+        
+	# unfiltered
+	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_1_0-25ns/1_1_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-1_1_0-25ns-1_1_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160105_224541/0000/myMicroAODOutputFile_1.root"
+	#filtered
+	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-TTHFiltered-1_2_0-25ns/1_2_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-TTHFiltered-1_2_0-25ns-1_2_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160113_173025/0000/myMicroAODOutputFile_1.root"
+
+	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_1_0-25ns/1_1_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-1_1_0-25ns-1_1_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160105_224456/0000/myMicroAODOutputFile_2.root"
+        #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-Prompt-1_1_0-25ns/1_1_0/DoubleEG/RunIISpring15-Prompt-1_1_0-25ns-1_1_0-v0-Run2015D-PromptReco-v4/160105_225454/0000/myMicroAODOutputFile_824.root"
         ))
 
+
+# flashgg tag sequence (for dipho MVA)
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 
@@ -48,9 +55,34 @@ process.analysisTree = cms.EDAnalyzer('FlashggtthOptimizationTreeMaker',
                                       globalVariables = globalVariables
                                       )
 
-
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("mytree.root")
+                                   fileName = cms.string("mytree_unfiltered.root")
                                    )
 
-process.p = cms.Path(process.flashggTagSequence*process.analysisTree)
+# import flashgg customization to check if we have data or MC
+from flashgg.MetaData.JobConfig import customize
+customize.parse()
+
+from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1") )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
+
+process.dataRequirements = cms.Sequence()
+if customize.processType == "data":
+        process.dataRequirements += process.hltHighLevel
+        process.dataRequirements += process.eeBadScFilter
+
+
+process.p = cms.Path(process.dataRequirements*process.flashggTagSequence*process.analysisTree)
+
+
+
+# set default options if needed                                                                                                                                                                        
+customize.setDefault("maxEvents",-1)
+customize.setDefault("targetLumi",2.63e+3)
+# call the customization
+customize(process)
+
