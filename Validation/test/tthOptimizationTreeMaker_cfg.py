@@ -19,9 +19,9 @@ process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(
         #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015D-05Oct2015-v1/151021_151712/0000/myMicroAODOutputFile_1.root"
         
 	# unfiltered
-	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_1_0-25ns/1_1_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-1_1_0-25ns-1_1_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160105_224541/0000/myMicroAODOutputFile_1.root"
+	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_1_0-25ns/1_1_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-1_1_0-25ns-1_1_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160105_224541/0000/myMicroAODOutputFile_1.root"
 	#filtered
-	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-TTHFiltered-1_2_0-25ns/1_2_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-TTHFiltered-1_2_0-25ns-1_2_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160113_173025/0000/myMicroAODOutputFile_1.root"
+	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-TTHFiltered-1_2_0-25ns/1_2_0/ttHJetToGG_M130_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-TTHFiltered-1_2_0-25ns-1_2_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160113_173025/0000/myMicroAODOutputFile_1.root"
 
 	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-1_1_0-25ns/1_1_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-1_1_0-25ns-1_1_0-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/160105_224456/0000/myMicroAODOutputFile_2.root"
         #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-Prompt-1_1_0-25ns/1_1_0/DoubleEG/RunIISpring15-Prompt-1_1_0-25ns-1_1_0-v0-Run2015D-PromptReco-v4/160105_225454/0000/myMicroAODOutputFile_824.root"
@@ -50,10 +50,12 @@ process.analysisTree = cms.EDAnalyzer('FlashggtthOptimizationTreeMaker',
                                       MuonTag=cms.InputTag('flashggSelectedMuons'),
                                       METTag=cms.InputTag('slimmedMETs'),
                                       jetPtThreshold = cms.untracked.double(20.),
+				      isControlSample = cms.untracked.bool(False),
                                       bTag = cms.untracked.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
                                       triggerBits = cms.InputTag('TriggerResults::HLT'),
                                       globalVariables = globalVariables
                                       )
+
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("mytree_unfiltered.root")
@@ -81,7 +83,7 @@ process.p = cms.Path(process.dataRequirements*process.flashggTagSequence*process
 
 
 # set default options if needed                                                                                                                                                                        
-customize.setDefault("maxEvents",-1)
+customize.setDefault("maxEvents",10000)
 customize.setDefault("targetLumi",2.63e+3)
 # call the customization
 customize(process)
