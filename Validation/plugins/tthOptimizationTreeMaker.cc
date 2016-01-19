@@ -36,6 +36,8 @@
 
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "TLorentzVector.h"
+
 #include "TTree.h"
 
 #include <vector>
@@ -97,6 +99,8 @@ struct eventInfo {
     vector<float> ele_eta;
     vector<float> ele_phi;
     vector<float> ele_idmva;
+    vector<float> ele_drGsfToPho1;
+    vector<float> ele_drGsfToPho2;
     vector<float> ele_iso;
     vector<float> ele_dz;
     vector<float> ele_d0;
@@ -307,6 +311,8 @@ private:
 
     double lumiWeight_;
 
+    bool isControlSample_;
+
     GlobalVariablesDumper *globalVarsDumper_;
 };
 // ******************************************************************************************
@@ -333,6 +339,7 @@ tthOptimizationTreeMaker::tthOptimizationTreeMaker( const edm::ParameterSet &iCo
     bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
     electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 20. );
     muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
+    isControlSample_ = iConfig.getUntrackedParameter<bool>( "isControlSample", false );
     lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb
     rhoFixedGrid_  = iConfig.getParameter<edm::InputTag>( "rhoFixedGridCollection" );
     globalVarsDumper_ = new GlobalVariablesDumper( iConfig.getParameter<edm::ParameterSet>( "globalVariables" ) );
@@ -430,12 +437,18 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             ngen++;
             npre++;
         }
+                
+        // if not control sample, apply loose photon id mva cut 
+        //- photon id mva cut (~99% efficient on signal photons after preselection)
+        if (!isControlSample_) {
+            if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
+            if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
+        }
+
         // - pt threshold
         if (dipho->leadingPhoton()->pt() < dipho->mass()/3. ) continue;
         if (dipho->subLeadingPhoton()->pt() < dipho->mass()/4. ) continue;
-        // - photon id mva cut (~99% efficient on signal photons after preselection)
-        if (dipho->leadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
-        if (dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() ) < -0.9 ) continue;
+
         bestIndex = idipho;
         if (! iEvent.isRealData() && (dipho->leadingPhoton()->genMatchType()==1 && dipho->subLeadingPhoton()->genMatchType()==1 )){
             nfullpre++;
@@ -562,7 +575,43 @@ void tthOptimizationTreeMaker::analyze( const edm::Event &iEvent, const edm::Eve
             if( electron->isEB() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 2 ) { continue; } 
             if( electron->isEE() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 1 ) { continue; }
 
-            // add dr photon - gsf track
+            /*
+            // dr ele, photon
+            TLorentzVector elec_p4;
+            elec_p4.SetXYZT( electron->px(), electron->py(), electron->pz(), electron->energy() );
+            
+            float phi = electron->superCluster()->phi();
+            float theta = ( 2 * atan( exp( -electron->superCluster()->eta() ) ) );
+            float energy = electron->ecalEnergy();
+            float px = energy * sin( theta ) * cos( phi );
+            float py = energy * sin( theta ) * sin( phi );
+            float pz = energy * cos( theta );
+            
+            TLorentzVector elec_superClusterVect;
+            elec_superClusterVect.SetXYZT( px, py, pz, energy );
+            TLorentzVector p1, p2;
+            p1.SetXYZT( dipho->leadingPhoton()->px(), dipho->leadingPhoton()->py(), dipho->leadingPhoton()->pz(), dipho->leadingPhoton()->energy() );
+            p2.SetXYZT( dipho->subLeadingPhoton()->px(), dipho->subLeadingPhoton()->py(), dipho->subLeadingPhoton()->pz(), dipho->subLeadingPhoton()->energy() );
+            cout << "drSCPho1 = " << p1.DeltaR( elec_superClusterVect) <<endl;;
+            cout << "drSCPho2 = " << p2.DeltaR( elec_superClusterVect) <<endl;;
+            */
+
+            //save dr(gamma, gsf) for checking electron/photon overlap
+            float TrkElecSCDeltaR1 = 999.;
+            float TrkElecSCDeltaR2 = 999.;
+            if( &( *(dipho->leadingPhoton())->superCluster() ) == &( *electron->superCluster() ) ) {
+                TrkElecSCDeltaR1 = sqrt( electron->deltaEtaSuperClusterTrackAtVtx() * electron->deltaEtaSuperClusterTrackAtVtx() +
+                                              electron->deltaPhiSuperClusterTrackAtVtx() * electron->deltaPhiSuperClusterTrackAtVtx() );
+            }
+            if( &( *(dipho->subLeadingPhoton())->superCluster() ) == &( *electron->superCluster() ) ) {
+                TrkElecSCDeltaR2 = sqrt( electron->deltaEtaSuperClusterTrackAtVtx() * electron->deltaEtaSuperClusterTrackAtVtx() +
+                                              electron->deltaPhiSuperClusterTrackAtVtx() * electron->deltaPhiSuperClusterTrackAtVtx() );
+            }
+            evInfo.ele_drGsfToPho1.push_back(TrkElecSCDeltaR1);
+            evInfo.ele_drGsfToPho2.push_back(TrkElecSCDeltaR2);
+
+            //cout << "drGsfPho1 = " << TrkElecSCDeltaR1 <<endl;;
+            //cout << "drGsfPho2 = " << TrkElecSCDeltaR2 <<endl;;
             
             Ptr<reco::Vertex> ele_vtx = chooseElectronVertex( electron,  vertices->ptrs() );
             float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
@@ -688,6 +737,8 @@ tthOptimizationTreeMaker::beginJob()
   eventTree->Branch( "ele_eta", &evInfo.ele_eta);
   eventTree->Branch( "ele_phi", &evInfo.ele_phi);
   eventTree->Branch( "ele_idmva", &evInfo.ele_idmva);
+  eventTree->Branch( "ele_drGsfToPho1", &evInfo.ele_drGsfToPho1);
+  eventTree->Branch( "ele_drGsfToPho2", &evInfo.ele_drGsfToPho2);
   eventTree->Branch( "ele_iso", &evInfo.ele_iso);
   eventTree->Branch( "ele_dz", &evInfo.ele_dz);
   eventTree->Branch( "ele_d0", &evInfo.ele_d0);
@@ -772,6 +823,8 @@ tthOptimizationTreeMaker::initEventStructure()
     evInfo.ele_eta .clear();
     evInfo.ele_phi .clear();
     evInfo.ele_idmva .clear();
+    evInfo.ele_drGsfToPho1 .clear();
+    evInfo.ele_drGsfToPho2 .clear();
     evInfo.ele_iso .clear();
     evInfo.ele_dz .clear();
     evInfo.ele_d0 .clear();

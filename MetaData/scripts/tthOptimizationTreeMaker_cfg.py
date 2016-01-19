@@ -49,6 +49,7 @@ process.analysisTree = cms.EDAnalyzer('FlashggtthOptimizationTreeMaker',
                                       MuonTag=cms.InputTag('flashggSelectedMuons'),
                                       METTag=cms.InputTag('slimmedMETs'),
                                       jetPtThreshold = cms.untracked.double(20.),
+				      isControlSample = cms.untracked.bool(False),
                                       bTag = cms.untracked.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
                                       triggerBits = cms.InputTag('TriggerResults::HLT'),
                                       globalVariables = globalVariables

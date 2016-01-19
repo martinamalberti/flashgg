@@ -69,8 +69,6 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
 
-customize.processType = "data"
-
 process.dataRequirements = cms.Sequence()
 if customize.processType == "data":
         process.dataRequirements += process.hltHighLevel
