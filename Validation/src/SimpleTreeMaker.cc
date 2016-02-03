@@ -123,7 +123,7 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
         iEvent.getByToken( PileUpToken_, PileupInfos );
         iEvent.getByToken( genParticleToken_, genParticles );
     }
-    
+
     //for( unsigned int i = 0 ; i < genParticles->size(); i++ ) {
     //    Ptr<reco::GenParticle> gen = genParticles->ptrAt(i);
     //    cout << " pdgId = "<< gen->pdgId()<< " prompt final state = "<< gen->isPromptFinalState() << "  status = " << gen->status() << "   isPrompt = " << gen->statusFlags().isPrompt() <<endl;
@@ -132,6 +132,13 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
     // -- initialize tree
     initEventStructure();
     
+    // EM filter bool
+    edm::Handle<bool> filterH; 
+    iEvent.getByLabel("gjfilter", "enrichmentFilter", filterH);        
+    evInfo.emFilter = (Int_t)*(filterH.product());
+    //cout << "EM filter = " <<evInfo.emFilter <<    endl;
+
+
     // -- check if event passes HLT: "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1"  
     const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
     vector<std::string> const &names = triggerNames.triggerNames();  
@@ -191,10 +198,12 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
                 const auto &weights = genInfo->weights();
                 if( ! weights.empty() ) {
                     w *= weights[0];
+		    cout << "gen weight = " << weights[0] << "   lumi weight = "<< lumiWeight_ << "   event weight =" << w <<endl;
                 }
             }
         }
         evInfo.weight = w;
+
 
         // -- pileup weights
         globalVarsDumper_->fill( iEvent );
@@ -411,6 +420,7 @@ SimpleTreeMaker::beginJob()
   nfullpre =0 ;
 
   // per-event tree
+  eventTree->Branch( "emFilter", &evInfo.emFilter, "emFilter/I" );
 
   eventTree->Branch( "run", &evInfo.run, "run/I" );
   eventTree->Branch( "lumi", &evInfo.lumi, "lumi/I" );
@@ -499,6 +509,8 @@ void
 SimpleTreeMaker::initEventStructure()
 {
     // per-event tree:
+    evInfo.emFilter = -999.;
+
     evInfo.weight = -999.;
     evInfo.puweight = -999.;
 

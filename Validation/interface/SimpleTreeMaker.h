@@ -54,6 +54,8 @@ using namespace flashgg;
 
 struct eventInfo {
 
+    int emFilter;
+ 
     float weight;
     float puweight;
 

@@ -37,5 +37,11 @@
 	"DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa" : { "xs" : 84.0 },
         "QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : {"xs" : 108000000.0 , "br" : 0.000225 },
         "QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : {"xs" : 54120000.0 , "br" : 0.002 },
-        "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8" : {"xs" : 162060000.0 , "br" : 0.0016 }
+        "QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8" : {"xs" : 162060000.0 , "br" : 0.0016 },
+
+        "GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : { "xs" : 23100.0 },
+        "GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : { "xs" :9110.0  },
+        "GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : { "xs" :2280.0},
+        "GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : { "xs" :273.0 },
+        "GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" : { "xs" :94.5 }
 }
