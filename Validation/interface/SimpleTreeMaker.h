@@ -299,6 +299,7 @@ class SimpleTreeMaker : public edm::BasicAnalyzer
   EDGetTokenT<View<pat::MET> > METToken_;
   EDGetTokenT<edm::TriggerResults> triggerBitsToken_;
   edm::EDGetTokenT<double> rhoToken_;
+  std::vector<edm::EDGetTokenT<View<flashgg::Jet> > > tokenJets_;
 
   typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
 

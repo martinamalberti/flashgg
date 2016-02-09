@@ -56,6 +56,14 @@ SimpleTreeMaker::SimpleTreeMaker( const edm::ParameterSet &iConfig, TFileDirecto
   lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb                                                                                                                              
   
   globalVarsDumper_ = new GlobalVariablesDumper( iConfig.getParameter<edm::ParameterSet>( "globalVariables" ), std::forward<edm::ConsumesCollector>(cc) );
+
+
+
+  for (unsigned i = 0 ; i < inputTagJets_.size() ; i++) {
+    auto token = cc.consumes<View<flashgg::Jet> >(inputTagJets_[i]);
+    tokenJets_.push_back(token);
+  }
+
   
   eventTree = fs.make<TTree>( "event", "event" );
   
@@ -95,10 +103,16 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
   Handle<View<flashgg::DiPhotonMVAResult> > mvaResults;
   iEvent.getByToken( mvaResultToken_, mvaResults );
   
+  //JetCollectionVector Jets( inputTagJets_.size() );
+  //for( size_t j = 0; j < inputTagJets_.size(); ++j ) {
+  //  iEvent.getByLabel( inputTagJets_[j], Jets[j] );
+  //}
+
   JetCollectionVector Jets( inputTagJets_.size() );
   for( size_t j = 0; j < inputTagJets_.size(); ++j ) {
-    iEvent.getByLabel( inputTagJets_[j], Jets[j] );
+    iEvent.getByToken( tokenJets_[j], Jets[j] );
   }
+
   
   Handle<View<flashgg::Electron> > electrons;
   iEvent.getByToken( electronToken_, electrons );
@@ -134,7 +148,7 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
     
     // -- check if event passes HLT: "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1"  
     const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
-    vector<std::string> const &names = triggerNames.triggerNames();  
+    //vector<std::string> const &names = triggerNames.triggerNames();  
     for( unsigned index = 0; index < triggerNames.size(); ++index ) {
         if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95") ) {
             //cout << TString::Format((triggerNames.triggerName( index )).c_str()) << " " << triggerBits->accept( index ) << endl;
