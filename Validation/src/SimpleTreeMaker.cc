@@ -307,9 +307,9 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
             if (electron->pt()  < electronPtThreshold_) { continue; }
             if( electron->hasMatchedConversion() ) { continue; } // remove conversions
             // missing hits: from cut-based selection: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
-            if( electron->isEB() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 2 ) { continue; } 
-            if( electron->isEE() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 1 ) { continue; }
-
+            //if( electron->isEB() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 2 ) { continue; } 
+            //if( electron->isEE() && electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ) > 1 ) { continue; }
+	    
             /*
             // dr ele, photon
             TLorentzVector elec_p4;
@@ -352,6 +352,10 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
             float d0 = electron->gsfTrack()->dxy( ele_vtx->position() );
             float dz = electron->gsfTrack()->dz( ele_vtx->position() );
             float isol = electronIsolation(electron, rho); 
+	    int nhits = electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS ); 
+	    
+	    int passCutBasedIdLoose = passCutBasedElectronIdLoose( electron, vertices->ptrs() );
+	    
             int mcMatch = -1;
             if( ! iEvent.isRealData() )
                 mcMatch = electronMatchingToGen(electron, genParticles); 
@@ -364,6 +368,8 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
             evInfo.ele_iso.push_back(isol);
             evInfo.ele_d0.push_back(d0);
             evInfo.ele_dz.push_back(dz);
+            evInfo.ele_nMissingHits.push_back(nhits);
+	    evInfo.ele_passCutBasedIdLoose.push_back(passCutBasedIdLoose);
             evInfo.ele_isMatchedToGen.push_back(mcMatch);
         }       
 
@@ -476,6 +482,8 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "ele_iso", &evInfo.ele_iso);
   eventTree->Branch( "ele_dz", &evInfo.ele_dz);
   eventTree->Branch( "ele_d0", &evInfo.ele_d0);
+  eventTree->Branch( "ele_nMissingHits", &evInfo.ele_nMissingHits);
+  eventTree->Branch( "ele_passCutBasedIdLoose", &evInfo.ele_passCutBasedIdLoose);
   eventTree->Branch( "ele_isMatchedToGen", &evInfo.ele_isMatchedToGen);
 
   eventTree->Branch( "mu_pt", &evInfo.mu_pt);
@@ -562,6 +570,8 @@ SimpleTreeMaker::initEventStructure()
     evInfo.ele_iso .clear();
     evInfo.ele_dz .clear();
     evInfo.ele_d0 .clear();
+    evInfo.ele_nMissingHits .clear();
+    evInfo.ele_passCutBasedIdLoose .clear();
     evInfo.ele_isMatchedToGen .clear();
 
     evInfo.mu_pt .clear();

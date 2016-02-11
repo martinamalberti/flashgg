@@ -104,6 +104,8 @@ struct eventInfo {
     vector<float> ele_iso;
     vector<float> ele_dz;
     vector<float> ele_d0;
+    vector<int> ele_nMissingHits;
+    vector<int> ele_passCutBasedIdLoose;
     vector<int> ele_isMatchedToGen;
     
     vector<float> mu_pt;
@@ -123,6 +125,76 @@ struct eventInfo {
 
 };
 // ******************************************************************************************
+
+// ******************************************************************************************
+float passCutBasedElectronIdLoose(edm::Ptr<flashgg::Electron> electron, const std::vector<edm::Ptr<reco::Vertex> > &pvPointers){
+
+  bool pass = false;
+
+  float elfull5x5_sigmaIetaIeta = electron->full5x5_sigmaIetaIeta();
+  float eldEtaIn = electron->deltaEtaSuperClusterTrackAtVtx();
+  float eldPhiIn = electron->deltaPhiSuperClusterTrackAtVtx();
+  float elhOverE = electron->hcalOverEcal();
+  float elRelIsoEA = electron->standardHggIso()/electron->pt();
+
+  float elooEmooP =-999 ; 
+
+  if( electron->ecalEnergy() == 0 ){
+    elooEmooP = 1e30;
+  }else if( !std::isfinite(electron->ecalEnergy())){    
+    elooEmooP = 1e30;
+  }else{
+    elooEmooP = fabs(1.0/electron->ecalEnergy() - electron->eSuperClusterOverP()/electron->ecalEnergy() );
+  }
+
+  double vtx_dz = 1000000.;
+  unsigned int min_dz_vtx = -1;
+        
+  for( unsigned int vtxi = 0; vtxi < pvPointers.size(); vtxi++ ) {            
+    Ptr<reco::Vertex> vtx = pvPointers[vtxi];            
+    if( vtx_dz > fabs(electron->gsfTrack()->dz( vtx->position() )) ) {                
+      vtx_dz = fabs( electron->gsfTrack()->dz( vtx->position() ) );
+      min_dz_vtx = vtxi;
+    }
+  }
+        
+  Ptr<reco::Vertex> best_vtx_elec = pvPointers[min_dz_vtx];
+  float elDxy = fabs( electron->gsfTrack()->dxy( best_vtx_elec->position()) ) ;
+  float elDz = fabs( electron->gsfTrack()->dz( best_vtx_elec->position())) ;
+
+  int elMissedHits = electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS);
+
+  bool isEB = (fabs(electron->superCluster()->eta())<1.479);
+
+  if (isEB){
+    if ( elfull5x5_sigmaIetaIeta < 0.0103
+	 && fabs(eldEtaIn) < 0.0105
+	 && fabs(eldPhiIn) < 0.115
+	 && elhOverE < 0.104
+	 && elRelIsoEA < 0.0893
+	 && elooEmooP < 0.102
+	 && fabs(elDxy) < 0.0261
+	 && fabs(elDz) < 0.41
+	 && elMissedHits <=2 ) 
+      pass =  true;
+  }
+  else {
+    if ( elfull5x5_sigmaIetaIeta < 0.0301
+	 && fabs(eldEtaIn) < 0.00814
+	 && fabs(eldPhiIn) < 0.182
+	 && elhOverE < 0.0897
+	 && elRelIsoEA < 0.121
+	 && elooEmooP < 0.126
+	 && fabs(elDxy) < 0.118
+	 && fabs(elDz) < 0.822
+	 && elMissedHits <=1 )
+      pass = true; 
+  }
+
+  return pass;
+
+}
+
 
 
 // ******************************************************************************************
