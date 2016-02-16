@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.GeometryDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' # keep updated for JEC
+process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # keep updated for JEC
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
@@ -33,6 +33,8 @@ from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 # load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggDiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
+
+customize.processType = 'data'
 
 # import flashgg customization to check if we have data or MC
 # if data, apply only energy scale corrections, if MC apply only energy smearings
@@ -107,7 +109,7 @@ process.dataRequirements = cms.Sequence()
 if customize.processType == "data":
         process.dataRequirements += process.hltHighLevel
         process.dataRequirements += process.eeBadScFilter
-
+        process.GlobalTag.globaltag = '76X_dataRun2_v15'
 
 process.p = cms.Path(process.dataRequirements*
                      process.flashggDiPhotonSystematics*
