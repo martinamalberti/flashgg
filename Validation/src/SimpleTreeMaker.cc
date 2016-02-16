@@ -150,7 +150,9 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
     const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
     //vector<std::string> const &names = triggerNames.triggerNames();  
     for( unsigned index = 0; index < triggerNames.size(); ++index ) {
-        if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95") ) {
+      //if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton") ) 
+      //cout << (triggerNames.triggerName( index )).c_str() <<endl;
+      if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95") ) {
             //cout << TString::Format((triggerNames.triggerName( index )).c_str()) << " " << triggerBits->accept( index ) << endl;
             evInfo.passHLT =  triggerBits->accept( index );
         }
