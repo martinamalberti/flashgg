@@ -46,10 +46,8 @@ namespace flashgg {
         vector<int> weight_indices;
         vector<int> alpha_indices;
         vector<int> scale_indices;
-        string removeSpace( string line );
         PDFWeightsHelper pdfweightshelper_;//tool from HepMCCandAlgos/interface/PDFWeightsHelper
         unsigned int nPdfEigWeights_;
-        //		        std::vector<float> pdfeigweights_;
         edm::FileInPath mc2hessianCSV;
         std::vector<double> inpdfweights;
         float gen_weight;
@@ -117,12 +115,6 @@ namespace flashgg {
 				weight_lines = iter->lines();
 			}
 
-            
-
-            //if(flashgg_flag_){
-            //    PDFWeightProducer::set_generator_type(lines);
-            //    //std::cout << " After set_generator_type on " << iter->tag() << " we have pdfids: " << pdfid_1 << " " << pdfid_2 << std::endl;
-            //}
             for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
                 if (lines[iLine].find("powheg") != std::string::npos){
                     generatorType = "powheg";
@@ -173,7 +165,7 @@ namespace flashgg {
         }
 
 
-
+        /*
         //// Required std::stringstream object
         std::stringstream ss;
         //// Populate
@@ -181,7 +173,8 @@ namespace flashgg {
         cout << ss.str()<<endl;
         boost::property_tree::ptree pt;
         read_xml( ss , pt);
-        
+        */
+
         // --- get weight id for pdfs, alpha_s, scale variations
         for( unsigned int iLine = 0; iLine < weight_lines.size(); iLine++ ) {
                         
@@ -248,7 +241,7 @@ namespace flashgg {
         evt.getByToken( srcTokenGen_, genInfo );
     
         gen_weight = genInfo->weight();
-
+        //cout << "gen weight = " << gen_weight <<endl;
 
 
 		std::auto_ptr<vector<flashgg::PDFWeightObject> > PDFWeight( new vector<flashgg::PDFWeightObject> );
@@ -335,11 +328,24 @@ namespace flashgg {
 		PDFWeight->push_back( pdfWeight );
 
 		evt.put( PDFWeight );
-
-        //cout << "FINAL pdf_weight_container size " <<pdfWeight.pdf_weight_container.size() << endl;
-        //cout << "FINAL alpha_s_container size " <<pdfWeight.alpha_s_container.size() << endl;
-        //cout << "FINAL qcd_scale_container size " <<pdfWeight.qcd_scale_container.size() << endl;
         
+        /*
+        cout << "FINAL pdf_weight_container size " <<pdfWeight.pdf_weight_container.size() << endl;
+        for (unsigned int  i = 0 ; i < pdfWeight.pdf_weight_container.size() ; i++){
+            cout << i << "  " << pdfWeight.pdf_weight_container.at(i)  << endl;
+            //cout << i << "  " << (pdfWeight.uncompress(pdfWeight.pdf_weight_container)).at(i)  << endl;
+        }
+        
+        cout << "FINAL alpha_s_container size " <<pdfWeight.alpha_s_container.size() << endl;
+        for (unsigned int  i = 0 ; i < pdfWeight.alpha_s_container.size() ; i++){
+            cout << i << "  " << pdfWeight.alpha_s_container.at(i) <<endl;
+        }
+
+        cout << "FINAL qcd_scale_container size " <<pdfWeight.qcd_scale_container.size() << endl;
+        for (unsigned int  i = 0 ; i < pdfWeight.qcd_scale_container.size() ; i++){
+            cout << i << "  " << pdfWeight.qcd_scale_container.at(i) <<endl;
+        }
+        */
         
 	}
 
