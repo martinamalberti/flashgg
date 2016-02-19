@@ -17,8 +17,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(
-#"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/160127_024939/0000/myMicroAODOutputFile_1.root"
-"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIIFall15DR76-1_3_0-25ns/1_3_0/DoubleEG/RunIIFall15DR76-1_3_0-25ns-1_3_0-v0-Run2015C_25ns-16Dec2015-v1/160116_105829/0000/myMicroAODOutputFile_1.root"
+"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/160127_024939/0000/myMicroAODOutputFile_1.root"
+#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIIFall15DR76-1_3_0-25ns/1_3_0/DoubleEG/RunIIFall15DR76-1_3_0-25ns-1_3_0-v0-Run2015C_25ns-16Dec2015-v1/160116_105829/0000/myMicroAODOutputFile_1.root"
         ))
 
 # import flashgg customization to check if we have signal or background
@@ -28,13 +28,14 @@ customize.parse()
 # flashgg tag sequence (for dipho MVA) and jet collections
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
-
+process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
 
 # load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggDiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
+#massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggDiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
+massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
 
-customize.processType = 'data'
+#customize.processType = 'data'
 
 # import flashgg customization to check if we have data or MC
 # if data, apply only energy scale corrections, if MC apply only energy smearings
@@ -112,6 +113,7 @@ if customize.processType == "data":
         process.GlobalTag.globaltag = '76X_dataRun2_v15'
 
 process.p = cms.Path(process.dataRequirements*
+                     process.flashggUpdatedIdMVADiPhotons*
                      process.flashggDiPhotonSystematics*
                      process.flashggTagSequence
                      *process.analysisTree)
