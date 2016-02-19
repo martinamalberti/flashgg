@@ -1,0 +1,3 @@
+fggRunJobs.py --load jobs_data.json -H -D -P -n 200 -d jobsData -x cmsRun tthOptimizationTreeMaker_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd
+fggRunJobs.py --load jobs_mc_sig.json -H -D -P -n 10 -d jobsSig -x cmsRun tthOptimizationTreeMaker_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd
+fggRunJobs.py --load jobs_mc_bkg.json -H -D -P -n 10 -d jobsBkg -x cmsRun tthOptimizationTreeMaker_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd
