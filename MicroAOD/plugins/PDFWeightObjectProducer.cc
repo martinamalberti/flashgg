@@ -102,7 +102,7 @@ namespace flashgg {
             //}
             
 			if( ( iter->tag() ).compare( tag_ ) == 0 ) {
-				cout << iter->tag() << endl;
+				//cout << iter->tag() << endl;
 				weight_lines = iter->lines();
 			}
 
@@ -115,7 +115,8 @@ namespace flashgg {
         }
 
 
-        // From Josh's slides 13-15: https://indico.cern.ch/event/459797/contribution/2/attachments/1181555/1800214/mcaod-Feb15-2016.pdf
+        // --- Get the PDF ids -
+        // See Josh's slides 13-15: https://indico.cern.ch/event/459797/contribution/2/attachments/1181555/1800214/mcaod-Feb15-2016.pdf
         int pdfidx = 0;
         pdfidx = run->heprup().PDFSUP.first;
         if (pdfidx == -1 && generatorType == "powheg"){
@@ -123,15 +124,15 @@ namespace flashgg {
         }
         cout <<" This sample was generated with the following PDFs : " << pdfidx <<endl;
         
-        // --- get min and max pdf index for 100 replicas
-        if (!isStandardSample_) { pdfidx = 0; }
+        // --- Get min and max pdf index for 100 replicas
+        if (!isStandardSample_) { pdfidx = 0; } 
         pdfid_1 = boost::lexical_cast<std::string>(pdfidx + 1);
         pdfid_2 = boost::lexical_cast<std::string>(pdfidx + 100);
 
         cout << "PDFs min and max id for MC replicas: " << pdfid_1 << "   " << pdfid_2 <<endl;
         
 
-        // --- get alphas id
+        // --- Get alphas id
         if (doAlphasWeights_){
          
             if (pdfidx == 292200){
@@ -157,18 +158,19 @@ namespace flashgg {
         }
 
 
-        // for amcatnlo samples, remove last line
+        // --- for amcatnlo samples, remove last line
         if ( weight_lines.back() == "  <")
             weight_lines.pop_back();
                 
-        // Covert weight_lines in std::stringstream object and populate  boost::property_tree
+        // --- Convert weight_lines in std::stringstream object and populate boost::property_tree
         std::stringstream ss;
         std::copy(weight_lines.begin(), weight_lines.end(),std::ostream_iterator<std::string>(ss,""));
-        cout << ss.str()<<endl;
+        //cout << ss.str()<<endl;
         boost::property_tree::ptree pt;
         read_xml( ss , pt);
         
         
+        // --- Name of the weightgroup
         string scalevar = "scale_variation";
         string pdfvar   = "PDF_variation";
         if (!isStandardSample_){
@@ -176,7 +178,7 @@ namespace flashgg {
             scalevar = "Central scale variation";
         }
 
-        // Loop over elements to get PDF, alpha_s and scale weights
+        // --- Loop over elements to get PDF, alpha_s and scale weights
         BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("") ) {
             
             if (v.first == "weightgroup"){
@@ -190,7 +192,7 @@ namespace flashgg {
                 //if (weightgroupname1) cout <<  weightgroupname1.get() <<endl;
                 //if (weightgroupname2) cout <<  weightgroupname2.get() <<endl;
 
-                // PDFs + alpha_s weights
+                // -- PDFs + alpha_s weights
                 if ( (weightgroupname1 && weightgroupname1.get() == pdfvar)  || (weightgroupname2 && weightgroupname2.get() == pdfvar)) {               
                                     
                     BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree)
@@ -228,7 +230,7 @@ namespace flashgg {
 
 
 
-                // scale weights
+                // -- Scale weights
                 if ( (weightgroupname1 && weightgroupname1.get() == scalevar)  || ( weightgroupname2 && weightgroupname2.get() == scalevar) ) {               
                     
                     BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,subtree)
@@ -273,7 +275,7 @@ namespace flashgg {
 
 			int id_i = stoi( LHEEventHandle->weights()[i].id );
 			
-            //--- get pdf weights
+            // --- Get PDF weights
             for( unsigned int j = 0; j < PDFWeightProducer::pdf_indices.size(); j++ ){
 				int id_j = PDFWeightProducer::pdf_indices[j];	
                 if( id_i == id_j ){
@@ -282,7 +284,7 @@ namespace flashgg {
 				}
 			}
             
-            //--- get alpha_s weights
+            // --- Get alpha_s weights
             if ( doAlphasWeights_ ){
                 for( unsigned int k = 0; k < PDFWeightProducer::alpha_indices.size(); k++ ){
                     int id_k = PDFWeightProducer::alpha_indices[k];
@@ -294,7 +296,7 @@ namespace flashgg {
                 }
             }
             
-            //--- get qcd scale weights
+            // --- Get qcd scale weights
             if (doScaleWeights_ ){ 
                 for( unsigned int k = 0 ; k < PDFWeightProducer::scale_indices.size() ; k++ ) {
                     int id_k = PDFWeightProducer::scale_indices[k];
@@ -314,7 +316,7 @@ namespace flashgg {
 		//cout << "Size of alpha_s weights: " << PDFWeightProducer::alpha_indices.size() << endl;
         
 		
-        // get MCtoHessian pdf weights
+        // --- Get MCtoHessian PDF weights
         pdfweightshelper_.Init(PDFWeightProducer::pdf_indices.size(),nPdfEigWeights_,mc2hessianCSV);
         
         std::vector<double> outpdfweights(nPdfEigWeights_);
