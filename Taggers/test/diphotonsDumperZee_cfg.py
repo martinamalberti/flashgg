@@ -36,6 +36,7 @@ process.TFileService = cms.Service("TFileService",
 
 # import trigger filter
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+#process.options = cms.untracked.PSet( allowUnscheduled = cms.untracked.bool(True), wantSummary = cms.untracked.bool(True) )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 # load module to recompute photon id on-the-fly
@@ -49,13 +50,15 @@ customize.parse()
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
 
+
+from flashgg.Systematics.SystematicsCustomize import *
+
 # load appropriate scale and smearing bins 
 process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
 # Or use the official  tool instead  ????????????????
-#useEGMTools(process)
+useEGMTools(process)
 
-from flashgg.Systematics.SystematicsCustomize import *
 
 #customize.processType = 'data'
 
@@ -71,7 +74,10 @@ else:
     vpset = process.flashggDiPhotonSystematics.SystMethods
     newvpset = cms.VPSet()
     for pset in vpset:
-        pset.NSigmas = cms.vint32() # only central value, no syst. shifts
+        if type(pset.NSigmas) == type(cms.vint32()):
+            pset.NSigmas = cms.vint32() # only central value, no up/down syst shifts
+        else:
+            pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
             newvpset+= [pset]
     process.flashggDiPhotonSystematics.SystMethods = newvpset        
@@ -84,7 +90,6 @@ process.load("flashgg.Taggers.flashggPreselectedDiPhotons_cfi")
 process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 process.flashggPreselectedDiPhotons.src = cms.InputTag("flashggDiPhotonSystematics")
 
-
 ## diphoton dumper
 #process.load("flashgg.Taggers.diphotonDumper_cfi") ##  import diphotonDumper 
 #import flashgg.Taggers.dumperConfigTools as cfgTools
@@ -96,12 +101,14 @@ process.flashggPreselectedDiPhotons.src = cms.InputTag("flashggDiPhotonSystemati
 
 
 # untagged tag dumper
-import flashgg.Taggers.dumperConfigTools as cfgTools
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
+process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
+
 process.flashggUntagged.Boundaries = cms.vdouble(-2)
 process.flashggUntagged.DiPhotonTag    = "flashggPreselectedDiPhotons"
 process.flashggDiPhotonMVA.DiPhotonTag = "flashggPreselectedDiPhotons"
 
+import flashgg.Taggers.dumperConfigTools as cfgTools
 from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
 process.diphotonDumper = createTagDumper("UntaggedTag")
 process.diphotonDumper.src = "flashggUntagged"
@@ -124,7 +131,7 @@ cfgTools.addCategories(process.diphotonDumper,
                        ## categories definition
                        ## cuts are applied in cascade. Events getting to these categories have already failed the "Reject" selection
                        [
-                        ("All","leadingPhoton.pt>0",0)
+                        ("All","1",0)
                        ],
                        ## variables to be dumped in trees/datasets. Same variables for all categories
                        ## if different variables wanted for different categories, can add categorie one by one with cfgTools.addCategory
@@ -192,7 +199,8 @@ process.p = cms.Path(process.hltHighLevel*
                      process.dataRequirements*
                      process.flashggUpdatedIdMVADiPhotons*
                      process.flashggDiPhotonSystematics*
-                     process.flashggPreselectedDiPhotons*
+                     #process.flashggPreselectedDiPhotons*
+                     process.flashggTagSequence*
                      #process.flashggDiPhotonMVA*
                      #process.flashggUntagged*
                      process.diphotonDumper)
