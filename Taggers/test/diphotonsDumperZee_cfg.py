@@ -85,22 +85,39 @@ process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 process.flashggPreselectedDiPhotons.src = cms.InputTag("flashggDiPhotonSystematics")
 
 
-# diphoton dumper
-process.load("flashgg.Taggers.diphotonDumper_cfi") ##  import diphotonDumper 
+## diphoton dumper
+#process.load("flashgg.Taggers.diphotonDumper_cfi") ##  import diphotonDumper 
+#import flashgg.Taggers.dumperConfigTools as cfgTools
+#process.diphotonDumper.src = "flashggPreselectedDiPhotons"
+#process.diphotonDumper.dumpTrees = True
+#process.diphotonDumper.dumpWorkspace = False
+#process.diphotonDumper.quietRooFit = True
+#process.diphotonDumper.nameTemplate = "tree_$SQRTS_$LABEL_$SUBCAT"
+
+
+# untagged tag dumper
 import flashgg.Taggers.dumperConfigTools as cfgTools
+process.load("flashgg/Taggers/flashggTagSequence_cfi")
+process.flashggUntagged.Boundaries = cms.vdouble(-2)
+process.flashggUntagged.DiPhotonTag    = "flashggPreselectedDiPhotons"
+process.flashggDiPhotonMVA.DiPhotonTag = "flashggPreselectedDiPhotons"
 
-process.diphotonDumper.src = "flashggPreselectedDiPhotons"
-
+from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
+process.diphotonDumper = createTagDumper("UntaggedTag")
+process.diphotonDumper.src = "flashggUntagged"
+process.diphotonDumper.maxCandPerEvent = -1 # take them all
+process.diphotonDumper.splitLumiWeight=cms.untracked.bool(True)
 process.diphotonDumper.dumpTrees = True
 process.diphotonDumper.dumpWorkspace = False
 process.diphotonDumper.quietRooFit = True
+process.diphotonDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL"
 
-
-# split tree, histogram and datasets by process
-#process.diphotonDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL_$SUBCAT"
-
-process.diphotonDumper.nameTemplate = "minitree_$SQRTS_$LABEL_$SUBCAT"
-
+## define categories and associated objects to dump
+cfgTools.addCategory(process.diphotonDumper,
+                     "Reject",
+                     "0",
+                      -1 ## if nSubcat is -1 do not store anythings
+                     )
 
 # interestng categories 
 cfgTools.addCategories(process.diphotonDumper,
@@ -111,50 +128,51 @@ cfgTools.addCategories(process.diphotonDumper,
                        ],
                        ## variables to be dumped in trees/datasets. Same variables for all categories
                        ## if different variables wanted for different categories, can add categorie one by one with cfgTools.addCategory
-                       variables=["mass               :=mass",
-                                  "vtxProbMVA         :=vtxProbMVA",
-                                  "cosdphi            :=cos(leadingPhoton.phi-subLeadingPhoton.phi)",
-                                  "pt                 :=pt",
+                       variables=["mass               :=diPhoton.mass",
+                                  "pt                 :=diPhoton.pt",
+                                  "vtxprobMVA         :=diPhotonMVA.vtxprob",
+                                  "cosdphi            :=diPhotonMVA.CosPhi",
+                                  "diphotonMVA        :=diPhotonMVA.result",
 
-                                  "pho1_pt            :=leadingPhoton.pt",
-                                  "pho1_eta           :=leadingPhoton.superCluster.eta",
-                                  "pho1_energy        :=leadingPhoton.energy",
-                                  "pho1_rawEnergy     :=leadingPhoton.superCluster.rawEnergy",
-                                  "pho1_eTrue         := ?leadingPhoton().hasMatchedGenPhoton()?leadingPhoton().matchedGenPhoton().energy():0",
-                                  "pho1_r9            :=leadingPhoton.r9",
-                                  "pho1_full5x5_r9    :=leadingPhoton.full5x5_r9",
-                                  "pho1_sieie         :=leadingPhoton.sigmaIetaIeta",
-                                  "pho1_full5x5_sieie :=leadingPhoton.full5x5_sigmaIetaIeta",
-                                  "pho1_covieip       :=leadingPhoton.sieip",
-                                  "pho1_etawidth      :=leadingPhoton.superCluster.etaWidth",
-                                  "pho1_phiwidth      :=leadingPhoton.superCluster.phiWidth",
-                                  "pho1_s4            :=leadingPhoton.s4",
-                                  "pho1_phoIso        :=leadingPhoton.pfPhoIso03",
-                                  "pho1_ChgIso        :=leadingPhoton.pfChgIsoWrtChosenVtx03",
-                                  "pho1_ChgIsoWorstVtx:=leadingPhoton.pfChgIsoWrtWorstVtx03",
-                                  "pho1_esEffSigmaRR  :=leadingPhoton.esEffSigmaRR",
-                                  "pho1_idmva         :=leadPhotonId",
-                                  "pho1_sigmaEoE      :=leadingPhoton.sigEOverE",
+                                  "pho1_pt            :=diPhoton.leadingPhoton.pt",
+                                  "pho1_eta           :=diPhoton.leadingPhoton.superCluster.eta",
+                                  "pho1_energy        :=diPhoton.leadingPhoton.energy",
+                                  "pho1_rawEnergy     :=diPhoton.leadingPhoton.superCluster.rawEnergy",
+                                  "pho1_eTrue         := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+                                  "pho1_r9            :=diPhoton.leadingPhoton.r9",
+                                  "pho1_full5x5_r9    :=diPhoton.leadingPhoton.full5x5_r9",
+                                  "pho1_sieie         :=diPhoton.leadingPhoton.sigmaIetaIeta",
+                                  "pho1_full5x5_sieie :=diPhoton.leadingPhoton.full5x5_sigmaIetaIeta",
+                                  "pho1_covieip       :=diPhoton.leadingPhoton.sieip",
+                                  "pho1_etawidth      :=diPhoton.leadingPhoton.superCluster.etaWidth",
+                                  "pho1_phiwidth      :=diPhoton.leadingPhoton.superCluster.phiWidth",
+                                  "pho1_s4            :=diPhoton.leadingPhoton.s4",
+                                  "pho1_phoIso        :=diPhoton.leadingPhoton.pfPhoIso03",
+                                  "pho1_ChgIso        :=diPhoton.leadingPhoton.pfChgIsoWrtChosenVtx03",
+                                  "pho1_ChgIsoWorstVtx:=diPhoton.leadingPhoton.pfChgIsoWrtWorstVtx03",
+                                  "pho1_esEffSigmaRR  :=diPhoton.leadingPhoton.esEffSigmaRR",
+                                  "pho1_idmva         :=diPhoton.leadPhotonId",
+                                  "pho1_sigmaEoE      :=diPhoton.leadingPhoton.sigEOverE",
                                   
-                                  "pho2_pt            :=subLeadingPhoton.pt",
-                                  "pho2_eta           :=subLeadingPhoton.superCluster.eta",
-                                  "pho2_energy        :=subLeadingPhoton.energy",
-                                  "pho2_rawEnergy     :=subLeadingPhoton.superCluster.rawEnergy",
-                                  "pho2_eTrue         := ?subLeadingPhoton().hasMatchedGenPhoton()?subLeadingPhoton().matchedGenPhoton().energy():0",
-                                  "pho2_r9            :=subLeadingPhoton.r9",
-                                  "pho2_full5x5_r9    :=subLeadingPhoton.full5x5_r9",
-                                  "pho2_sieie         :=subLeadingPhoton.sigmaIetaIeta",
-                                  "pho2_full5x5_sieie :=subLeadingPhoton.full5x5_sigmaIetaIeta",
-                                  "pho2_covieip       :=subLeadingPhoton.sieip",
-                                  "pho2_etawidth      :=subLeadingPhoton.superCluster.etaWidth",
-                                  "pho2_phiwidth      :=subLeadingPhoton.superCluster.phiWidth",
-                                  "pho2_s4            :=subLeadingPhoton.s4",
-                                  "pho2_phoIso        :=subLeadingPhoton.pfPhoIso03",
-                                  "pho2_ChgIso        :=subLeadingPhoton.pfChgIsoWrtChosenVtx03",
-                                  "pho2_ChgIsoWorstVtx:=subLeadingPhoton.pfChgIsoWrtWorstVtx03",
-                                  "pho2_esEffSigmaRR  :=subLeadingPhoton.esEffSigmaRR",
-                                  "pho2_idmva         :=subLeadPhotonId",
-                                  "pho2_sigmaEoE      :=subLeadingPhoton.sigEOverE"
+                                  "pho2_pt            :=diPhoton.subLeadingPhoton.pt",
+                                  "pho2_eta           :=diPhoton.subLeadingPhoton.superCluster.eta",
+                                  "pho2_energy        :=diPhoton.subLeadingPhoton.energy",
+                                  "pho2_rawEnergy     :=diPhoton.subLeadingPhoton.superCluster.rawEnergy",
+                                  "pho2_eTrue         := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().energy():0",
+                                  "pho2_r9            :=diPhoton.subLeadingPhoton.r9",
+                                  "pho2_full5x5_r9    :=diPhoton.subLeadingPhoton.full5x5_r9",
+                                  "pho2_sieie         :=diPhoton.subLeadingPhoton.sigmaIetaIeta",
+                                  "pho2_full5x5_sieie :=diPhoton.subLeadingPhoton.full5x5_sigmaIetaIeta",
+                                  "pho2_covieip       :=diPhoton.subLeadingPhoton.sieip",
+                                  "pho2_etawidth      :=diPhoton.subLeadingPhoton.superCluster.etaWidth",
+                                  "pho2_phiwidth      :=diPhoton.subLeadingPhoton.superCluster.phiWidth",
+                                  "pho2_s4            :=diPhoton.subLeadingPhoton.s4",
+                                  "pho2_phoIso        :=diPhoton.subLeadingPhoton.pfPhoIso03",
+                                  "pho2_ChgIso        :=diPhoton.subLeadingPhoton.pfChgIsoWrtChosenVtx03",
+                                  "pho2_ChgIsoWorstVtx:=diPhoton.subLeadingPhoton.pfChgIsoWrtWorstVtx03",
+                                  "pho2_esEffSigmaRR  :=diPhoton.subLeadingPhoton.esEffSigmaRR",
+                                  "pho2_idmva         :=diPhoton.subLeadPhotonId",
+                                  "pho2_sigmaEoE      :=diPhoton.subLeadingPhoton.sigEOverE"
                                   ],
                        histograms=[]
                        )
@@ -175,6 +193,8 @@ process.p = cms.Path(process.hltHighLevel*
                      process.flashggUpdatedIdMVADiPhotons*
                      process.flashggDiPhotonSystematics*
                      process.flashggPreselectedDiPhotons*
+                     #process.flashggDiPhotonMVA*
+                     #process.flashggUntagged*
                      process.diphotonDumper)
 
 
@@ -182,7 +202,7 @@ process.p = cms.Path(process.hltHighLevel*
 #printSystematicInfo(process)
 
 # set default options if needed
-customize.setDefault("maxEvents",-1)
+customize.setDefault("maxEvents",1000)
 customize.setDefault("targetLumi",2.7e+3)
 # call the customization
 customize(process)
