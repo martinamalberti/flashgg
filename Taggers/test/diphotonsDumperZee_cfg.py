@@ -54,14 +54,12 @@ process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
 from flashgg.Systematics.SystematicsCustomize import *
 
 # load appropriate scale and smearing bins 
-#process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
+process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
 # Or use the official  tool instead  ????????????????
 useEGMTools(process)
 
-printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
-
-#customize.processType = 'data'
+#customize.processType = 'data' # for test
 
 # if data, apply only energy scale corrections, if MC apply only energy smearings
 if customize.processType == 'data':
@@ -72,25 +70,29 @@ else:
     print 'mc'
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Ele22_eta2p1_WPLoose_Gsf_v*") )
     customizePhotonSystematicsForMC(process)
-#    #syst (1D) 
-#    vpset   = process.flashggDiPhotonSystematics.SystMethods
-#    newvpset = cms.VPSet()
-#    for pset in vpset:
-#        pset.NSigmas = cms.vint32() # only central value, no up/down syst shifts
-#        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
-#            newvpset+= [pset]
-#    process.flashggDiPhotonSystematics.SystMethods = newvpset        
+    #syst (1D) 
+    vpset   = process.flashggDiPhotonSystematics.SystMethods
+    newvpset = cms.VPSet()
+    for pset in vpset:
+        pset.NSigmas = cms.vint32() # no up/down syst shifts
+        pset.ApplyCentralValue = cms.bool(False) # no central value
+        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+        newvpset+= [pset]
+    process.flashggDiPhotonSystematics.SystMethods = newvpset        
     #syst (2D) : smearings with EGMTool
     vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
     newvpset2D = cms.VPSet()
     for pset in vpset2D:
         pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
             newvpset2D+= [pset]
     process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D       
 
-
-#printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
+print 'syst 1D'
+printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
+print 'syst 2D'
 printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
 
 
