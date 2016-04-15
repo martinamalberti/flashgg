@@ -57,7 +57,7 @@ from flashgg.Systematics.SystematicsCustomize import *
 process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
 # Or use the official  tool instead  ????????????????
-useEGMTools(process)
+#useEGMTools(process)
 
 #customize.processType = 'data' # for test
 
@@ -124,11 +124,12 @@ from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
 process.diphotonDumper = createTagDumper("UntaggedTag")
 process.diphotonDumper.src = "flashggUntagged"
 process.diphotonDumper.maxCandPerEvent = -1 # take them all
-process.diphotonDumper.splitLumiWeight=cms.untracked.bool(True)
+#process.diphotonDumper.splitLumiWeight=cms.untracked.bool(True)
 process.diphotonDumper.dumpTrees = True
 process.diphotonDumper.dumpWorkspace = False
 process.diphotonDumper.quietRooFit = True
-process.diphotonDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL"
+#process.diphotonDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL"
+process.diphotonDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 
 ## define categories and associated objects to dump
 cfgTools.addCategory(process.diphotonDumper,
