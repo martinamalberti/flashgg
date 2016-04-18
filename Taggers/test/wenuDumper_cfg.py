@@ -21,9 +21,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
         # mc
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
         ))
 
 #output file
@@ -63,7 +63,8 @@ process.flashggDiPhotonSystematics = cms.EDProducer('FlashggPhotonSystematicProd
                     MCSmearHighR9EE,
                     MCSmearLowR9EE,
                     MCSmearHighR9EB,
-                    MCSmearLowR9EB
+                    MCSmearLowR9EB,
+                    SigmaEOverESmearing
                     )
 )
 
@@ -152,9 +153,11 @@ cfgTools.addCategories(process.wenuDumper,
                        ## if different variables wanted for different categories, can add categorie one by one with cfgTools.addCategory
                        variables=["pho1_pt            :=photon.pt",
                                   "pho1_eta           :=photon.superCluster.eta",
+                                  "pho1_phi           :=photon.superCluster.phi",
                                   "pho1_energy        :=photon.energy",
                                   "pho1_rawEnergy     :=photon.superCluster.rawEnergy",
                                   "pho1_eTrue         := ?photon().hasMatchedGenPhoton()?photon().matchedGenPhoton().energy():0",
+                                  "pho1_p             :=electron.p4().P()",
                                   "pho1_r9            :=photon.r9",
                                   "pho1_full5x5_r9    :=photon.full5x5_r9",
                                   #"pho1_etawidth      :=photon.superCluster.etaWidth",
