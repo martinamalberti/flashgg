@@ -267,4 +267,13 @@
 </class>
 <class name="std::vector<flashgg::TagCandidate>"/>
 <class name="edm::Wrapper<std::vector<flashgg::TagCandidate> >"/>
+
+<class name="flashgg::WenuCandidate"/>
+<class name="std::vector<flashgg::WenuCandidate>"/>
+<class name="edm::Wrapper<std::vector<flashgg::WenuCandidate> >"/>
+<class name="edm::Ptr<flashgg::WenuCandidate>"/>
+<class name="edm::Wrapper<edm::Ptr<flashgg::WenuCandidate> >"/>
+<class name="std::vector<edm::Ptr<flashgg::WenuCandidate> >"/>
+<class name="edm::Wrapper<std::vector<edm::Ptr<flashgg::WenuCandidate> > >"/>
+
 </lcgdict>

@@ -33,6 +33,7 @@
 #include "flashgg/DataFormats/interface/PDFWeightObject.h"
 #include "flashgg/DataFormats/interface/ZPlusJetTag.h"
 #include "flashgg/DataFormats/interface/TagCandidate.h"
+#include "flashgg/DataFormats/interface/WenuCandidate.h"
 
 #include <vector>
 #include <map>
@@ -264,6 +265,11 @@ namespace  {
         edm::Wrapper<flashgg::TagCandidate>                      wrp_tags;
         std::vector<flashgg::TagCandidate>                       vec_tags;
         edm::Wrapper<std::vector<flashgg::TagCandidate> >    wrp_vec_tags;
+
+        flashgg::WenuCandidate                                        wenus;
+        edm::Wrapper<flashgg::WenuCandidate>                      wrp_wenus;
+        std::vector<flashgg::WenuCandidate>                       vec_wenus;
+        edm::Wrapper<std::vector<flashgg::WenuCandidate> >    wrp_vec_wenus;
     };
 }
 // Local Variables:
