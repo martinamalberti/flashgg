@@ -10,6 +10,7 @@
 #include "flashgg/DataFormats/interface/WenuCandidate.h"
 #include "flashgg/DataFormats/interface/Electron.h"
 #include "flashgg/DataFormats/interface/Photon.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include "DataFormats/Common/interface/RefToPtr.h"
 
@@ -34,33 +35,161 @@ namespace flashgg {
         WenuCandidateProducer( const ParameterSet & );
     private:
         void produce( Event &, const EventSetup & ) override;
+        bool passCutBasedID(edm::Ptr<flashgg::Electron> electron, const std::vector<edm::Ptr<reco::Vertex> > &pvPointers, string wp);
 
         EDGetTokenT<View<Electron> > electronToken_;
         EDGetTokenT<View<Photon> > photonToken_;
         EDGetTokenT<View<pat::MET> > METToken_;
+        EDGetTokenT<View<reco::Vertex> > vertexToken_;
 
         // thresholds for selections
         double minElectronPt_;
         double maxElectronEta_;
         double minMet_;
-        //double electronWP_;
+        string electronIdWP_;
         
     };
 
     WenuCandidateProducer::WenuCandidateProducer( const ParameterSet &iConfig ) :
         electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag>( "ElectronTag" ) ) ),
         photonToken_( consumes<View<flashgg::Photon> >( iConfig.getParameter<InputTag>( "PhotonTag" ) ) ),
-        METToken_( consumes<View<pat::MET> >( iConfig.getParameter<InputTag> ( "METTag" ) ) )
+        METToken_( consumes<View<pat::MET> >( iConfig.getParameter<InputTag> ( "METTag" ) ) ),
+        vertexToken_( consumes<View<reco::Vertex> >( iConfig.getParameter<InputTag> ( "VertexTag" ) ) )
     {
 
         minElectronPt_  = iConfig.getParameter<double>( "minElectronPt");
         maxElectronEta_ = iConfig.getParameter<double>( "maxElectronEta");
         minMet_  = iConfig.getParameter<double>( "minMet");
+        electronIdWP_  = iConfig.getParameter<string>( "electronIdWP");
 
         produces<vector<WenuCandidate> >();
     }
 
     
+    bool WenuCandidateProducer::passCutBasedID(edm::Ptr<flashgg::Electron> electron, const std::vector<edm::Ptr<reco::Vertex> > &pvPointers, string wp)
+    {
+
+        bool pass = false;
+
+        float full5x5_sigmaIetaIeta = electron->full5x5_sigmaIetaIeta();
+        float dEtaIn = electron->deltaEtaSuperClusterTrackAtVtx();
+        float dPhiIn = electron->deltaPhiSuperClusterTrackAtVtx();
+        float hOverE = electron->hcalOverEcal();
+        float relIsoEA = electron->standardHggIso()/electron->pt();
+
+        float ooEmooP =-999 ; 
+
+        if( electron->ecalEnergy() == 0 ){
+            ooEmooP = 1e30;
+        }else if( !std::isfinite(electron->ecalEnergy())){    
+            ooEmooP = 1e30;
+        }else{
+            ooEmooP = fabs(1.0/electron->ecalEnergy() - electron->eSuperClusterOverP()/electron->ecalEnergy() );
+        }
+
+        double vtx_dz = 1000000.;
+        unsigned int min_dz_vtx = -1;
+        
+        for( unsigned int vtxi = 0; vtxi < pvPointers.size(); vtxi++ ) {            
+            Ptr<reco::Vertex> vtx = pvPointers[vtxi];            
+            if( vtx_dz > fabs(electron->gsfTrack()->dz( vtx->position() )) ) {                
+                vtx_dz = fabs( electron->gsfTrack()->dz( vtx->position() ) );
+                min_dz_vtx = vtxi;
+            }
+        }
+        
+        Ptr<reco::Vertex> best_vtx_elec = pvPointers[min_dz_vtx];
+        float dxy = fabs( electron->gsfTrack()->dxy( best_vtx_elec->position()) ) ;
+        float dz = fabs( electron->gsfTrack()->dz( best_vtx_elec->position())) ;
+
+        int missedHits = electron->gsfTrack()->hitPattern().numberOfHits( reco::HitPattern::MISSING_INNER_HITS);
+
+        bool isEB = (fabs(electron->superCluster()->eta())<1.479);
+
+        if (isEB){
+            if ( wp == "loose" 
+                 && full5x5_sigmaIetaIeta < 0.0103
+                 && fabs(dEtaIn) < 0.0105
+                 && fabs(dPhiIn) < 0.115
+                 && hOverE < 0.104
+                 && relIsoEA < 0.0893
+                 && ooEmooP < 0.102
+                 && fabs(dxy) < 0.0261
+                 && fabs(dz) < 0.41
+                 && missedHits <=2 ) 
+                pass =  true;
+
+            if ( wp == "medium" 
+                 && full5x5_sigmaIetaIeta < 0.0101
+                 && fabs(dEtaIn) < 0.0103
+                 && fabs(dPhiIn) < 0.0336
+                 && hOverE < 0.0876
+                 && relIsoEA < 0.0766
+                 && ooEmooP < 0.0174
+                 && fabs(dxy) < 0.0118
+                 && fabs(dz) < 0.373
+                 && missedHits <=2 ) 
+                pass =  true;
+
+            if ( wp == "tight" 
+                 && full5x5_sigmaIetaIeta < 0.0101
+                 && fabs(dEtaIn) < 0.00926
+                 && fabs(dPhiIn) < 0.0336
+                 && hOverE < 0.0597
+                 && relIsoEA < 0.0354
+                 && ooEmooP < 0.012
+                 && fabs(dxy) < 0.0111
+                 && fabs(dz) < 0.0466
+                 && missedHits <=2 ) 
+                pass =  true;
+        }
+        else {
+            if ( wp == "loose"
+                 && full5x5_sigmaIetaIeta < 0.0301
+                 && fabs(dEtaIn) < 0.00814
+                 && fabs(dPhiIn) < 0.182
+                 && hOverE < 0.0897
+                 && relIsoEA < 0.121
+                 && ooEmooP < 0.126
+                 && fabs(dxy) < 0.118
+                 && fabs(dz) < 0.822
+                 && missedHits <=1 )
+                pass = true; 
+
+            if ( wp == "medium"
+                 && full5x5_sigmaIetaIeta < 0.0283
+                 && fabs(dEtaIn) < 0.00733
+                 && fabs(dPhiIn) < 0.114
+                 && hOverE < 0.0678
+                 && relIsoEA < 0.0678
+                 && ooEmooP < 0.0898
+                 && fabs(dxy) < 0.0739
+                 && fabs(dz) < 0.602
+                 && missedHits <=1 )
+                pass = true; 
+            
+            if ( wp == "tight"
+                 && full5x5_sigmaIetaIeta < 0.0279
+                 && fabs(dEtaIn) < 0.00724
+                 && fabs(dPhiIn) < 0.0918
+                 && hOverE < 0.0615
+                 && relIsoEA < 0.0646
+                 && ooEmooP < 0.00999
+                 && fabs(dxy) < 0.0351
+                 && fabs(dz) < 0.417
+                 && missedHits <=1 )
+                pass = true; 
+
+        }
+
+        return pass;
+
+    
+        
+    }
+
+
+
     void WenuCandidateProducer::produce( Event &evt, const EventSetup & )
         
     {
@@ -80,6 +209,9 @@ namespace flashgg {
         Ptr<pat::MET> theMet = METs->ptrAt( 0 );
 
 
+        Handle<View<reco::Vertex> > vertices;
+        evt.getByToken( vertexToken_, vertices );
+
         std::auto_ptr<vector<WenuCandidate> > WenuCandidates( new vector<WenuCandidate> );
         
         for( unsigned int iele = 0; iele < electrons->size(); iele++) {
@@ -90,8 +222,8 @@ namespace flashgg {
             if (theElectron->pt() < minElectronPt_) continue;
             if (fabs(theElectron->eta()) > maxElectronEta_) continue;
             //if (!wpXX) continue;
-
-            
+            if( theElectron->hasMatchedConversion() ) continue; 
+            if ( !passCutBasedID(theElectron, vertices->ptrs(), electronIdWP_) ) continue;
 
             // --- find photons corresponding to the electrons
             int imatch = -1;
