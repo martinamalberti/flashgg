@@ -237,7 +237,7 @@ namespace flashgg {
 
 
             // min met cut
-            if (thMet->pt() < minMet_) continue;
+            if (theMet->pt() < minMet_) continue;
             
             if (imatch != -1){
                 Ptr<flashgg::Photon> thePhoton = photons->ptrAt(imatch);
