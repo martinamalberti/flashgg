@@ -46,34 +46,36 @@ customize.parse()
 
 # load syst producer - need to apply to single photons
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-#process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
 
-from flashgg.Systematics.flashggDiPhotonSystematics_cfi import *
 for isyst in [process.MCScaleHighR9EB, process.MCScaleLowR9EB, process.MCScaleHighR9EE, process.MCScaleLowR9EE, process.MCSmearHighR9EE, process.MCSmearLowR9EE, process.MCSmearHighR9EB, process.MCSmearLowR9EB, process.SigmaEOverESmearing]:
+    isyst.MethodName = isyst.PhotonMethodName
+
+for isyst in [process.MCScaleHighR9EB_EGM, process.MCScaleLowR9EB_EGM, process.MCScaleHighR9EE_EGM, process.MCScaleLowR9EE_EGM, process.MCSmearHighR9EE_EGM, process.MCSmearLowR9EE_EGM, process.MCSmearHighR9EB_EGM, process.MCSmearLowR9EB_EGM, process.SigmaEOverESmearing_EGM]:
     isyst.MethodName = isyst.PhotonMethodName
 
 process.flashggDiPhotonSystematics = cms.EDProducer('FlashggPhotonSystematicProducer',
                 src = cms.InputTag("flashggRandomizedPhotons"),
                 SystMethods2D = cms.VPSet(),
                 SystMethods = cms.VPSet(
-                    MCScaleHighR9EB,
-                    MCScaleLowR9EB,
-                    MCScaleHighR9EE,
-                    MCScaleLowR9EE,
-                    MCSmearHighR9EE,
-                    MCSmearLowR9EE,
-                    MCSmearHighR9EB,
-                    MCSmearLowR9EB,
-                    SigmaEOverESmearing
+                    process.MCScaleHighR9EB,
+                    process.MCScaleLowR9EB,
+                    process.MCScaleHighR9EE,
+                    process.MCScaleLowR9EE,
+                    process.MCSmearHighR9EE,
+                    process.MCSmearLowR9EE,
+                    process.MCSmearHighR9EB,
+                    process.MCSmearLowR9EB,
+                    process.SigmaEOverESmearing
                     )
 )
+
 
 
 # customize photon systematics for MC and data
 from flashgg.Systematics.SystematicsCustomize import *
 
-# use EGM tool
-#useEGMTools(process)
+process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
+#useEGMTools(process) # non funziona...
 
 #customize.processType = 'data' # for test
 
@@ -94,13 +96,14 @@ else:
         pset.ApplyCentralValue = cms.bool(False) # no central value
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
             pset.ApplyCentralValue = cms.bool(True)
-        newvpset+= [pset]
+            newvpset+= [pset]
     process.flashggDiPhotonSystematics.SystMethods = newvpset        
     #syst (2D) : smearings with EGMTool
     vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
     newvpset2D = cms.VPSet()
     for pset in vpset2D:
         pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
+        pset.ApplyCentralValue = cms.bool(False) # no central value
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
             pset.ApplyCentralValue = cms.bool(True)
             newvpset2D+= [pset]
@@ -110,13 +113,6 @@ print 'syst 1D'
 printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
 print 'syst 2D'
 printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
-
-print 'ciao'
-
-# preselection Zee
-#process.load("flashgg.Taggers.flashggPreselectedDiPhotons_cfi")
-#process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
-#process.flashggPreselectedDiPhotons.src = cms.InputTag("flashggDiPhotonSystematics")
 
 
 # wenu producer + dumper
@@ -128,11 +124,9 @@ import flashgg.Taggers.dumperConfigTools as cfgTools
 
 process.wenuDumper.src = "flashggWenu"
 process.wenuDumper.maxCandPerEvent = -1 # take them all
-#process.wenuDumper.splitLumiWeight=cms.untracked.bool(True)
 process.wenuDumper.dumpTrees = True
 process.wenuDumper.dumpWorkspace = False
 process.wenuDumper.quietRooFit = True
-#process.wenuDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL"
 process.wenuDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 
 ## define categories and associated objects to dump
@@ -150,25 +144,20 @@ cfgTools.addCategories(process.wenuDumper,
                         ("All","1",0)
                        ],
                        ## variables to be dumped in trees/datasets. Same variables for all categories
-                       ## if different variables wanted for different categories, can add categorie one by one with cfgTools.addCategory
-                       variables=["pho1_pt            :=photon.pt",
-                                  "pho1_eta           :=photon.superCluster.eta",
-                                  "pho1_phi           :=photon.superCluster.phi",
-                                  "pho1_energy        :=photon.energy",
-                                  "pho1_rawEnergy     :=photon.superCluster.rawEnergy",
-                                  "pho1_eTrue         := ?photon().hasMatchedGenPhoton()?photon().matchedGenPhoton().energy():0",
-                                  "pho1_p             :=electron.p4().P()",
-                                  "pho1_r9            :=photon.r9",
-                                  "pho1_full5x5_r9    :=photon.full5x5_r9",
-                                  #"pho1_etawidth      :=photon.superCluster.etaWidth",
-                                  #"pho1_phiwidth      :=photon.superCluster.phiWidth",
-                                  #"pho1_s4            :=photon.s4",
-                                  #"pho1_phoIso        :=photon.pfPhoIso03",
-                                  #"pho1_ChgIso        :=photon.pfChgIsoWrtChosenVtx03",
-                                  #"pho1_ChgIsoWorstVtx:=photon.pfChgIsoWrtWorstVtx03",
-                                  #"pho1_esEffSigmaRR  :=photon.esEffSigmaRR",
-                                  #"pho1_idmva         :=photon.leadPhotonId",
-                                  #"pho1_sigmaEoE      :=photon.sigEOverE",
+                       ## if different variables wanted for different categories, can add  categorie one by one with cfgTools.addCategory
+                       variables=["ele1_energy        :=photon.energy",  # photon regression
+                                  "ele1_et            :=photon.pt", # photon regression
+                                  "ele1_rawEnergy     :=electron.superCluster.rawEnergy",
+                                  "ele1_esEnergy      :=electron.superCluster.preshowerEnergy",
+                                  "ele1_scEta         :=electron.superCluster.eta",
+                                  "ele1_scPhi         :=electron.superCluster.phi",
+                                  "ele1_p             :=electron.p4().P()",
+                                  "ele1_pt            :=electron.p4().Pt",
+                                  "ele1_eta           :=electron.eta()",
+                                  "ele1_phi           :=electron.phi()",
+                                  #"ele1_eTrue         := ?electron.genLepton()?electron.genLepton().energy():0",
+                                  "ele1_r9            :=electron.r9",
+                                  "ele1_full5x5_r9    :=electron.full5x5_r9",
                                   "met  := met.pt"
                                   ],
                        histograms=[]

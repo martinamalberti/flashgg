@@ -47,7 +47,7 @@ namespace flashgg {
         double maxElectronEta_;
         double minMet_;
         string electronIdWP_;
-        
+      
     };
 
     WenuCandidateProducer::WenuCandidateProducer( const ParameterSet &iConfig ) :
@@ -235,6 +235,9 @@ namespace flashgg {
                 }
             }
 
+
+            // min met cut
+            if (thMet->pt() < minMet_) continue;
             
             if (imatch != -1){
                 Ptr<flashgg::Photon> thePhoton = photons->ptrAt(imatch);
