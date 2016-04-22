@@ -24,7 +24,7 @@ process.source = cms.Source("PoolSource",
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
         # mc
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
-        "file:/afs/cern.ch/work/m/malberti/HGG/CMSSW_7_6_3_patch2/src/flashgg/MicroAOD/test/myMicroAODOutputFile.root"
+        "/store/group/phys_higgs/cmshgg/malberti/flashgg/RunIIFall15DR76-WJets/1_3_0/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-WJets-1_3_0-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160420_104732/0000/myMicroAODOutputFile_1.root"
         ))
 
 #output file
