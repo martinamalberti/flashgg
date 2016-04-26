@@ -65,17 +65,25 @@ process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 if customize.processType == 'data':
     print 'data' 
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
-            "HLT_Ele27_WPLoose_Gsf_v*",
-            "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
-            "HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
+            #DoubleEG
+            "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+            #SingleEG
+            #"HLT_Ele27_WPLoose_Gsf_v*" # 7_6_X
+            ##"HLT_Ele27_WPLoose_Gsf_v*",
+            ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
+            ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
             ) )
     customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
 else:
     print 'mc'
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
-            "HLT_Ele27_WPLoose_Gsf_v*",
-            "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
-            "HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
+            #DoubleEG
+            "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+            #SingleEG
+            #"HLT_Ele23_WPLoose_Gsf_v*" # 7_6_X
+            ##"HLT_Ele27_WPLoose_Gsf_v*",
+            ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
+            ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
             ) )
     customizePhotonSystematicsForMC(process)
     #syst (1D) 
@@ -142,9 +150,10 @@ process.diphotonDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
     tag = cms.InputTag("TriggerResults::HLT"),
     bits = cms.vstring(
-    "HLT_Ele27_WPLoose_Gsf_v",
-    "HLT_Ele27_eta2p1_WPLoose_Gsf_v",
-    "HLT_Ele22_eta2p1_WPLoose_Gsf_v"
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*"
+        #"HLT_Ele27_WPLoose_Gsf_v",
+        #"HLT_Ele27_eta2p1_WPLoose_Gsf_v",
+        #"HLT_Ele22_eta2p1_WPLoose_Gsf_v"
     )
 )
 

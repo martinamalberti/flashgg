@@ -21,10 +21,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015C_25ns-16Dec2015-v1/160127_023910/0000/myMicroAODOutputFile_1.root"
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
         # mc
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
-        "/store/group/phys_higgs/cmshgg/malberti/flashgg/RunIIFall15DR76-WJets/1_3_0/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-WJets-1_3_0-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160420_104732/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/malberti/flashgg/RunIIFall15DR76-WJets/1_3_0/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-WJets-1_3_0-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160420_104732/0000/myMicroAODOutputFile_1.root"
         ))
 
 #output file
@@ -84,19 +85,29 @@ process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 # if data, apply only energy scale corrections, if MC apply only energy smearings
 if customize.processType == 'data':
     print 'data' 
-    process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
+    process.hltHighLevel= hltHighLevel.clone(
+        HLTPaths = cms.vstring(
+            "HLT_Ele23_WPLoose_Gsf_v*",
             "HLT_Ele27_WPLoose_Gsf_v*",
             "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
             "HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
-            ) )
+            ),
+        andOr = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
+        throw = cms.bool(False) # throw exception on unknown path names 
+        )
     customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
 else:
     print 'mc'
-    process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
+    process.hltHighLevel= hltHighLevel.clone(
+        HLTPaths = cms.vstring(
+            "HLT_Ele23_WPLoose_Gsf_v*",
             "HLT_Ele27_WPLoose_Gsf_v*",
             "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
             "HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
-            ) )
+            ),
+        andOr = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
+        throw = cms.bool(False) # throw exception on unknown path names 
+        )
     customizePhotonSystematicsForMC(process)
     #syst (1D) 
     vpset   = process.flashggDiPhotonSystematics.SystMethods
@@ -143,6 +154,7 @@ process.wenuDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 process.wenuDumper.globalVariables.addTriggerBits = cms.PSet(
     tag = cms.InputTag("TriggerResults::HLT"),
     bits = cms.vstring(
+    "HLT_Ele23_WPLoose_Gsf_v",
     "HLT_Ele27_WPLoose_Gsf_v",
     "HLT_Ele27_eta2p1_WPLoose_Gsf_v",
     "HLT_Ele22_eta2p1_WPLoose_Gsf_v"
