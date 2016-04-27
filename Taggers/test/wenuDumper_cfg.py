@@ -183,14 +183,16 @@ cfgTools.addCategories(process.wenuDumper,
                                   "ele1_esEnergy      :=electron.superCluster.preshowerEnergy",
                                   "ele1_scEta         :=electron.superCluster.eta",
                                   "ele1_scPhi         :=electron.superCluster.phi",
-                                  "ele1_p             :=electron.p4().P()",
-                                  "ele1_pt            :=electron.p4().Pt",
+                                  "ele1_tkP           :=electron.trackMomentumAtVtx().R()",
+                                  "ele1_tkPt          :=electron.trackMomentumAtVtx().rho()",
                                   "ele1_eta           :=electron.eta()",
                                   "ele1_phi           :=electron.phi()",
                                   #"ele1_eTrue         := ?electron.genLepton()?electron.genLepton().energy():0",
-                                  "ele1_r9            :=electron.r9",
-                                  "ele1_full5x5_r9    :=electron.full5x5_r9",
-                                  "met  := met.pt"
+                                  "ele1_r9            :=photon.r9",
+                                  "ele1_full5x5_r9    :=photon.full5x5_r9",
+                                  "met                := met.pt"
+                                  "mex                := met.px"
+                                  "mey                := met.py"
                                   ],
                        histograms=[]
                        )

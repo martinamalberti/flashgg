@@ -9,6 +9,6 @@ flashggWenu = cms.EDProducer('FlashggWenuCandidateProducer',
                              minElectronPt = cms.double(30.),
                              maxElectronEta = cms.double(2.5),
                              minMet = cms.double(25.),
-                             electronIdWP = cms.string("medium")
+                             electronIdWP = cms.string("tight")
                              )
 
