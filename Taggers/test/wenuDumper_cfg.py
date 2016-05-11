@@ -190,8 +190,9 @@ cfgTools.addCategories(process.wenuDumper,
                                   #"ele1_eTrue         := ?electron.genLepton()?electron.genLepton().energy():0",
                                   "ele1_r9            :=photon.r9",
                                   "ele1_full5x5_r9    :=photon.full5x5_r9",
-                                  "met                := met.pt"
-                                  "mex                := met.px"
+                                  "met                := met.pt",
+                                  "metPhi             := met.phi",
+                                  "mex                := met.px",
                                   "mey                := met.py"
                                   ],
                        histograms=[]
