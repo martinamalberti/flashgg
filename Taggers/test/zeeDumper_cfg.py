@@ -13,7 +13,6 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-
 if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
     process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
 else:
@@ -22,10 +21,11 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 
+## apply shower shape corrections
 doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)
 
 
-# input files
+## input files
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
@@ -34,52 +34,51 @@ process.source = cms.Source("PoolSource",
         "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
         ))
 
-#output file
+## output file
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("test.root")
 )
 
 
 
-# import trigger filter
+## import trigger filter
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
-#process.options = cms.untracked.PSet( allowUnscheduled = cms.untracked.bool(True), wantSummary = cms.untracked.bool(True) )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
-# load module to recompute photon id on-the-fly
+## load module to recompute photon id on-the-fly
 process.load("flashgg/Taggers/flashggUpdatedIdMVADiPhotons_cfi")
 
-# import flashgg customization to check if we have data, signal or background
+## import flashgg customization to check if we have data, signal or background
 from flashgg.MetaData.JobConfig import customize
 customize.parse()
 
-# import systs. customize
+## import systs. customize
 from flashgg.Systematics.SystematicsCustomize import *
 #customize.processId = 'Data' # for test
 
-# load syst producer
+## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 if (doUpdatedIdMVADiPhotons):
     process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
 else:
     process.flashggDiPhotonSystematics.src = "flashggDiPhotons"
-    print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
+print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
 
 
-# load appropriate scale and smearing bins 
+## load appropriate scale and smearing bins 
 #process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
-# Or use the official  tool instead  ????????????????
+## Or use the official  tool instead  ????????????????
 useEGMTools(process)
 
-# if data, apply only energy scale corrections, if MC apply only energy smearings
+## if data, apply only energy scale corrections, if MC apply only energy smearings
 if customize.processId == 'Data':
     print 'data' 
     customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
 else:
     print 'mc'
     customizePhotonSystematicsForMC(process)
-    #syst (1D) 
+    ##syst (1D) 
     vpset   = process.flashggDiPhotonSystematics.SystMethods
     newvpset = cms.VPSet()
     for pset in vpset:
@@ -89,7 +88,7 @@ else:
             pset.ApplyCentralValue = cms.bool(True)
         newvpset+= [pset]
     process.flashggDiPhotonSystematics.SystMethods = newvpset        
-    #syst (2D) : smearings with EGMTool
+    ##syst (2D) : smearings with EGMTool
     vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
     newvpset2D = cms.VPSet()
     for pset in vpset2D:
@@ -106,7 +105,7 @@ printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
 
 
 
-# preselection Zee
+## preselection Zee
 process.load("flashgg.Taggers.flashggPreselectedDiPhotons_cfi")
 process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 process.flashggPreselectedDiPhotons.src = "flashggDiPhotonSystematics"
@@ -122,7 +121,7 @@ process.flashggPreselectedDiPhotons.src = "flashggDiPhotonSystematics"
 #process.diphotonDumper.nameTemplate = "tree_$SQRTS_$LABEL_$SUBCAT"
 
 
-# untagged tag dumper
+## untagged tag dumper
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
 process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
 
@@ -135,7 +134,6 @@ from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
 process.diphotonDumper = createTagDumper("UntaggedTag")
 process.diphotonDumper.src = "flashggUntagged"
 process.diphotonDumper.maxCandPerEvent = -1 # take them all
-#process.diphotonDumper.splitLumiWeight=cms.untracked.bool(True)
 process.diphotonDumper.dumpTrees = True
 process.diphotonDumper.dumpWorkspace = False
 process.diphotonDumper.quietRooFit = True
@@ -159,7 +157,7 @@ cfgTools.addCategory(process.diphotonDumper,
                       -1 ## if nSubcat is -1 do not store anythings
                      )
 
-# interestng categories 
+## interestng categories 
 cfgTools.addCategories(process.diphotonDumper,
                        ## categories definition
                        ## cuts are applied in cascade. Events getting to these categories have already failed the "Reject" selection
@@ -205,7 +203,7 @@ cfgTools.addCategories(process.diphotonDumper,
                        )
 
 
-# ee bad supercluster filter on data
+## HLT + EE bad supercluster filter on data
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only) 
 process.dataRequirements = cms.Sequence()
@@ -251,8 +249,8 @@ else:
 
 #printSystematicInfo(process)
 
-# set default options if needed
+## set default options if needed
 customize.setDefault("maxEvents",100)
 customize.setDefault("targetLumi",2.7e+3)
-# call the customization
+## call the customization
 customize(process)
