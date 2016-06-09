@@ -15,6 +15,8 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag import GlobalTag
 if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
     process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
+elif os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
+    process.GlobalTag = GlobalTag(process.GlobalTag,'80X_mcRun2_asymptotic_v11')
 else:
     process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
@@ -29,9 +31,10 @@ doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corr
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v1/160524_085131/0000/myMicroAODOutputFile_1.root"
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2/160524_085254/0000/myMicroAODOutputFile_2.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v1/160524_085131/0000/myMicroAODOutputFile_31.root"
         # mc
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
         ))
 
 ## output file
@@ -65,8 +68,6 @@ else:
 print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
 
 
-## load appropriate scale and smearing bins 
-#process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
 ## Or use the official  tool instead  ????????????????
 useEGMTools(process)
@@ -143,8 +144,8 @@ process.diphotonDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
     tag = cms.InputTag("TriggerResults::HLT"),
     bits = cms.vstring(
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1"
-        #"HLT_Ele27_WPLoose_Gsf_v",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1",
+        "HLT_Ele27_WPTight_Gsf_v1",
         #"HLT_Ele27_eta2p1_WPLoose_Gsf_v",
         #"HLT_Ele22_eta2p1_WPLoose_Gsf_v"
     )
@@ -212,7 +213,9 @@ if customize.processId == 'Data':
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
             #DoubleEG
             "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+            #"HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*"
             #SingleEG
+            "HLT_Ele27_WPTight_Gsf_v*",
             #"HLT_Ele27_WPLoose_Gsf_v*" # 7_6_X
             ##"HLT_Ele27_WPLoose_Gsf_v*",
             ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
@@ -236,7 +239,6 @@ if (doUpdatedIdMVADiPhotons):
                          process.dataRequirements*
                          process.flashggUpdatedIdMVADiPhotons*
                          process.flashggDiPhotonSystematics*
-                         #process.flashggPreselectedDiPhotons* # this is already in TagSequence
                          process.flashggTagSequence*
                          process.diphotonDumper)
 else:
@@ -250,7 +252,7 @@ else:
 #printSystematicInfo(process)
 
 ## set default options if needed
-customize.setDefault("maxEvents",100)
-customize.setDefault("targetLumi",2.7e+3)
+customize.setDefault("maxEvents",-1)
+customize.setDefault("targetLumi",1e+3)
 ## call the customization
 customize(process)
