@@ -10,3 +10,6 @@ fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 100 -d jobsZeeDumper_MC_v2 -x c
 # to save output on eos
 mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/jobsZeeDumper_MC_DYToEE/
 fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d jobsZeeDumper_MC_DYToEE -x cmsRun zeeDumper_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/jobsZeeDumper_MC_DYToEE
+
+mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/jobsZeeDumper_Data_SingleElectron_EXOSpring16/
+fggRunJobs.py --load jobsZee_SingleElectron.json -H -D -P -n 50 -d jobsZeeDumper_Data_SingleElectron_EXOSpring16 -x cmsRun zeeDumper_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/jobsZeeDumper_Data_SingleElectron_EXOSpring16/
