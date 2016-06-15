@@ -13,9 +13,12 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
-    process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
+    process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v13')
+elif os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
+    process.GlobalTag = GlobalTag(process.GlobalTag,'80X_mcRun2_asymptotic_v11')
 else:
-    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' 
+    raise Exception,"The default setup does not support releases other than 76X and 80X"
+
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
@@ -96,6 +99,11 @@ process.load("flashgg/Taggers/flashggTagSequence_cfi")
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
+# use 2015 vtx prob parametrization to be consistent with the diphotonMVA training
+process.flashggDiPhotonMVA.VertexProbParamsConv=cms.vdouble(-0.049,-0.241,-0.505,-0.270)
+process.flashggDiPhotonMVA.VertexProbParamsNoConv=cms.vdouble(-0.344,-0.091,-0.234,-0.186)
+                           
+
 
 
 ## global variables to dump
@@ -131,9 +139,10 @@ process.TFileService = cms.Service("TFileService",
 
 ## HLT filter
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
-process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v1",
-                                                                "HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1",
-                                                                "HLT_Diphoton30EB_18EB_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1"),
+process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*",
+#                                                                "HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1",
+#                                                                "HLT_Diphoton30EB_18EB_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1"
+                                                                ),
                                          andOr    = cms.bool(True) # True = or between triggers 
                                          )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -149,24 +158,37 @@ if customize.processId == "Data":
         process.dataRequirements += process.eeBadScFilter
 
 
+## to run on EXOSpring16_v1                    
+from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
+process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
+
+
 #
 if (doUpdatedIdMVADiPhotons):
     process.p = cms.Path(process.dataRequirements*
                          process.flashggUpdatedIdMVADiPhotons*
                          process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence
-                         *process.analysisTree)
+                         process.flashggTagSequence*
+                         process.analysisTree)
 else:
-    process.p = cms.Path(#process.dataRequirements*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence
-                         *process.analysisTree)
+    #for 
+    if customize.processId == "Data":
+        process.p = cms.Path(process.flashggSelectedElectrons*
+                             process.dataRequirements*
+                             process.flashggDiPhotonSystematics*
+                             process.flashggTagSequence*
+                             process.analysisTree)
+    else:
+        process.p = cms.Path(process.dataRequirements*
+                             process.flashggDiPhotonSystematics*
+                             process.flashggTagSequence*
+                             process.analysisTree)
 
 
 
 ## set default options if needed
 customize.setDefault("maxEvents",1000)
-customize.setDefault("targetLumi",2.6e+3)
+customize.setDefault("targetLumi",1e+3)
 ## call the customization
 customize(process)
 
