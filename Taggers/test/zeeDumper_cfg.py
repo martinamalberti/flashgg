@@ -250,7 +250,7 @@ if (doUpdatedIdMVADiPhotons):
                          process.diphotonDumper)
 else:
     process.p = cms.Path(
-                         process.flashggSelectedElectrons*
+                         #process.flashggSelectedElectrons*
                          process.hltHighLevel*
                          process.dataRequirements*
                          process.flashggDiPhotonSystematics*

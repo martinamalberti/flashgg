@@ -1,12 +1,12 @@
 {
     "processes" : {
         "Data" : [ 
-	       	 "/SingleElectron_musella-EXOSpring16_v1_p3-diphotons_80_v1-v0-Run2016B-PromptReco-v1-ea408274daa18c6402a808da38fd2b89_USER",
-		 "/SingleElectron_musella-EXOSpring16_v1_p3-diphotons_80_v1-v0-Run2016B-PromptReco-v2-ea408274daa18c6402a808da38fd2b89_USER",
-		 "/SingleElectron_musella-EXOSpring16_v1_p5-Moriond16WSFinal-70-ga303087-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d_USER",
-		 "/SingleElectron_musella-EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2-a5f1c0c964d9d1f7d2e18cd5bbce5233_USER",
-		 "/SingleElectron_spigazzi-EXOSpring16_v1_p6-Moriond16WSFinal-74-g8fd901f-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d_USER",
-		 "/SingleElectron_spigazzi-EXOSpring16_v1_p7-Moriond16WSFinal-74-g8fd901f-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d_USER"
+	       	 "/SingleElectron/musella-EXOSpring16_v1_p3-diphotons_80_v1-v0-Run2016B-PromptReco-v1-ea408274daa18c6402a808da38fd2b89/USER",
+		 "/SingleElectron/musella-EXOSpring16_v1_p3-diphotons_80_v1-v0-Run2016B-PromptReco-v2-ea408274daa18c6402a808da38fd2b89/USER",
+		 "/SingleElectron/musella-EXOSpring16_v1_p5-Moriond16WSFinal-70-ga303087-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d/USER",
+		 "/SingleElectron/musella-EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2-a5f1c0c964d9d1f7d2e18cd5bbce5233/USER",
+		 "/SingleElectron/spigazzi-EXOSpring16_v1_p6-Moriond16WSFinal-74-g8fd901f-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d/USER",
+		 "/SingleElectron/spigazzi-EXOSpring16_v1_p7-Moriond16WSFinal-74-g8fd901f-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d/USER"
    	       	 ]
      },																
        
