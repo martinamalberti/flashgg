@@ -8,8 +8,8 @@
 		  "/DoubleEG/musella-EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2-a5f1c0c964d9d1f7d2e18cd5bbce5233/USER", 
 		  "/DoubleEG/spigazzi-EXOSpring16_v1_p6-Moriond16WSFinal-74-g8fd901f-v0-Run2016B-PromptReco-v2-5c50ce53d80a6fec7ad55686b342f79d/USER" 
 		 ]
-     },															         
-       
-     "cmdLine" : "campaign=RunIISpring16DR80X-2_0_0-25ns processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-274421_13TeV_PromptReco_Collisions16_JSON.txt"
+     },															                
+     "cmdLine" : "campaign=RunIISpring16DR80X-2_0_0-25ns processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-274443_13TeV_PromptReco_Collisions16_JSON.txt"
+
 
 }    
