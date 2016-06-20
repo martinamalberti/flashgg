@@ -146,14 +146,14 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
     // -- initialize tree
     initEventStructure();
     
-    // -- check if event passes HLT: "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1"  
+    // -- check if event passes HLT: "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*"  
     const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
     //vector<std::string> const &names = triggerNames.triggerNames();  
     for( unsigned index = 0; index < triggerNames.size(); ++index ) {
       //if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton") ) 
       //cout << (triggerNames.triggerName( index )).c_str() <<endl;
-      if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95") ) {
-            //cout << TString::Format((triggerNames.triggerName( index )).c_str()) << " " << triggerBits->accept( index ) << endl;
+      if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v") ) {
+	//cout << TString::Format((triggerNames.triggerName( index )).c_str()) << " " << triggerBits->accept( index ) << endl;
             evInfo.passHLT =  triggerBits->accept( index );
         }
     }
@@ -410,10 +410,11 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
 
 
         // -- MET 
-        evInfo.met = theMET->pt();
-        evInfo.metx = theMET->px();
-        evInfo.mety = theMET->py();
-        evInfo.metphi = theMET->phi();
+        evInfo.met = theMET->corPt();
+        evInfo.metx = theMET->corPx();
+        evInfo.mety = theMET->corPy();
+        evInfo.metphi = theMET->corPhi();
+        evInfo.metSumEt = theMET->corSumEt();
 
         
         // --- fill the tree
@@ -500,7 +501,8 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "met", &evInfo.met);
   eventTree->Branch( "metx", &evInfo.metx);
   eventTree->Branch( "mety", &evInfo.mety);
-  eventTree->Branch( "metphi", &evInfo.metphi);
+  eventTree->Branch( "metphi", &evInfo.metphi);  
+  eventTree->Branch( "metSumEt", &evInfo.metSumEt);
 
 }
 // ******************************************************************************************
@@ -589,6 +591,7 @@ SimpleTreeMaker::initEventStructure()
     evInfo.metx = -999;
     evInfo.mety = -999;
     evInfo.metphi = -999;
+    evInfo.metSumEt = -999;
 
 }
 // ******************************************************************************************

@@ -122,6 +122,7 @@ struct eventInfo {
     float metx;
     float mety;
     float metphi;
+    float metSumEt;
 
 };
 // ******************************************************************************************
