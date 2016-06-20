@@ -132,6 +132,15 @@ process.analysisTree = cms.EDAnalyzer('EDSimpleTreeMaker',
                                       )
 
 
+process.analysisTree.globalVariables.addTriggerBits = cms.PSet(
+    tag = cms.InputTag("TriggerResults::HLT"),
+    bits = cms.vstring(
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v2"
+    )
+)
+
+
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("mytree.root")
                                    )
