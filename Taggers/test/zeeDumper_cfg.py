@@ -31,10 +31,10 @@ doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corr
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2/160524_085254/0000/myMicroAODOutputFile_2.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2/160524_085254/0000/myMicroAODOutputFile_2.root"
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v1/160524_085131/0000/myMicroAODOutputFile_31.root"
         # mc
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
         ))
 
 ## output file
@@ -235,6 +235,11 @@ else:
 
  
 
+## to run on EXOSpring16_v1
+from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
+process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
+
+
 if (doUpdatedIdMVADiPhotons):
     process.p = cms.Path(process.hltHighLevel*
                          process.dataRequirements*
@@ -243,11 +248,20 @@ if (doUpdatedIdMVADiPhotons):
                          process.flashggTagSequence*
                          process.diphotonDumper)
 else:
-    process.p = cms.Path(process.hltHighLevel*
-                         process.dataRequirements*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence*
-                         process.diphotonDumper)
+    # to run on EXOSpring16_v1
+    if customize.processId == 'Data':
+        process.p = cms.Path(process.flashggSelectedElectrons*
+                             process.hltHighLevel*
+                             process.dataRequirements*
+                             process.flashggDiPhotonSystematics*
+                             process.flashggTagSequence*
+                             process.diphotonDumper)
+    else:
+        process.p = cms.Path(process.hltHighLevel*
+                             process.dataRequirements*
+                             process.flashggDiPhotonSystematics*
+                             process.flashggTagSequence*
+                             process.diphotonDumper)
 
 
 #printSystematicInfo(process)
