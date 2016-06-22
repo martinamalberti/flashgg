@@ -83,6 +83,7 @@ struct eventInfo {
     float dipho_m;
     float dipho_pt;
     float dipho_mva;
+    int dipho_vtxind;
     
     vector<float> jet_e;
     vector<float> jet_pt;

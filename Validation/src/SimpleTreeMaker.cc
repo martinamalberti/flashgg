@@ -259,6 +259,7 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
         evInfo.dipho_pt  = dipho->pt();
         evInfo.dipho_m   = dipho->mass();
         evInfo.dipho_mva = mvares->result ;
+	evInfo.dipho_vtxind = dipho->vertexIndex();
         
         // -- jets
         // take the jets corresponding to the diphoton candidate
@@ -464,6 +465,7 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "dipho_pt", &evInfo.dipho_pt, "dipho_pt/F" );
   eventTree->Branch( "dipho_m", &evInfo.dipho_m, "dipho_m/F" );
   eventTree->Branch( "dipho_mva", &evInfo.dipho_mva, "dipho_mva/F" );
+  eventTree->Branch( "dipho_vtxind", &evInfo.dipho_vtxind, "dipho_vtxind/I" );
 
   eventTree->Branch( "jet_e", &evInfo.jet_e);
   eventTree->Branch( "jet_pt", &evInfo.jet_pt);
@@ -553,6 +555,8 @@ SimpleTreeMaker::initEventStructure()
     evInfo.dipho_pt   = -999.;
     evInfo.dipho_m    = -999.;
     evInfo.dipho_mva  = -999.;
+    evInfo.dipho_vtxind = -999;
+
     
     evInfo.jet_e .clear();
     evInfo.jet_pt .clear();
