@@ -1,0 +1,311 @@
+#!/usr/bin/env cmsRun
+
+import FWCore.ParameterSet.Config as cms
+import FWCore.Utilities.FileUtils as FileUtils
+import os
+
+process = cms.Process("Analysis")
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+
+process.load("Configuration.StandardSequences.GeometryDB_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
+    process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
+elif os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
+    process.GlobalTag = GlobalTag(process.GlobalTag,'80X_mcRun2_asymptotic_v11')
+else:
+    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4'
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
+
+
+## apply shower shape corrections
+doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)                                                                                   
+
+## input files
+process.source = cms.Source("PoolSource",
+                            fileNames=cms.untracked.vstring(
+        #data
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
+        # mc
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/GluGluHToGG_M-125_13TeV_powheg_pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/160130_032602/0000/myMicroAODOutputFile_1.root"
+        ))
+
+
+## output file
+process.TFileService = cms.Service("TFileService",
+                                   fileName = cms.string("test.root")
+)
+
+
+
+## load module to recompute photon id on-the-fly
+process.load("flashgg/Taggers/flashggUpdatedIdMVADiPhotons_cfi")
+
+## preselection Zee
+process.load("flashgg.Taggers.flashggPreselectedDiPhotons_cfi")
+process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
+
+## load tag sequence, keeping only untagged tags
+process.load("flashgg/Taggers/flashggTagSequence_cfi")
+process.flashggTagSequence.remove(process.flashggVBFMVA)
+process.flashggTagSequence.remove(process.flashggVBFDiPhoDiJetMVA)
+process.flashggTagSequence.remove(process.flashggVBFTag)
+process.flashggTagSequence.remove(process.flashggTTHLeptonicTag)
+process.flashggTagSequence.remove(process.flashggTTHHadronicTag)
+process.flashggUntagged.Boundaries = cms.vdouble(-2)
+process.flashggTagSorter.TagPriorityRanges = cms.VPSet(cms.PSet(TagName = cms.InputTag('flashggUntagged')))
+process.flashggTagSorter.MassCutUpper=cms.double(9999.)
+process.flashggTagSorter.MassCutLower=cms.double(60.)
+print process.flashggTagSequence
+
+
+## import flashgg customization
+from flashgg.MetaData.JobConfig import customize
+customize.parse()
+
+
+## import systs. customization
+from flashgg.Systematics.SystematicsCustomize import *
+
+systlabels = [""]
+phosystlabels = []
+jetsystlabels = []
+elesystlabels = []
+musystlabels = []
+jetSystematicsInputTags = []
+modifyTagSequenceForSystematics(process,jetSystematicsInputTags)
+
+for direction in ["Up","Down"]:
+    for r9 in ["HighR9","LowR9"]:
+        for region in ["EB","EE"]:
+            phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
+#            for var in ["Rho","Phi"]:
+#                phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
+#phosystlabels = []
+systlabels += phosystlabels
+
+print systlabels
+
+## load syst producer
+process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
+if (doUpdatedIdMVADiPhotons):
+    process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
+else:
+    process.flashggDiPhotonSystematics.src = "flashggDiPhotons"
+print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
+
+
+# Or use the official  tool instead  ????????????????
+useEGMTools(process)
+
+#customize.processId = 'Data' # for test
+
+# if data, apply only energy scale corrections, if MC apply only energy smearings
+if customize.processId == 'Data':
+    print 'Data' 
+    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
+else:
+    print 'mc'
+    customizePhotonSystematicsForMC(process)
+    #syst (1D) 
+    vpset   = process.flashggDiPhotonSystematics.SystMethods
+    newvpset = cms.VPSet()
+    for pset in vpset:
+        pset.NSigmas = cms.vint32() # no up/down syst shifts
+        pset.ApplyCentralValue = cms.bool(False) # no central value
+        if ( pset.Label.value().count("MCScale")):
+            pset.ApplyCentralValue = cms.bool(False)
+            pset.NSigmas = cms.vint32(1,-1)
+        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+            pset.NSigmas = cms.vint32(1,-1) # no up/down syst shifts
+        newvpset+= [pset]
+    process.flashggDiPhotonSystematics.SystMethods = newvpset        
+    #syst (2D) : smearings with EGMTool
+    vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
+    newvpset2D = cms.VPSet()
+    for pset in vpset2D:
+        pset.ApplyCentralValue = cms.bool(False)
+        pset.NSigmas = cms.PSet( firstVar = cms.vint32(0,0,0,0), secondVar = cms.vint32(0,0,0,0) )
+        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+            pset.NSigmas = cms.PSet( firstVar = cms.vint32(1,-1,0,0), secondVar = cms.vint32(0,0,1,-1) ) # smear up/down (2D case)
+        newvpset2D+= [pset]
+    process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D       
+
+print 'syst 1D'
+printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
+print 'syst 2D'
+printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
+
+
+print 'Cloning Tag seq for each syst...'
+cloneTagSequenceForEachSystematic(process,systlabels,phosystlabels,jetsystlabels,jetSystematicsInputTags)
+#print process.systematicsTagSequences 
+
+
+#Tag dumper
+process.load("flashgg.Taggers.diphotonTagDumper_cfi") ##  import diphotonTagDumper 
+import flashgg.Taggers.dumperConfigTools as cfgTools
+process.tagsDumper.className = "DiPhotonTagDumper"
+process.tagsDumper.src = "flashggSystTagMerger"
+#process.tagsDumper.maxCandPerEvent = -1 # take them all
+#process.tagsDumper.maxCandPerEvent = 1 # take one
+process.tagsDumper.dumpTrees = True
+process.tagsDumper.dumpWorkspace = False
+process.tagsDumper.quietRooFit = True
+#process.tagsDumper.nameTemplate = cms.untracked.string("tree_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL")
+process.tagsDumper.processId = "test"
+process.tagsDumper.nameTemplate = cms.untracked.string("$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL")
+
+process.tagsDumper.globalVariables.addTriggerBits = cms.PSet(
+    tag = cms.InputTag("TriggerResults::HLT"),
+    bits = cms.vstring(
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v2",
+        "HLT_Ele27_WPTight_Gsf_v1",
+        "HLT_Ele27_WPTight_Gsf_v2",
+        #"HLT_Ele27_WPLoose_Gsf_v",
+        #"HLT_Ele27_eta2p1_WPLoose_Gsf_v",
+        #"HLT_Ele22_eta2p1_WPLoose_Gsf_v"
+    )
+)
+
+ 
+## define categories and associated objects to dump
+tagList=[
+["UntaggedTag",0]
+]
+
+
+definedSysts=set()
+process.tagsDumper.classifierCfg.remap=cms.untracked.VPSet()
+for tag in tagList: 
+    tagName=tag[0]
+    tagCats=tag[1]
+  # remap return value of class-based classifier
+    process.tagsDumper.classifierCfg.remap.append( cms.untracked.PSet( src=cms.untracked.string("flashgg%s"%tagName), dst=cms.untracked.string(tagName) ) )
+    for systlabel in systlabels:
+        print systlabel
+        if not systlabel in definedSysts:
+            # the cut corresponding to the systematics can be defined just once
+            cutstring = "hasSyst(\"%s\") "%(systlabel)
+            print systlabel, cutstring
+            definedSysts.add(systlabel)
+        else:
+            cutstring = None
+
+        # interestng categories 
+        cfgTools.addCategory(process.tagsDumper,
+                             systlabel, #syst. label
+                             classname=tagName,#catname
+                             #cutbased="1", #cutstring
+                             cutbased=cutstring, #cutstring
+                             subcats=0,#n subcats                         
+                             variables=["mass               :=diPhoton.mass",
+                                        "pt                 :=diPhoton.pt",
+                                        #"vtxprobMVA         :=diPhotonMVA.vtxprob",
+                                        #"cosdphi            :=diPhotonMVA.CosPhi",
+                                        "diphotonMVA        :=diPhotonMVA.result",
+                                        
+                                        "ele1_et            :=diPhoton.leadingPhoton.pt",
+                                        "ele1_energy        :=diPhoton.leadingPhoton.energy",
+                                        "ele1_rawEnergy     :=diPhoton.leadingPhoton.superCluster.rawEnergy",
+                                        "ele1_esEnergy      :=diPhoton.leadingPhoton.superCluster.preshowerEnergy",
+                                        "ele1_eTrue         := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+                                        "ele1_scEta         :=diPhoton.leadingPhoton.superCluster.eta",
+                                        "ele1_scPhi         :=diPhoton.leadingPhoton.superCluster.phi",
+                                        "ele1_eta           :=diPhoton.leadingPhoton.eta",
+                                        "ele1_phi           :=diPhoton.leadingPhoton.phi",
+                                        "ele1_r9            :=diPhoton.leadingPhoton.r9",
+                                        "ele1_full5x5_r9    :=diPhoton.leadingPhoton.full5x5_r9",
+                                        "ele1_idmva         :=diPhoton.leadPhotonId",
+                                        
+                                        "ele2_et            :=diPhoton.subLeadingPhoton.pt",
+                                        "ele2_energy        :=diPhoton.subLeadingPhoton.energy",
+                                        "ele2_rawEnergy     :=diPhoton.subLeadingPhoton.superCluster.rawEnergy",
+                                        "ele2_esEnergy      :=diPhoton.subLeadingPhoton.superCluster.preshowerEnergy",
+                                        "ele2_eTrue         := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+                                        "ele2_scEta         :=diPhoton.subLeadingPhoton.superCluster.eta",
+                                        "ele2_scPhi         :=diPhoton.subLeadingPhoton.superCluster.phi",
+                                        "ele2_eta           :=diPhoton.subLeadingPhoton.eta",
+                                        "ele2_phi           :=diPhoton.subLeadingPhoton.phi",
+                                        "ele2_r9            :=diPhoton.subLeadingPhoton.r9",
+                                        "ele2_full5x5_r9    :=diPhoton.subLeadingPhoton.full5x5_r9",
+                                        "ele2_idmva         :=diPhoton.subLeadPhotonId"
+                                        ],
+                             histograms=[]
+                             )
+
+
+# HLT filter + EE bad supercluster filter on data
+# import trigger filter
+from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
+process.dataRequirements = cms.Sequence()
+if customize.processId == "Data":
+    process.dataRequirements += process.eeBadScFilter
+    process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
+            #DoubleEG
+            "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+            #SingleEG
+            "HLT_Ele27_WPTight_Gsf_v*",
+            #"HLT_Ele27_WPLoose_Gsf_v*" # 7_6_X
+            ##"HLT_Ele27_WPLoose_Gsf_v*",
+            ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
+            ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
+            ) )
+else:
+    process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
+    #DoubleEG
+    #"HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+    #SingleEG
+    #"HLT_Ele23_WPLoose_Gsf_v*" # 7_6_X
+    ##"HLT_Ele27_WPLoose_Gsf_v*",
+    ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
+    ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
+    ) )
+
+ 
+if (doUpdatedIdMVADiPhotons):
+    process.p = cms.Path(process.hltHighLevel*
+                         process.dataRequirements*
+                         process.flashggUpdatedIdMVADiPhotons*
+                         process.flashggDiPhotonSystematics*
+                         (process.flashggTagSequence*process.systematicsTagSequences)*
+                         process.flashggSystTagMerger*
+                         process.tagsDumper
+                         )
+else:
+    process.p = cms.Path(process.hltHighLevel*
+                         process.dataRequirements*
+                         process.flashggDiPhotonSystematics*
+                         (process.flashggTagSequence*process.systematicsTagSequences)*
+                         process.flashggSystTagMerger*
+                         process.tagsDumper
+                         )
+
+
+##############
+## Dump EDM ##
+##############
+#process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('CustomizeWillChangeThisAnyway.root'),
+#                               outputCommands = cms.untracked.vstring('keep *') # dump everything! small tests only!
+#                               )
+#process.e = cms.EndPath(process.out)
+
+
+#printSystematicInfo(process)
+
+# set default options if needed
+customize.setDefault("maxEvents",1000)
+customize.setDefault("targetLumi",1e+3)
+# call the customization
+customize(process)
