@@ -108,6 +108,7 @@ struct eventInfo {
     vector<int> ele_nMissingHits;
     vector<int> ele_passCutBasedIdLoose;
     vector<int> ele_isMatchedToGen;
+    vector<int> ele_charge;
     
     vector<float> mu_pt;
     vector<float> mu_eta;
@@ -117,7 +118,7 @@ struct eventInfo {
     vector<bool> mu_isMedium;
     vector<bool> mu_isLoose;
     vector<int> mu_isMatchedToGen;
-
+    vector<int> mu_charge;
 
     float met;
     float metx;

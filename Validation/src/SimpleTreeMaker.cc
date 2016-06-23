@@ -50,8 +50,8 @@ SimpleTreeMaker::SimpleTreeMaker( const edm::ParameterSet &iConfig, TFileDirecto
 {
   jetPtThreshold_ = iConfig.getUntrackedParameter<double>( "jetPtThreshold", 20. );
   bTag_ = iConfig.getUntrackedParameter<string> ( "bTag", "pfCombinedInclusiveSecondaryVertexV2BJetTags" );
-  electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 20. );
-  muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 20. );
+  electronPtThreshold_ = iConfig.getUntrackedParameter<double>( "electronPtThreshold", 10. );
+  muonPtThreshold_ = iConfig.getUntrackedParameter<double>( "muonPtThreshold", 10. );
   isControlSample_ = iConfig.getUntrackedParameter<bool>( "isControlSample", false );
   lumiWeight_ = iConfig.getUntrackedParameter<double>( "lumiWeight", 1000. ); //pb                                                                                                                              
   
@@ -374,6 +374,7 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
             evInfo.ele_nMissingHits.push_back(nhits);
 	    evInfo.ele_passCutBasedIdLoose.push_back(passCutBasedIdLoose);
             evInfo.ele_isMatchedToGen.push_back(mcMatch);
+	    evInfo.ele_charge.push_back(electron->charge());
         }       
 
 
@@ -407,6 +408,7 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
             evInfo.mu_isMedium.push_back(muon::isMediumMuon( *muon ));
             evInfo.mu_isLoose.push_back(muon::isLooseMuon( *muon ));
             evInfo.mu_isMatchedToGen.push_back(mcMatch); 
+	    evInfo.mu_charge.push_back(muon->charge());
         }
 
 
@@ -490,6 +492,7 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "ele_nMissingHits", &evInfo.ele_nMissingHits);
   eventTree->Branch( "ele_passCutBasedIdLoose", &evInfo.ele_passCutBasedIdLoose);
   eventTree->Branch( "ele_isMatchedToGen", &evInfo.ele_isMatchedToGen);
+  eventTree->Branch( "ele_charge", &evInfo.ele_charge);
 
   eventTree->Branch( "mu_pt", &evInfo.mu_pt);
   eventTree->Branch( "mu_eta", &evInfo.mu_eta);
@@ -499,6 +502,7 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "mu_isMedium", &evInfo.mu_isMedium);
   eventTree->Branch( "mu_isLoose", &evInfo.mu_isLoose);
   eventTree->Branch( "mu_isMatchedToGen", &evInfo.mu_isMatchedToGen);
+  eventTree->Branch( "mu_charge", &evInfo.mu_charge);
 
   eventTree->Branch( "met", &evInfo.met);
   eventTree->Branch( "metx", &evInfo.metx);
@@ -581,6 +585,7 @@ SimpleTreeMaker::initEventStructure()
     evInfo.ele_nMissingHits .clear();
     evInfo.ele_passCutBasedIdLoose .clear();
     evInfo.ele_isMatchedToGen .clear();
+    evInfo.ele_charge .clear();
 
     evInfo.mu_pt .clear();
     evInfo.mu_eta .clear();
@@ -590,6 +595,7 @@ SimpleTreeMaker::initEventStructure()
     evInfo.mu_isMedium .clear();
     evInfo.mu_isLoose .clear();
     evInfo.mu_isMatchedToGen .clear();
+    evInfo.mu_charge .clear();
 
     evInfo.met = -999;
     evInfo.metx = -999;
