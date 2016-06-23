@@ -52,6 +52,7 @@ process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 
 ## load tag sequence, keeping only untagged tags
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
+process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons)
 process.flashggTagSequence.remove(process.flashggVBFMVA)
 process.flashggTagSequence.remove(process.flashggVBFDiPhoDiJetMVA)
 process.flashggTagSequence.remove(process.flashggVBFTag)
