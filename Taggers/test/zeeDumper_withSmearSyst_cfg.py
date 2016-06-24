@@ -4,6 +4,8 @@ import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 import os
 
+from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag,cloneProcessingSnippet
+
 process = cms.Process("Analysis")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -29,9 +31,9 @@ doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corr
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/SingleElectron/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-Run2015D-16Dec2015-v1/160127_024003/0000/myMicroAODOutputFile_1.root"
+       "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_1_0-25ns_ICHEP16/2_1_0/DoubleEG/RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-Run2016B-PromptReco-v1/160618_073656/0000/myMicroAODOutputFile_102.root"
         # mc
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/GluGluHToGG_M-125_13TeV_powheg_pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/160130_032602/0000/myMicroAODOutputFile_1.root"
         ))
 
@@ -52,7 +54,6 @@ process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 
 ## load tag sequence, keeping only untagged tags
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
-process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics       
 process.flashggTagSequence.remove(process.flashggVBFMVA)
 process.flashggTagSequence.remove(process.flashggVBFDiPhoDiJetMVA)
 process.flashggTagSequence.remove(process.flashggVBFTag)
@@ -86,12 +87,16 @@ for direction in ["Up","Down"]:
         for region in ["EB","EE"]:
 #            phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
             for var in ["Rho","Phi"]:
-#            for var in ["Rho"]: # do only rho as now we have no stocastic smearings
                 phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
-#phosystlabels = []
-systlabels += phosystlabels
+
+customize.processId = 'Data'
+if customize.processId == "Data":
+    systlabels = [""]
+else:
+    systlabels += phosystlabels
 
 print systlabels
+
 
 ## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
