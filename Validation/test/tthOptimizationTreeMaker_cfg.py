@@ -170,8 +170,8 @@ if customize.processId == "Data":
 
 
 ## to run on EXOSpring16_v1                    
-from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
-process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
+#from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
+#process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
 
 
 #
@@ -183,17 +183,17 @@ if (doUpdatedIdMVADiPhotons):
                          process.analysisTree)
 else:
     #for 
-    if customize.processId == "Data":
-        process.p = cms.Path(process.flashggSelectedElectrons*
-                             process.dataRequirements*
-                             process.flashggDiPhotonSystematics*
-                             process.flashggTagSequence*
-                             process.analysisTree)
-    else:
-        process.p = cms.Path(process.dataRequirements*
-                             process.flashggDiPhotonSystematics*
-                             process.flashggTagSequence*
-                             process.analysisTree)
+    #if customize.processId == "Data":
+    #    process.p = cms.Path(process.flashggSelectedElectrons*
+    #                         process.dataRequirements*
+    #                         process.flashggDiPhotonSystematics*
+    #                         process.flashggTagSequence*
+    #                         process.analysisTree)
+    #else:
+    process.p = cms.Path(process.dataRequirements*
+                         process.flashggDiPhotonSystematics*
+                         process.flashggTagSequence*
+                         process.analysisTree)
 
 
 
