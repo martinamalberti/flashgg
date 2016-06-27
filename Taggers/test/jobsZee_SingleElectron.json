@@ -6,7 +6,7 @@
 		 ]
      },																
        
-     "cmdLine" : "campaign=RunIISpring16DR80X-2_1_0-25ns_ICHEP processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt"
+     "cmdLine" : "campaign=RunIISpring16DR80X-2_1_0-25ns_ICHEP16 processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt"
 
 
 }    
