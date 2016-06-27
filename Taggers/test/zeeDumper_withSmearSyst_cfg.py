@@ -25,7 +25,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 
 ## apply shower shape corrections
-doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)                                                                                   
+#doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)                                                                                   
 
 ## input files
 process.source = cms.Source("PoolSource",
@@ -89,7 +89,7 @@ for direction in ["Up","Down"]:
             for var in ["Rho","Phi"]:
                 phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
 
-customize.processId = 'Data'
+
 if customize.processId == "Data":
     systlabels = [""]
 else:
@@ -100,19 +100,13 @@ print systlabels
 
 ## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-if (doUpdatedIdMVADiPhotons):
-    process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
-else:
-    process.flashggDiPhotonSystematics.src = "flashggDiPhotons"
 print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
 
 
 # Or use the official  tool instead  ????????????????
 useEGMTools(process)
 
-#customize.processId = 'Data' # for test
-
-# if data, apply only energy scale corrections, if MC apply only energy smearings
+# if data, apply only energy scale corrections
 if customize.processId == 'Data':
     print 'Data' 
     customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
@@ -277,32 +271,14 @@ else:
     ) )
 
  
-if (doUpdatedIdMVADiPhotons):
-    process.p = cms.Path(process.hltHighLevel*
-                         process.dataRequirements*
-                         process.flashggUpdatedIdMVADiPhotons*
-                         process.flashggDiPhotonSystematics*
-                         (process.flashggTagSequence*process.systematicsTagSequences)*
-                         process.flashggSystTagMerger*
-                         process.tagsDumper
-                         )
-else:
-    process.p = cms.Path(process.hltHighLevel*
-                         process.dataRequirements*
-                         process.flashggDiPhotonSystematics*
-                         (process.flashggTagSequence*process.systematicsTagSequences)*
-                         process.flashggSystTagMerger*
-                         process.tagsDumper
-                         )
-
-
-##############
-## Dump EDM ##
-##############
-#process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('CustomizeWillChangeThisAnyway.root'),
-#                               outputCommands = cms.untracked.vstring('keep *') # dump everything! small tests only!
-#                               )
-#process.e = cms.EndPath(process.out)
+process.p = cms.Path(process.hltHighLevel*
+                     process.dataRequirements*
+                     process.flashggUpdatedIdMVADiPhotons*
+                     process.flashggDiPhotonSystematics*
+                     (process.flashggTagSequence*process.systematicsTagSequences)*
+                     process.flashggSystTagMerger*
+                     process.tagsDumper
+                     )
 
 
 #printSystematicInfo(process)
