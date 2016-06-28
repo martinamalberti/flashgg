@@ -2,8 +2,8 @@
    "processes" : {
 
    "DYToEE" : [
-	      "/DYToEE_NNPDF30_13TeV-powheg-pythia8/ferrif-RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1-ab7f7a5fb9fbc4628a618ccc220a1e9e/USER"
-   	  ]
+   	      "/DYToEE_NNPDF30_13TeV-powheg-pythia8/ferrif-RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1-cf1879a9a5c82d33d53f7849490ebb2e/USER"
+	      ]
 
     },
 
