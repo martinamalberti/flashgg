@@ -419,6 +419,12 @@ void SimpleTreeMaker::analyze(const edm::EventBase& evt)
         evInfo.metphi = theMET->corPhi();
         evInfo.metSumEt = theMET->corSumEt();
 
+        evInfo.uncorr_met = theMET->uncorPt();
+        evInfo.uncorr_metx = theMET->uncorPx();
+        evInfo.uncorr_mety = theMET->uncorPy();
+        evInfo.uncorr_metphi = theMET->uncorPhi();
+        evInfo.uncorr_metSumEt = theMET->uncorSumEt();
+
         
         // --- fill the tree
         //if ( njets > 0. ) // fill only if min number of jets?
@@ -509,6 +515,12 @@ SimpleTreeMaker::beginJob()
   eventTree->Branch( "mety", &evInfo.mety);
   eventTree->Branch( "metphi", &evInfo.metphi);  
   eventTree->Branch( "metSumEt", &evInfo.metSumEt);
+
+  eventTree->Branch( "uncorr_met", &evInfo.uncorr_met);
+  eventTree->Branch( "uncorr_metx", &evInfo.uncorr_metx);
+  eventTree->Branch( "uncorr_mety", &evInfo.uncorr_mety);
+  eventTree->Branch( "uncorr_metphi", &evInfo.uncorr_metphi);  
+  eventTree->Branch( "uncorr_metSuuncorr_met", &evInfo.uncorr_metSumEt);
 
 }
 // ******************************************************************************************
@@ -602,6 +614,12 @@ SimpleTreeMaker::initEventStructure()
     evInfo.mety = -999;
     evInfo.metphi = -999;
     evInfo.metSumEt = -999;
+
+    evInfo.uncorr_met = -999;
+    evInfo.uncorr_metx = -999;
+    evInfo.uncorr_mety = -999;
+    evInfo.uncorr_metphi = -999;
+    evInfo.uncorr_metSumEt = -999;
 
 }
 // ******************************************************************************************

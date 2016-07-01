@@ -126,6 +126,12 @@ struct eventInfo {
     float metphi;
     float metSumEt;
 
+    float uncorr_met;
+    float uncorr_metx;
+    float uncorr_mety;
+    float uncorr_metphi;
+    float uncorr_metSumEt;
+
 };
 // ******************************************************************************************
 
