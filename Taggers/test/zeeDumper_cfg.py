@@ -24,19 +24,15 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 
 ## apply shower shape corrections
-doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)
-
+applyShowerShapeCorrections=True
 
 ## input files
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-Run2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2/160524_085254/0000/myMicroAODOutputFile_2.root"
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v1/160524_085131/0000/myMicroAODOutputFile_31.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-Run2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"
         # mc
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
         ))
 
 ## output file
@@ -52,6 +48,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ## load module to recompute photon id on-the-fly
 process.load("flashgg/Taggers/flashggUpdatedIdMVADiPhotons_cfi")
+print process.flashggUpdatedIdMVADiPhotons.src
 
 ## import flashgg customization to check if we have data, signal or background
 from flashgg.MetaData.JobConfig import customize
@@ -63,12 +60,7 @@ from flashgg.Systematics.SystematicsCustomize import *
 
 ## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-if (doUpdatedIdMVADiPhotons):
-    process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
-else:
-    process.flashggDiPhotonSystematics.src = "flashggDiPhotons"
-print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
-
+process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
 
 ## Or use the official  tool instead  ????????????????
 useEGMTools(process)
@@ -246,20 +238,12 @@ else:
 
  
 
-if (doUpdatedIdMVADiPhotons):
-    process.p = cms.Path(process.hltHighLevel*
-                         process.dataRequirements*
-                         process.flashggUpdatedIdMVADiPhotons*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence*
-                         process.diphotonDumper)
-else:
-    process.p = cms.Path(process.hltHighLevel*
-                         process.dataRequirements*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence*
-                         process.diphotonDumper)
-    
+process.p = cms.Path(process.hltHighLevel*
+                     process.dataRequirements*
+                     process.flashggUpdatedIdMVADiPhotons*
+                     process.flashggDiPhotonSystematics*
+                     process.flashggTagSequence*
+                     process.diphotonDumper)
     
 #printSystematicInfo(process)
 
