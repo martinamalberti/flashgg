@@ -1,7 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
-# default energy scale uncertainties and smearings from 76X re-reco
-from flashgg.Systematics.escales.escale76X_16DecRereco_2015 import photonSmearBins, photonScaleUncertBins 
+# No default. Latest is only in the EGM tool
+photonSmearBins = cms.PSet()
+photonScaleUncertBins = cms.PSet()
 
 mvaShiftBins = cms.PSet(
     variables = cms.vstring("abs(superCluster.eta)"),
@@ -252,14 +253,9 @@ emptySigma = cms.PSet(
     secondVar = cms.vint32()
 )
 
-# latest greatest
-# scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/76X_16DecRereco_2015_photons")
-
-# unblinding version + Et-dependent scale uncertainties
-##scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/76X_16DecRereco_2015_Etunc")
-## test scale and smearings from Giuseppe 
-scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/test_2016B/Golden10June_plus_DCS")      
-                                       
+scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/Golden22June")
+#scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/Golden10June_plus_DCS")
+scalesAndSmearingsPrefixForSigmaEOverE = cms.string("EgammaAnalysis/ElectronTools/data/Golden10June_plus_DCS")
 
 MCScaleHighR9EB = cms.PSet( PhotonMethodName = cms.string("FlashggPhotonScale"),
           MethodName = cms.string("FlashggDiPhotonFromPhoton"),
@@ -440,7 +436,7 @@ SigmaEOverEShift = cms.PSet( PhotonMethodName = cms.string("FlashggPhotonSigEOve
           OverallRange = cms.string("1"),
           BinList = sigmaEOverEShiftBins,
           Debug = cms.untracked.bool(False),
-          ApplyCentralValue = cms.bool(True)
+          ApplyCentralValue = cms.bool(False)
           )
 
 SigmaEOverESmearing = cms.PSet( PhotonMethodName = cms.string("FlashggPhotonSigEoverESmearing"),
@@ -458,7 +454,7 @@ SigmaEOverESmearing_EGM = cms.PSet( PhotonMethodName = cms.string("FlashggPhoton
           Label = cms.string("SigmaEOverESmearing"),
           FirstParameterName = cms.string("Rho"),
           SecondParameterName = cms.string("Phi"),
-          CorrectionFile = scalesAndSmearingsPrefix,
+          CorrectionFile = scalesAndSmearingsPrefixForSigmaEOverE,
           NSigmas = cms.PSet( firstVar = cms.vint32(),
                             secondVar = cms.vint32()),
           OverallRange = cms.string("1"),

@@ -31,11 +31,12 @@ doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corr
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        "/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring16_v1_p8/Moriond16WSFinal-106-ga327d4a/DoubleEG/EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2/160610_113125/0000/diphotonsMicroAOD_88.root"
+        #"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring16_v1_p8/Moriond16WSFinal-106-ga327d4a/DoubleEG/EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2/160610_113125/0000/diphotonsMicroAOD_88.root"
        #"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring16_v1_p8/Moriond16WSFinal-106-ga327d4a/DoubleEG/EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2/160610_113125/0000/diphotonsMicroAOD_253.root"
         # mc
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160524_101636/0000/myMicroAODOutputFile_1.root"
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_1_0-25ns_ICHEP16/2_1_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160618_081701/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_1_0-25ns_ICHEP16/2_1_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160618_081701/0000/myMicroAODOutputFile_1.root"
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/160707_152047/0000/myMicroAODOutputFile_1.root"
         ))
 
 
@@ -136,13 +137,22 @@ process.analysisTree = cms.EDAnalyzer('EDSimpleTreeMaker',
                                       )
 
 
+
 process.analysisTree.globalVariables.addTriggerBits = cms.PSet(
     tag = cms.InputTag("TriggerResults::HLT"),
     bits = cms.vstring(
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v1",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v2"
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v2",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v3",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v4"
     )
 )
+if customize.processId == "Data":
+    process.analysisTree.triggerBits = cms.InputTag('TriggerResults::HLT') 
+    process.analysisTree.globalVariables.addTriggerBits.tag = cms.InputTag("TriggerResults::HLT")
+else:
+    process.analysisTree.triggerBits = cms.InputTag('TriggerResults::HLT2') 
+    process.analysisTree.globalVariables.addTriggerBits.tag = cms.InputTag("TriggerResults::HLT2")
 
 
 process.TFileService = cms.Service("TFileService",

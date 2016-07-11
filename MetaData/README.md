@@ -95,7 +95,71 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/FLASHggFramework#Instructions_for_u
 
 ### SRING16 (80x)
 
+#### 80X MiniAODv2
+
+Tags for flashgg: `2_2_0` and `RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2`
+
+```
+cd $CMSSW_BASE/src/flashgg/MetaData/work
+# split the campaign json file into sig and (data + bkg) to use different options for file splitting
+./prepareCrabJobs.py -C RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 -U 1 -L 25 -s campaigns/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_sig.json -V 2_2_0 -p ${CMSSW_BASE}/src/flashgg/MicroAOD/test/microAODstd.py --lumiMask ${PWD}/jsons/json_DCSONLY_1467860596_for_ICHEP_MiniAODv2.txt
+./prepareCrabJobs.py -C RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 -U 5 -L 25 -s campaigns/RunIISpring16DR80X-
+2_2_0-25ns_ICHEP16_MiniAODv2_data_bkg.json -V 2_2_0 -p ${CMSSW_BASE}/src/flashgg/MicroAOD/test/microAODstd.py --lumiMask ${PWD}/jsons/json_DCSONLY_1467860596_for_ICHEP_MiniAODv2.txt
+cd RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2
+echo crabConfig_*.py | xargs -n 1 crab sub
+```
+
+#### 80X QGL update
+
+Tags for flashgg: `2_1_0` and `RunIISpring16DR80X-2_1_0-25ns_ICHEP16`
+
+```
+cd $CMSSW_BASE/src/flashgg/MetaData/work
+./prepareCrabJobs.py -C RunIISpring16DR80X-2_1_2-25ns_ICHEP16 -U 5 -L 25 -s campaigns/RunIISpring16DR80X-2_1_2-25ns_ICHEP16.json -V 2_1_2 -p ${CMSSW_BASE}/src/flashgg/MicroAOD/test/microAODstd.py --lumiMask ${PWD}/jsons/json_DCSONLY_1466185760.txt
+cd RunIISpring16DR80X-2_1_2-25ns_ICHEP16
+echo crabConfig_*.py | xargs -n 1 crab sub
+```
+
+
+#### 80X Pu Jet ID update 
+
+Tags for flashgg: `2_1_0` and `RunIISpring16DR80X-2_1_0-25ns_ICHEP16`
+
+```
+cd $CMSSW_BASE/src/flashgg/MetaData/work
+./prepareCrabJobs.py -C RunIISpring16DR80X-2_1_1-25ns_ICHEP16 -U 5 -L 25 -s campaigns/RunIISpring16DR80X-2_1_1-25ns_ICHEP16.json -V 2_1_1 -p ${CMSSW_BASE}/src/flashgg/MicroAOD/test/microAODstd.py --lumiMask ${PWD}/jsons/json_DCSONLY_1466185760.txt
+cd RunIISpring16DR80X-2_1_1-25ns_ICHEP16
+echo crabConfig_*.py | xargs -n 1 crab sub
+```
+
 #### 80X trainings on 80X
+
+Example of top-up submission for data samples. The campaign is called p2
+(part2) and the corresponding catalog will be merged to the main one as soon as
+finished.
+Tags for flashgg: `2_1_0` and `RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2`
+Latest JSON available taken from the central CMS afs area: `json_DCSONLY_1467118709_for_ICHEPp2.txt`
+
+```
+cd $CMSSW_BASE/src/flashgg/MetaData/work
+# make one campaign file per dataset:
+#   campaigns/RunIISpring16DR80X-2_1_0-25ns_ICHEP16_{DoubleEG,SingleElectron,DoubleMuon,SingleMuon}.json
+for dset in DoubleEG SingleElectron DoubleMuon SingleMuon
+do
+        fggManageSamples.py -C RunIISpring16DR80X-2_1_0-25ns_ICHEP16 getlumi /${dset}* output=${dset}_p1_done.json
+        compareJSON.py --sub jsons/json_DCSONLY_1467118709_for_ICHEPp2.txt ${dset}_p1_done.json jsons/RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2_${dset}.json
+mkdir orig ; mv crabConfig_*orig*.py orig
+        ./prepareCrabJobs.py -C RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2 -U 5 -L 25 -s campaigns/RunIISpring16DR80X-2_1_0-25ns_ICHEP16_${dset}.json -V 2_1_0 -p ${CMSSW_BASE}/src/flashgg/MicroAOD/test/microAODstd.py --lumiMask ${PWD}/jsons/RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2_${dset}.json
+done
+cd RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2
+echo crabConfig_*.py | xargs -n 1 crab sub
+
+for dset in DoubleEG SingleElectron DoubleMuon SingleMuon
+do
+        fggManageSamples.py -C RunIISpring16DR80X-2_1_0-25ns_ICHEP16 catimport RunIISpring16DR80X-2_1_0-25ns_ICHEP16_p2 ${dset}*
+        fggManageSamples.py -C RunIISpring16DR80X-2_1_0-25ns_ICHEP16 overlap ${dset}*
+done
+```
 
 Tags for flashgg: `2_1_0` and `RunIISpring16DR80X-2_1_0-25ns_ICHEP16`
 

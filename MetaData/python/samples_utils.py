@@ -4,6 +4,8 @@ from das_client import get_data as das_query
 
 from pprint import pprint
 
+from hashlib import sha256
+
 import os,json,fcntl,sys
 from parallel  import *
 from threading import Semaphore
@@ -401,13 +403,15 @@ class SamplesManager(object):
         if writeCatalog:
             self.writeCatalog(catalog)
 
-    def reviewCatalog(self):
+    def reviewCatalog(self, pattern=None):
         datasets,catalog = self.getAllDatasets()
 
         primaries = {}
         keepAll = False
         dataregex = re.compile("Run[0-9]+[A-Z]")
         for d in datasets:
+            if pattern and not fnmatch(d, pattern):
+                continue
             if not keepAll:
                 reply = ask_user("keep this dataset (yes/no/all)?\n %s\n" % d, ["y","n","a"])
                 if reply == "n":
@@ -477,7 +481,7 @@ class SamplesManager(object):
         @fileName: file name
         """
         fName = fileName
-        tmp = ".tmp%s_%d.json"%(dsetName.replace("/","_"),ifile)
+        tmp = ".tmp%s_%d.json"%(sha256(dsetName).hexdigest(),ifile)
         if self.continue_:
             if os.path.exists(tmp):
                 print "%s already exists" % tmp
@@ -932,5 +936,5 @@ Commands:
     def run_clear(self):
         self.mn.clearCatalog()
     
-    def run_review(self):
-        self.mn.reviewCatalog()
+    def run_review(self, pattern=None):
+        self.mn.reviewCatalog(pattern)

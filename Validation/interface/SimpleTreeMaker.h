@@ -144,7 +144,8 @@ float passCutBasedElectronIdLoose(edm::Ptr<flashgg::Electron> electron, const st
   float eldEtaIn = electron->deltaEtaSuperClusterTrackAtVtx();
   float eldPhiIn = electron->deltaPhiSuperClusterTrackAtVtx();
   float elhOverE = electron->hcalOverEcal();
-  float elRelIsoEA = electron->standardHggIso()/electron->pt();
+  //float elRelIsoEA = electron->standardHggIso()/electron->pt(); // for 76X microAODs
+  float elRelIsoEA = electron->standardHggIso();// for 80X microAODs it is laready stored as relative isolation
 
   float elooEmooP =-999 ; 
 
