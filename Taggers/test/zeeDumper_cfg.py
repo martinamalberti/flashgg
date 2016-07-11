@@ -16,7 +16,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
     process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
 elif os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
-    process.GlobalTag = GlobalTag(process.GlobalTag,'80X_mcRun2_asymptotic_v11')
+    process.GlobalTag = GlobalTag(process.GlobalTag,'80X_mcRun2_asymptotic_2016_v3')
 else:
     process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
@@ -31,10 +31,12 @@ doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corr
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-Run2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2/160524_085254/0000/myMicroAODOutputFile_2.root"
         #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DoubleEG/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v1/160524_085131/0000/myMicroAODOutputFile_31.root"
         # mc
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/160524_084452/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
         ))
 
 ## output file
@@ -145,13 +147,21 @@ process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
     bits = cms.vstring(
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1",
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v2",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v3",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v4",
         "HLT_Ele27_WPTight_Gsf_v1",
         "HLT_Ele27_WPTight_Gsf_v2",
-        "HLT_Ele35_WPLoose_Gsf_v*",
+        "HLT_Ele27_WPTight_Gsf_v3",
+        "HLT_Ele27_WPTight_Gsf_v4",
+        "HLT_Ele35_WPLoose_Gsf_v1",
+        "HLT_Ele35_WPLoose_Gsf_v2",
+        "HLT_Ele35_WPLoose_Gsf_v3",
+        "HLT_Ele35_WPLoose_Gsf_v4",
         #"HLT_Ele27_eta2p1_WPLoose_Gsf_v",
         #"HLT_Ele22_eta2p1_WPLoose_Gsf_v"
     )
 )
+
 
 ## define categories and associated objects to dump
 cfgTools.addCategory(process.diphotonDumper,
@@ -236,11 +246,6 @@ else:
 
  
 
-## to run on EXOSpring16_v1
-from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
-process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
-
-
 if (doUpdatedIdMVADiPhotons):
     process.p = cms.Path(process.hltHighLevel*
                          process.dataRequirements*
@@ -249,26 +254,17 @@ if (doUpdatedIdMVADiPhotons):
                          process.flashggTagSequence*
                          process.diphotonDumper)
 else:
-    # to run on EXOSpring16_v1
-    if customize.processId == 'Data':
-        process.p = cms.Path(process.flashggSelectedElectrons*
-                             process.hltHighLevel*
-                             process.dataRequirements*
-                             process.flashggDiPhotonSystematics*
-                             process.flashggTagSequence*
-                             process.diphotonDumper)
-    else:
-        process.p = cms.Path(process.hltHighLevel*
-                             process.dataRequirements*
-                             process.flashggDiPhotonSystematics*
-                             process.flashggTagSequence*
-                             process.diphotonDumper)
-
-
+    process.p = cms.Path(process.hltHighLevel*
+                         process.dataRequirements*
+                         process.flashggDiPhotonSystematics*
+                         process.flashggTagSequence*
+                         process.diphotonDumper)
+    
+    
 #printSystematicInfo(process)
 
 ## set default options if needed
-customize.setDefault("maxEvents",-1)
+customize.setDefault("maxEvents",1000)
 customize.setDefault("targetLumi",1e+3)
 ## call the customization
 customize(process)
