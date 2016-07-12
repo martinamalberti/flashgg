@@ -253,7 +253,8 @@ emptySigma = cms.PSet(
     secondVar = cms.vint32()
 )
 
-scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/Golden22June")
+scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/80X_DCS05July_plus_Golden22") # from Giuseppe
+#scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/Golden22June")
 #scalesAndSmearingsPrefix = cms.string("EgammaAnalysis/ElectronTools/data/Golden10June_plus_DCS")
 scalesAndSmearingsPrefixForSigmaEOverE = cms.string("EgammaAnalysis/ElectronTools/data/Golden10June_plus_DCS")
 

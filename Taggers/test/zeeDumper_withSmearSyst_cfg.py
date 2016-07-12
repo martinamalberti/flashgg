@@ -30,11 +30,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 ## input files
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-        #data
-       "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_1_0-25ns_ICHEP16/2_1_0/DoubleEG/RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-Run2016B-PromptReco-v1/160618_073656/0000/myMicroAODOutputFile_102.root"
-        # mc
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/160210_050006/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIIFall15DR76-1_3_0-25ns_ext1/1_3_1/GluGluHToGG_M-125_13TeV_powheg_pythia8/RunIIFall15DR76-1_3_0-25ns_ext1-1_3_1-v0-RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/160130_032602/0000/myMicroAODOutputFile_1.root"
+        #data                                                                                                                                                                  
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-R\un2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"                                                                                                      
+        # mc                                                                                                                                                               
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_\MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
         ))
 
 
@@ -258,24 +257,9 @@ process.dataRequirements = cms.Sequence()
 if customize.processId == "Data":
     process.dataRequirements += process.eeBadScFilter
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
-            #DoubleEG
-            #"HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
-            #SingleEG
-            #"HLT_Ele27_WPTight_Gsf_v*",
-            #"HLT_Ele27_WPLoose_Gsf_v*" # 7_6_X
-            ##"HLT_Ele27_WPLoose_Gsf_v*",
-            ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
-            ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
             ) )
 else:
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
-    #DoubleEG
-    #"HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
-    #SingleEG
-    #"HLT_Ele23_WPLoose_Gsf_v*" # 7_6_X
-    ##"HLT_Ele27_WPLoose_Gsf_v*",
-    ##"HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
-    ##"HLT_Ele22_eta2p1_WPLoose_Gsf_v*"
     ) )
 
  
