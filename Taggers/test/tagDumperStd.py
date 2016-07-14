@@ -44,9 +44,6 @@ musystlabels = []
 from flashgg.MetaData.JobConfig import customize
 customize.parse()
 print "customize.processId:",customize.processId
-# load appropriate scale and smearing bins here
-# systematics customization scripts will take care of adjusting flashggDiPhotonSystematics
-#process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
 # Or use the official tool instead
 useEGMTools(process)
@@ -62,6 +59,8 @@ myvariables = [ "mass       := diPhoton().mass",
                 "subleadEta := diPhoton().subLeadingPhoton.eta()",
                 "leadR9     := diPhoton().leadingPhoton.full5x5_r9()",
                 "subleadR9  := diPhoton().subLeadingPhoton.full5x5_r9()",
+                "leadEtrue   := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+                "subleadEtrue:= ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().energy():0"
                 ]
                 
 variablesToUse = myvariables
@@ -255,7 +254,7 @@ printSystematicInfo(process)
 #print >> processDumpFile, process.dumpPython()
 
 # set default options if needed
-customize.setDefault("maxEvents",300)
-customize.setDefault("targetLumi",2.61e+3)
+customize.setDefault("maxEvents",100)
+customize.setDefault("targetLumi",1e+3)
 # call the customization
 customize(process)
