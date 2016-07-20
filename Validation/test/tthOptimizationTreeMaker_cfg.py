@@ -23,19 +23,12 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 
-## apply shower shape corrections
-doUpdatedIdMVADiPhotons = False # set to True for 76X (for 80X shower shape corrections not yet available)
-
-
 ## input file
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data
-        #"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring16_v1_p8/Moriond16WSFinal-106-ga327d4a/DoubleEG/EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2/160610_113125/0000/diphotonsMicroAOD_88.root"
-       #"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring16_v1_p8/Moriond16WSFinal-106-ga327d4a/DoubleEG/EXOSpring16_v1_p8-Moriond16WSFinal-106-ga327d4a-v0-Run2016B-PromptReco-v2/160610_113125/0000/diphotonsMicroAOD_253.root"
+
         # mc
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160524_101636/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_1_0-25ns_ICHEP16/2_1_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_1_0-25ns_ICHEP16-2_1_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160618_081701/0000/myMicroAODOutputFile_1.root"
         "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/160707_152047/0000/myMicroAODOutputFile_1.root"
         ))
 
@@ -49,19 +42,12 @@ from flashgg.Systematics.SystematicsCustomize import *
 
 # load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-if (doUpdatedIdMVADiPhotons):
-    process.flashggDiPhotonSystematics.src = "flashggUpdatedIdMVADiPhotons"
-else:
-    process.flashggDiPhotonSystematics.src = "flashggDiPhotons"
-print "input to flashggDiPhotonSystematics = ", process.flashggDiPhotonSystematics.src
 
 
 ##customize.processId = 'Data'
 
-## load appropriate scale and smearing bins 
-#process.load("flashgg.Systematics.escales.escale76X_16DecRereco_2015")
 
-## Or use the official  tool instead  ????????????????
+# apply scale and smearing corrections
 useEGMTools(process)
 
 ## if data, apply only energy scale corrections, if MC apply only energy smearings
@@ -102,11 +88,6 @@ process.load("flashgg/Taggers/flashggTagSequence_cfi")
 from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
-# use 2015 vtx prob parametrization to be consistent with the diphotonMVA training
-process.flashggDiPhotonMVA.VertexProbParamsConv=cms.vdouble(-0.049,-0.241,-0.505,-0.270)
-process.flashggDiPhotonMVA.VertexProbParamsNoConv=cms.vdouble(-0.344,-0.091,-0.234,-0.186)
-                           
-
 
 
 ## global variables to dump
@@ -144,7 +125,8 @@ process.analysisTree.globalVariables.addTriggerBits = cms.PSet(
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v1",
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v2",
         "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v3",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v4"
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v4",
+        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v5"
     )
 )
 if customize.processId == "Data":
@@ -181,32 +163,12 @@ if customize.processId == "Data":
         process.dataRequirements += process.eeBadScFilter
 
 
-## to run on EXOSpring16_v1                    
-#from flashgg.MicroAOD.flashggLeptonSelectors_cff import flashggSelectedElectrons
-#process.flashggSelectedElectrons = flashggSelectedElectrons.clone()
 
-
-#
-if (doUpdatedIdMVADiPhotons):
-    process.p = cms.Path(process.dataRequirements*
-                         process.flashggUpdatedIdMVADiPhotons*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence*
-                         process.analysisTree)
-else:
-    #for 
-    #if customize.processId == "Data":
-    #    process.p = cms.Path(process.flashggSelectedElectrons*
-    #                         process.dataRequirements*
-    #                         process.flashggDiPhotonSystematics*
-    #                         process.flashggTagSequence*
-    #                         process.analysisTree)
-    #else:
-    process.p = cms.Path(process.dataRequirements*
-                         process.flashggDiPhotonSystematics*
-                         process.flashggTagSequence*
-                         process.analysisTree)
-
+process.p = cms.Path(process.dataRequirements*
+                     process.flashggUpdatedIdMVADiPhotons*
+                     process.flashggDiPhotonSystematics*
+                     process.flashggTagSequence*
+                     process.analysisTree)
 
 
 ## set default options if needed
