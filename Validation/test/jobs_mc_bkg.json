@@ -1,23 +1,27 @@
+{
+
+
 {	
    "processes" : {
 
    "diphoton" : [ 
-		  ["DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa" , {"njobs":100}]
+		  ["/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa" , { "args" : ["outputFile=output_DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa.root"], "njobs": 100 } 
    	      	],
 
+
    "gjet"     : [
-		  ["/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"njobs":100} ],
-		  ["/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"njobs":100} ],
-		  ["/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8",{"njobs":50}]
+		  ["/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"args" : ["outputFile=output_GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf.root"], "njobs":100} ],
+		  ["/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8",{"args" : ["outputFile=output_GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf.root"], "njobs":100}  ],
+		  ["/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", {"args" : ["outputFile=output_GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":50} ]
 		],
 
    "qcd"      : [
-                  ["/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", {"njobs":100} ],
-                  ["/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"njobs":100} ],
-		  ["/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8",{"njobs":100} ]
+                  ["/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", {"args" : ["outputFile=output_QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":50} ],
+                  ["/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"args" : ["outputFile=output_QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8.root"], "njobs":50} ],
+		  ["/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8",{"args" : ["outputFile=output_QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf.root"], "njobs":50} ]
 		]
    },
 
-     "cmdLine" : "campaign=RunIISpring16DR80X-2_1_0-25ns_ICHEP16 targetLumi=1.0e+3 puTarget=1.85e+03,2.74e+04,1.81e+05,4.8e+05,7.68e+05,1.03e+06,1.53e+06,7.78e+06,2.36e+07,3.84e+07,6.16e+07,9.55e+07,1.44e+08,2.14e+08,2.94e+08,3.58e+08,3.97e+08,4.11e+08,4e+08,3.67e+08,3.2e+08,2.65e+08,2.07e+08,1.53e+08,1.05e+08,6.63e+07,3.84e+07,2.03e+07,9.8e+06,4.34e+06,1.78e+06,6.85e+05,2.54e+05,9.4e+04,3.74e+04,1.78e+04,1.1e+04,8.5e+03,7.4e+03,6.8e+03,6.42e+03,6.15e+03,5.96e+03,5.8e+03,5.67e+03,5.52e+03,5.37e+03,5.19e+03,4.99e+03,4.75e+03 processType='mc'"
+     "cmdLine" : "campaign=RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 targetLumi=1.0e+3 puTarget=1.85e+03,2.74e+04,1.81e+05,4.8e+05,7.68e+05,1.03e+06,1.53e+06,7.78e+06,2.36e+07,3.84e+07,6.16e+07,9.55e+07,1.44e+08,2.14e+08,2.94e+08,3.58e+08,3.97e+08,4.11e+08,4e+08,3.67e+08,3.2e+08,2.65e+08,2.07e+08,1.53e+08,1.05e+08,6.63e+07,3.84e+07,2.03e+07,9.8e+06,4.34e+06,1.78e+06,6.85e+05,2.54e+05,9.4e+04,3.74e+04,1.78e+04,1.1e+04,8.5e+03,7.4e+03,6.8e+03,6.42e+03,6.15e+03,5.96e+03,5.8e+03,5.67e+03,5.52e+03,5.37e+03,5.19e+03,4.99e+03,4.75e+03 processType='mc'"
 
 }
