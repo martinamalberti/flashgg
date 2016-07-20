@@ -35,6 +35,8 @@
         "GluGluHToGG_M129_13TeV_amcatnlo_pythia8"                          : { "xs" : 45.940,   "br" : 0.00225, "itype":-129000 },
         "GluGluHToGG_M130_13TeV_amcatnloFXFX_pythia8"                          : { "xs" : 45.310,   "br" : 0.00224, "itype":-130000 },
         "GluGluHToGG_M130_13TeV_amcatnlo_pythia8"                          : { "xs" : 45.310,   "br" : 0.00224, "itype":-130000 },
+        "GluGluHToGG_M90_13TeV_amcatnloFXFX_pythia8"                          : { "xs" : 45.310,   "br" : 0.00224, "itype":-130000 },
+        "GluGluHToGG_M90_13TeV_amcatnlo_pythia8"                          : { "xs" : 45.310,   "br" : 0.00224, "itype":-130000 },
         "ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8"                          : { "xs" : 0.5697,   "br" : 0.00222, "itype":-120300 },
         "ttHJetToGG_M120_13TeV_amcatnloFXFX_madspin_pythia8_v2"                          : { "xs" : 0.5697,   "br" : 0.00222, "itype":-120300 },
         "ttHJetToGG_M121_13TeV_amcatnloFXFX_madspin_pythia8"                          : { "xs" : 0.5568,   "br" : 0.00223, "itype":-121300 },
