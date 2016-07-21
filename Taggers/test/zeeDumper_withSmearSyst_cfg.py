@@ -31,9 +31,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         #data                                                                                                                                                                  
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-R\un2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"                                                                                                      
+        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/SingleElectron/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-R\un2016C-PromptReco-v2/160707_145632/0000/myMicroAODOutputFile_1.root"                                                                                                      
         # mc                                                                                                                                                               
-        "/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_\MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
+        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/DYToEE_NNPDF30_13TeV-powheg-pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_\MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160707_143004/0000/myMicroAODOutputFile_1.root"
         ))
 
 
@@ -84,7 +84,7 @@ modifyTagSequenceForSystematics(process,jetSystematicsInputTags)
 for direction in ["Up","Down"]:
     for r9 in ["HighR9","LowR9"]:
         for region in ["EB","EE"]:
-#            phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
+            phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
             for var in ["Rho","Phi"]:
                 phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
 
