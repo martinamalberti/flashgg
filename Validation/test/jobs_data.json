@@ -27,9 +27,19 @@
         [ "/DoubleEG/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_p2-2_2_0-v0-Run2016D-PromptReco-v2-9a092465adbfb13c40886e07b86f6d23/USER", { "args" : ["outputFile=output_DoubleEG_Run2016D-PromptReco-v2_p2.root"], "njobs": 100 }
 	  ]		 		 
 
+        [ "/DoubleEG/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_p3-2_2_0-v0-Run2016B-PromptReco-v2-6afd65c310508d0f49bd277bc7a8e5b1/USER", { "args" : ["outputFile=output_DoubleEG_Run2016B-PromptReco-v2_p3.root"], "njobs": 1 }
+	  ],		 		 
+
+	["/DoubleEG/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_p3-2_2_0-v0-Run2016D-PromptReco-v2-9a092465adbfb13c40886e07b86f6d23/USER",{ "args" : ["outputFile=output_DoubleEG_Run2016D-PromptReco-v2_p3.root"], "njobs": 100 }
+          ],    		
+
+	["/DoubleEG/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_p4-2_2_0-v0-Run2016D-PromptReco-v2-9a092465adbfb13c40886e07b86f6d23/USER",{ "args" : ["outputFile=output_DoubleEG_Run2016D-PromptReco-v2_p4.root"], "njobs": 50 }
+	 ]														       	      
+
      },															                
 
-     "cmdLine" : "campaign=RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276384_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
+     "cmdLine" : "campaign=RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
+
 
 
 }    
