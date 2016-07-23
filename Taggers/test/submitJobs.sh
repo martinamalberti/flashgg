@@ -12,5 +12,9 @@ mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/Go
 fggRunJobs.py --load jobsZee_SingleElectron.json -H -D -P -n 100 -d jobsZeeDumper_Data_SingleElectron_GoldenJsonJuly20/ -x cmsRun zeeDumper_withSmearSyst_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_Data_SingleElectron
 
 
-mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE
-fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_GoldenJsonJuly20 -x cmsRun zeeDumper_withSmearSyst_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE
+mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withSmearSyst
+fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d jobsZeeDumper_MC_DYToEE_GoldenJsonJuly20_withSmearSyst -x cmsRun zeeDumper_withSmearSyst_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withSmearSyst
+
+
+mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withScaleSyst
+fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d jobsZeeDumper_MC_DYToEE_GoldenJsonJuly20_withScaleSyst -x cmsRun zeeDumper_withScaleSyst_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withScaleSyst

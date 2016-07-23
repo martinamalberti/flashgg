@@ -84,7 +84,7 @@ modifyTagSequenceForSystematics(process,jetSystematicsInputTags)
 for direction in ["Up","Down"]:
     for r9 in ["HighR9","LowR9"]:
         for region in ["EB","EE"]:
-            phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
+            #phosystlabels.append("MCScale%s%s%s01sigma" % (r9,region,direction))
             for var in ["Rho","Phi"]:
                 phosystlabels.append("MCSmear%s%s%s%s01sigma" % (r9,region,var,direction))
 
