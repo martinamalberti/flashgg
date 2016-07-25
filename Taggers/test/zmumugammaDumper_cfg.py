@@ -18,6 +18,18 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("test_mmg.root")
 )
 
+
+#update photon shower shapes and photon id
+process.load("flashgg.Taggers.flashggPhotonWithUpdatedIdMVAProducer_cfi")
+
+#preselection on single photon???
+#process.load("flashgg.Taggers.flashggPreselectedDiPhotons")
+#process.flashggPreselectedDiPhotons.src = "flashggUpdatedIdMVAPhotons"
+
+#re-run mumugamma producer
+process.load("flashgg.MicroAOD.flashggMuMuGamma_cfi")
+process.flashggMuMuGamma.PhotonTag=cms.InputTag('flashggUpdatedIdMVAPhotons')
+
 process.load("flashgg.Taggers.mumugammaDumper_cfi") ##  import mumugammaDumper 
 import flashgg.Taggers.dumperConfigTools as cfgTools
 
@@ -60,10 +72,15 @@ cfgTools.addCategories(process.mumugammaDumper,
                                   "subleadMuonPhi      :=DiMuPtr.subleadingMuon.phi",
                                   "subleadMuonCharge   :=DiMuPtr.subleadingMuon.charge",
                                   "subleadMuonNtrk     :=DiMuPtr.subleadingMuon.innerTrack().hitPattern().trackerLayersWithMeasurement()", ## for rochester corrections
+                                  "photonE             :=MMG_Photon.energy",
                                   "photonPt            :=MMG_Photon.pt",
                                   "photonScEta         :=MMG_Photon.superCluster.eta",
                                   "photonScPhi         :=MMG_Photon.superCluster.phi",
+                                  "photonEta           :=MMG_Photon.eta",
+                                  "photonPhi           :=MMG_Photon.phi",
                                   "photonR9            :=MMG_Photon.full5x5_r9",
+                                  "photonS4            :=MMG_Photon.s4",
+                                  "photonEtaWidth      :=MMG_Photon.superCluster().etaWidth()"
                                   ],
                        ## histograms to be plotted. 
                        ## the variables need to be defined first
@@ -73,11 +90,13 @@ cfgTools.addCategories(process.mumugammaDumper,
 
 
 process.p1 = cms.Path(
-       process.mumugammaDumper
+    process.flashggUpdatedIdMVAPhotons*
+    process.flashggMuMuGamma*
+    process.mumugammaDumper
     )
 
 
 
 from flashgg.MetaData.JobConfig import customize
-customize.setDefault("maxEvents",10000)
+customize.setDefault("maxEvents",100000)
 customize(process)
