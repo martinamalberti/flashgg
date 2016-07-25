@@ -15,7 +15,29 @@
 
      "ggh_M90_m5" : [
 		["/GluGluHToGG_M90_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_minus5percentMaterial_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER", {"args" : ["outputFile=GluGluHToGG_M90_13TeV_amcatnloFXFX_pythia8_m5material.root"]}]
-		]
+		],
+
+
+     "ggh_M125" : [
+     		   ["/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER",  {"args" : ["outputFile=GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8.root"]}]
+                   ],
+
+
+      "ggh_M125_p10" :[
+      		      ["/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_plus10percentMaterial_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER", {"args" : ["outputFile=GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_p10material.root"]}]
+      		     ],
+
+      "ggh_M125_p5" : [
+      		       ["/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_plus5percentMaterial_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER", {"args" : ["outputFile=GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_p5material.root"]}]
+      		     ],
+
+      "ggh_M125_m10" :[
+      		      ["/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_minus10percentMaterial_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER", {"args" : ["outputFile=GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_m10material.root"]}]
+      		     ],
+
+      "ggh_M125_m5" :[
+      		     ["/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_minus5percentMaterial_80X_mcRun2_asymptotic_v14-v1-9d6acec11aa5264fedffe5a321afb429/USER", {"args" : ["outputFile=GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_m5material.root"]}]
+      		     ]
 		
 },
 

@@ -18,3 +18,8 @@ fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d jobsZeeDumper_MC_DYToEE_
 
 mkdir ~/eos/cms/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withScaleSyst
 fggRunJobs.py --load jobsZee_MC.json -H -D -P -n 200 -d jobsZeeDumper_MC_DYToEE_GoldenJsonJuly20_withScaleSyst -x cmsRun zeeDumper_withScaleSyst_cfg.py maxEvents=-1 --no-use-tarball -q cmscaf1nd --stage-to=/store/group/phys_higgs/cmshgg/malberti/flashgg/zee_validation/GoldenJsonJuly20/jobsZeeDumper_MC_DYToEE_withScaleSyst
+
+
+
+#material samples
+fggRunJobs.py --load jobsTagDumperStd_Material.json -H -D -P -n 10 -d ggH_material -x cmsRun tagDumperStd_M90.py maxEvents=-1 --no-use-tarball -q cmscaf1nd
