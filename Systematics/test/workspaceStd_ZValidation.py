@@ -31,6 +31,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 100 )
 
 from flashgg.Systematics.SystematicsCustomize import *
 jetSystematicsInputTags = createStandardSystematicsProducers(process)
+process.flashggTagSorter.MassCutLower = 60.
+process.flashggUntagged.Boundaries = cms.vdouble(-999.,-99.,-9.,-1.)
+process.flashggVBFTag.Boundaries = cms.vdouble(9.,999.)
+process.flashggTTHLeptonicTag.MVAThreshold = 999.
+process.flashggTTHHadronicTag.MVAThreshold = 999.
 if dropVBFInNonGold:
     process.flashggVBFTag.SetArbitraryNonGoldMC = True
     process.flashggVBFTag.DropNonGoldData = True
@@ -168,7 +173,9 @@ from flashgg.MetaData.samples_utils import SamplesManager
 
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring(
-"root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext2-v1/160707_150558/0000/myMicroAODOutputFile_25.root"
+        "root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring16DR80X-2_2_0-25ns_DYWithPDF/2_2_0/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16DR80X-2_2_0-25ns_DYWithPDF-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/160718_161741/0000/myMicroAODOutputFile_1.root"
+
+#"root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2/2_2_0/VBFHToGG_M125_13TeV_amcatnlo_pythia8/RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext2-v1/160707_150558/0000/myMicroAODOutputFile_25.root"
 #"file:/afs/cern.ch/work/s/sethzenz/fromscratch107/CMSSW_8_0_8_patch1/src/flashgg/myMicroAODOutputFile.root"
 #"root://eoscms.cern.ch//eos/cms/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_0_0-25ns/2_0_0/VBFHToGG_M-125_13TeV_powheg_pythia8/RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/160524_093752/0000/myMicroAODOutputFile_1.root"
         #                             "file:myMicroAODOutputFile.root"
@@ -196,11 +203,18 @@ process.tagsDumper.className = "DiPhotonTagDumper"
 process.tagsDumper.src = "flashggSystTagMerger"
 #process.tagsDumper.src = "flashggTagSystematics"
 process.tagsDumper.processId = "test"
-process.tagsDumper.dumpTrees = False
-process.tagsDumper.dumpWorkspace = True
+process.tagsDumper.dumpTrees = True
+process.tagsDumper.dumpWorkspace = False
 process.tagsDumper.dumpHistos = False
 process.tagsDumper.quietRooFit = True
 process.tagsDumper.nameTemplate = cms.untracked.string("$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL")
+
+process.flashggPreselectedDiPhotons.variables =  cms.vstring('pfPhoIso03',
+                                                             'trkSumPtHollowConeDR03',
+                                                             'full5x5_sigmaIetaIeta',
+                                                             'full5x5_r9',
+                                                             '1-passElectronVeto')
+
 
 #tagList=[
 #["UntaggedTag",4],
@@ -276,10 +290,12 @@ for tag in tagList:
 
 # Require standard diphoton trigger
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
-process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*",
+#process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*",
 #                                                                "HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1",
 #                                                                "HLT_Diphoton30EB_18EB_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1"
-                                                                ))
+#                                                                ))
+#process.hltHighLevel = hltHighLevel.clone(HLTPaths=cms.vstring("HLT_Ele27_eta2p1_WPLoose_Gsf_v*"))
+process.hltHighLevel = hltHighLevel.clone(HLTPaths=cms.vstring("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*"))
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
