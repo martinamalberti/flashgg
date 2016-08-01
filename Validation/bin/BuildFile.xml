@@ -1,8 +1,25 @@
 <use name="root"/>
 <use name="rootgraphics"/>
+<use name="clhep"/>
 <use name="FWCore/FWLite"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/PythonParameterSet"/>
+<use name="CondFormats/EgammaObjects"/>
+<use name="roottmva"/>
+<use   name="FWCore/Framework"/>
+<use   name="DataFormats/HcalRecHit"/>
+<use   name="DataFormats/EgammaReco"/>
+<use   name="DataFormats/EgammaCandidates"/>
+<use   name="Geometry/CaloGeometry"/>
+<use   name="clhep"/>
+<use   name="root"/>
+<use   name="PhysicsTools/MVAComputer"/>
+<use   name="PhysicsTools/MVATrainer"/>
+<use   name="CondFormats/DataRecord"/>
+<use   name="CondFormats/EgammaObjects"/>
+<use   name="RecoEcal/EgammaCoreTools"/>
+<use   name="CondCore/DBOutputService"/>
+<use   name="DataFormats/ParticleFlowReco"/>
 <flags EDM_PLUGIN="1"/>
 <environment>
   <bin
@@ -10,4 +27,9 @@
       file="MakeValidationPlots.cc,
             ../src/drawUtils.cc,">
   </bin>
+  <bin
+      name="TestRegressionZee"
+      file="TestRegressionZee.cc">
+  </bin>
+
 </environment>
