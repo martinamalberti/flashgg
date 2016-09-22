@@ -38,7 +38,7 @@
 		   ["/SingleElectron/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2_p5-2_2_0-v0-Run2016G-PromptReco-v1-1c4f014e0b128564177a0bace59e44e3/USER", { "args" : ["outputFile=output_SingleElectron_Run2016G-PromptReco-v1_p5.root"], "njobs":20 }
 		   ]
 
-     ],
+     ]
 },
        
      "cmdLine" : "campaign=RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 processType='Data' lumiMask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
