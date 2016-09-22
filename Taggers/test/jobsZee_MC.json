@@ -1,0 +1,11 @@
+{	
+   "processes" : {
+
+   "DYToEE" : [
+      	       ["/DYToEE_NNPDF30_13TeV-powheg-pythia8/ferrif-RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2-2_2_0-v0-RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1-94d03017ce60e1991044b8807b85a209/USER",{"args" : ["outputFile=output_DYToEE_NNPDF30_13TeV-powheg-pythia8.root"],"njobs":200}]
+	      ]
+    },
+
+    "cmdLine" : "campaign=RunIISpring16DR80X-2_2_0-25ns_ICHEP16_MiniAODv2 targetLumi=1e+3 processType='mc' puTarget=3.53e+03,3.16e+05,1.16e+06,2.05e+06,2.89e+06,3.93e+06,5.12e+06,9.83e+06,3.11e+07,7.43e+07,1.55e+08,2.83e+08,4.48e+08,6.2e+08,8.04e+08,1.01e+09,1.19e+09,1.31e+09,1.38e+09,1.41e+09,1.41e+09,1.39e+09,1.34e+09,1.28e+09,1.2e+09,1.1e+09,9.87e+08,8.67e+08,7.46e+08,6.3e+08,5.2e+08,4.19e+08,3.28e+08,2.49e+08,1.83e+08,1.31e+08,9.04e+07,6.07e+07,3.94e+07,2.47e+07,1.49e+07,8.62e+06,4.79e+06,2.55e+06,1.31e+06,6.4e+05,3.02e+05,1.39e+05,6.26e+04,2.91e+0"
+
+}
