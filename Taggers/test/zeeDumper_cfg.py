@@ -56,7 +56,7 @@ customize.parse()
 
 ## import systs. customize
 from flashgg.Systematics.SystematicsCustomize import *
-customize.processId = 'Data' # for test
+#customize.processId = 'Data' # for test
 
 ## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
