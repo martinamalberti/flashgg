@@ -89,6 +89,14 @@ from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
 process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
 
+#remove un-necessary tags ...
+process.flashggTagSequence.remove(process.flashggVBFTag)
+process.flashggTagSequence.remove(process.flashggTTHLeptonicTag)
+process.flashggTagSequence.remove(process.flashggTTHHadronicTag)
+process.flashggTagSequence.remove(process.flashggVHEtTag)
+process.flashggTagSequence.remove(process.flashggVHLooseTag)
+process.flashggTagSequence.remove(process.flashggVHTightTag)
+process.flashggTagSequence.remove(process.flashggTagSorter)
 
 ## global variables to dump
 from flashgg.Taggers.globalVariables_cff import globalVariables
