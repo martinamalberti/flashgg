@@ -25,6 +25,13 @@ process.load("flashgg.MicroAOD.flashggMets_cfi")
 # load tag sequence
 process.load("flashgg.Taggers.flashggTagSequence_cfi")
 
+#release cuts
+process.flashggVHHadronicTag.jetPtThreshold  = cms.double(20.)
+process.flashggVHHadronicTag.jetEtaThreshold = cms.double(5.0)
+process.flashggVHHadronicTag.dijetMassLowThreshold = cms.double(0.)
+process.flashggVHHadronicTag.dijetMassHighThreshold =cms.double(9999.)
+process.flashggVHHadronicTag.cosThetaStarThreshold = cms.double(1.)
+
 # use the preselected diphotons
 #from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
 #massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggDiPhotons"),cms.InputTag("flashggPreselectedDiPhotons"))
@@ -42,21 +49,37 @@ process.vhHadTagDumper.dumpWorkspace = False
 
 # get the variable list
 
-diphoton_variables = ["mass           := diPhoton.mass",
-                      "pho1_pt        := diPhoton.leadingPhoton.pt",
-                      "pho2_pt        := diPhoton.subLeadingPhoton.pt",
+diphoton_variables = ["mass            := diPhoton.mass",
+                      "diphoton_mva    := diPhotonMVA.result",
+                      "pho1_pt         := diPhoton.leadingPhoton.pt",
+                      "pho1_eta        := diPhoton.leadingPhoton.eta",
+                      "pho1_phi        := diPhoton.leadingPhoton.phi",
+                      "pho1_energy     := diPhoton.leadingPhoton.energy",
+                      "pho1_full5x5_r9 := diPhoton.leadingPhoton.full5x5_r9",
+                      "pho1_idmva      := diPhoton.leadPhotonId",
+                      "pho2_pt         := diPhoton.subLeadingPhoton.pt",
+                      "pho2_eta        := diPhoton.subLeadingPhoton.eta",
+                      "pho2_phi        := diPhoton.subLeadingPhoton.phi",
+                      "pho2_energy     := diPhoton.subLeadingPhoton.energy",
+                      "pho2_full5x5_r9 := diPhoton.subLeadingPhoton.full5x5_r9",
+                      "pho2_idmva      := diPhoton.subLeadPhotonId"
                       ]
 
-jet_variables      = ["jet1_pt := leadingJet.pt()",
-                      "jet2_pt := subLeadingJet.pt()"
+jet_variables      = ["jet1_pt      := leadingJet.pt()",
+                      "jet1_eta     := leadingJet.eta()",
+                      "jet1_phi     := leadingJet.phi()",
+                      "jet1_energy  := leadingJet.energy()",
+                      "jet2_pt      := subLeadingJet.pt()",
+                      "jet2_eta     := subLeadingJet.eta()",
+                      "jet2_phi     := subLeadingJet.phi()",
+                      "jet2_energy  := subLeadingJet.energy()",
                      ]
 
 all_variables = diphoton_variables + jet_variables
 
 cfgTools.addCategories(process.vhHadTagDumper,
                        [
-                           ("VHHadronicTag","leadingJet.pt>0",0),
-                           ("excluded","1",0)
+                           ("VHHadronicTag","leadingJet.pt>0",0)
                        ],
                        variables  = all_variables,
                        histograms = []
