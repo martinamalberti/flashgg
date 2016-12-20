@@ -72,11 +72,13 @@ jet_variables      = ["jet1_pt      := leadingJet.pt()",
                       "jet1_phi     := leadingJet.phi()",
                       "jet1_energy  := leadingJet.energy()",
                       "jet1_qgl     := leadingJet.QGL()",
+                      "jet1_bdisc   := leadingJet.bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')",
                       "jet2_pt      := subLeadingJet.pt()",
                       "jet2_eta     := subLeadingJet.eta()",
                       "jet2_phi     := subLeadingJet.phi()",
                       "jet2_energy  := subLeadingJet.energy()",
-                      "jet2_qgl     := subLeadingJet.QGL()"
+                      "jet2_qgl     := subLeadingJet.QGL()",
+                      "jet2_bdisc   := subLeadingJet.bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')"
                      ]
 
 all_variables = diphoton_variables + jet_variables
