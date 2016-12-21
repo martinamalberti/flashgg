@@ -48,6 +48,18 @@ process.TFileService = cms.Service("TFileService",
 # load tag sequence
 process.load("flashgg.Taggers.flashggTagSequence_cfi")
 
+# ivert photon ID on one photon to get a control sample
+process.flashggPreselectedDiPhotons.cut = cms.string(
+        "    (leadingPhoton.full5x5_r9>0.8||leadingPhoton.egChargedHadronIso<20||leadingPhoton.egChargedHadronIso/leadingPhoton.pt<0.3)"
+        " && (subLeadingPhoton.full5x5_r9>0.8||subLeadingPhoton.egChargedHadronIso<20||subLeadingPhoton.egChargedHadronIso/subLeadingPhoton.pt<0.3)"
+        " && (leadingPhoton.hadronicOverEm < 0.08 && subLeadingPhoton.hadronicOverEm < 0.08)"
+        " && (leadingPhoton.pt >30.0 && subLeadingPhoton.pt > 20.0)"
+        " && (abs(leadingPhoton.superCluster.eta) < 2.5 && abs(subLeadingPhoton.superCluster.eta) < 2.5)"
+        " && (abs(leadingPhoton.superCluster.eta) < 1.4442 || abs(leadingPhoton.superCluster.eta) > 1.566)"
+        " && (abs(subLeadingPhoton.superCluster.eta) < 1.4442 || abs(subLeadingPhoton.superCluster.eta) > 1.566)"
+        " && ( (leadPhotonId > -0.9 && subLeadPhotonId < -0.9) || (leadPhotonId < -0.9 && subLeadPhotonId > -0.9) )" # invert ID on one of the photons
+        )
+
 #release cuts
 process.flashggVHHadronicTag.jetPtThreshold  = cms.double(20.)
 #process.flashggVHHadronicTag.jetEtaThreshold = cms.double(5.0)
@@ -58,7 +70,7 @@ process.flashggVHHadronicTag.dijetMassHighThreshold =cms.double(9999.)
 process.flashggVHHadronicTag.cosThetaStarThreshold = cms.double(1.)
 process.flashggVHHadronicTag.dRJetToPhoLThreshold = cms.double(0.4)
 process.flashggVHHadronicTag.dRJetToPhoSThreshold = cms.double(0.4)
-
+process.flashggVHHadronicTag.phoIdMVAThreshold = cms.double(-1.0)
 
 # dumper
 from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
