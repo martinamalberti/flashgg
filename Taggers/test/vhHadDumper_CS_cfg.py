@@ -6,6 +6,8 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 from flashgg.MetaData.samples_utils import SamplesManager
 import os
 
+from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag,cloneProcessingSnippet
+
 process = cms.Process("VHHadronicTagDumper")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -41,14 +43,44 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("vhHadDump.root"),
                                    closeFileFast = cms.untracked.bool(True))
 
+import flashgg customization to check if we have signal or background                                                                                               
+from flashgg.MetaData.JobConfig import customize
+customize.parse()
 
-# met 
-#process.load("flashgg.MicroAOD.flashggMets_cfi")
+## import systs. customize
+from flashgg.Systematics.SystematicsCustomize import *
+
+# load syst producer 
+process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
+
+# apply scale and smearing corrections 
+useEGMTools(process)
+
+## if data, apply only energy scale corrections, if MC apply only energy smearings                                                                                    
+if customize.processId == 'Data':
+    print 'data'
+    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts                                                                               
+else:
+    print 'mc'
+    customizePhotonSystematicsForMC(process)
+    ##syst (2D) : smearings with EGMTool
+    vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
+    newvpset2D = cms.VPSet()
+    for pset in vpset2D:
+        pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)                           
+        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+            newvpset2D+= [pset]
+    process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D
+print 'syst 2D'
+printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
 
 # load tag sequence
 process.load("flashgg.Taggers.flashggTagSequence_cfi")
+process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
+massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
 
-# ivert photon ID on one photon to get a control sample
+# invert photon ID on one photon to get a control sample
 process.flashggPreselectedDiPhotons.cut = cms.string(
         "    (leadingPhoton.full5x5_r9>0.8||leadingPhoton.egChargedHadronIso<20||leadingPhoton.egChargedHadronIso/leadingPhoton.pt<0.3)"
         " && (subLeadingPhoton.full5x5_r9>0.8||subLeadingPhoton.egChargedHadronIso<20||subLeadingPhoton.egChargedHadronIso/subLeadingPhoton.pt<0.3)"
@@ -159,10 +191,11 @@ customize(process)
 
 
 process.p1 = cms.Path(
-#    process.flashggMets+
-   process.dataRequirements*
-   process.flashggTagSequence*
-   process.vhHadTagDumper
+    process.dataRequirements*
+    process.flashggUpdatedIdMVADiPhotons*
+    process.flashggDiPhotonSystematics*
+    process.flashggTagSequence*
+    process.vhHadTagDumper
 )
 
 print process.p1
