@@ -309,7 +309,8 @@ void Photon::smearSigmaEOverEValueBy( float val ) {
 float const Photon::sigEOverE() const
 {
     // Use uncertainty and error stored from reco because we want this fraction to be constant
-    return ( getCorrectedEnergyError( regression_type ) / getCorrectedEnergy( regression_type ) );
+    //return ( getCorrectedEnergyError( regression_type ) / getCorrectedEnergy( regression_type ) );
+    return ( getCorrectedEnergyError( getCandidateP4type() ) / getCorrectedEnergy( getCandidateP4type() ) );
 }
 // Local Variables:
 // mode:c++

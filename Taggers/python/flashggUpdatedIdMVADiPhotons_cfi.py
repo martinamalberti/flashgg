@@ -17,6 +17,6 @@ flashggUpdatedIdMVADiPhotons = cms.EDProducer("FlashggDiPhotonWithUpdatedPhoIdMV
                                               photonIdMVAweightfile_EE_new = cms.FileInPath("flashgg/MicroAOD/data/MVAweights_80X_endcap_ICHEPvtx_r9s4EtaWshift_wLowMass.xml"),
 
                                               # commenting out this parameter will disable all corrections performed by this module
-                                              correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_80X_v4.root"),
+                                              #correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_80X_v4.root"),
                                               Debug                    = cms.bool(False)
                                               )

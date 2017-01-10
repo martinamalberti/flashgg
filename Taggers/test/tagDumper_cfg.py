@@ -1,0 +1,189 @@
+#!/usr/bin/env cmsRun
+
+import FWCore.ParameterSet.Config as cms
+import FWCore.Utilities.FileUtils as FileUtils
+from FWCore.ParameterSet.VarParsing import VarParsing
+from flashgg.MetaData.samples_utils import SamplesManager
+import os
+
+from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag,cloneProcessingSnippet
+
+
+process = cms.Process("TagDumper")
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+
+process.load("Configuration.StandardSequences.GeometryDB_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+if os.environ["CMSSW_VERSION"].count("CMSSW_7_6"):
+    process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12'
+elif os.environ["CMSSW_VERSION"].count("CMSSW_7_4"):
+    process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4' 
+elif os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
+    process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+else:
+    raise Exception,"Could not find a sensible CMSSW_VERSION for default globaltag"
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
+
+# input files
+process.source = cms.Source ("PoolSource",
+                             fileNames = cms.untracked.vstring(
+#MC
+"/store//group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/161114_134042/0000/myMicroAODOutputFile_1.root"
+#data
+#"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/DoubleEG/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016E-23Sep2016-v1/161114_163114/0000/myMicroAODOutputFile_817.root"
+
+))
+
+
+process.TFileService = cms.Service("TFileService",
+                                   fileName = cms.string("vhHadDump.root"),
+                                   closeFileFast = cms.untracked.bool(True))
+
+# import flashgg customization to check if we have signal or background
+from flashgg.MetaData.JobConfig import customize
+customize.parse()
+
+## import systs. customize
+#from flashgg.Systematics.SystematicsCustomize import *
+
+## load syst producer
+#process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
+
+## apply scale and smearing corrections
+#useEGMTools(process)
+
+
+## if data, apply only energy scale corrections, if MC apply only energy smearings
+#if customize.processId == 'Data' or customize.processId == 'data':
+#    print 'data' 
+#    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
+#else:
+#    print 'mc'
+#    customizePhotonSystematicsForMC(process)
+#    ##syst (2D) : smearings with EGMTool
+#    vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
+#    newvpset2D = cms.VPSet()
+#    for pset in vpset2D:
+#        pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
+#        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+#            pset.ApplyCentralValue = cms.bool(True)
+#            newvpset2D+= [pset]
+#    process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D       
+
+#print 'syst 1D'
+#printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
+#print 'syst 2D'
+#printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
+
+
+# load tag sequence
+process.load("flashgg.Taggers.flashggTagSequence_cfi")
+process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
+#massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
+
+
+#no diphoMVA cut
+process.flashggUntagged.Boundaries = cms.vdouble(-2)
+
+#remove other sequences that are not needed
+process.flashggTagSequence.remove(process.flashggVBFTag)
+process.flashggTagSequence.remove(process.flashggTTHLeptonicTag)
+process.flashggTagSequence.remove(process.flashggTTHHadronicTag)
+process.flashggTagSequence.remove(process.flashggVHEtTag)
+process.flashggTagSequence.remove(process.flashggVHLooseTag)
+process.flashggTagSequence.remove(process.flashggVHTightTag)
+process.flashggTagSequence.remove(process.flashggTagSorter)
+process.flashggTagSequence.remove(process.flashggUnpackedJets)
+process.flashggTagSequence.remove(process.flashggVBFMVA)
+process.flashggTagSequence.remove(process.flashggVBFDiPhoDiJetMVA)
+
+# dumper
+from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
+import flashgg.Taggers.dumperConfigTools as cfgTools
+
+process.diphotonDumper = createTagDumper("UntaggedTag")
+process.diphotonDumper.src = "flashggUntagged"
+process.diphotonDumper.maxCandPerEvent = -1 # take them all
+process.diphotonDumper.dumpTrees = True
+process.diphotonDumper.dumpWorkspace = False
+process.diphotonDumper.quietRooFit = True
+#process.diphotonDumper.nameTemplate ="$PROCESS_$SQRTS_$LABEL"
+process.diphotonDumper.nameTemplate ="tree_$SQRTS_$LABEL"
+
+# get the variable list
+diphoton_variables = ["mass            := diPhoton.mass",
+                      "diphoton_pt     := diPhoton.pt",
+                      "diphoton_mva    := diPhotonMVA.result",
+                      "pho1_pt         := diPhoton.leadingPhoton.pt",
+                      "pho1_eta        := diPhoton.leadingPhoton.eta",
+                      "pho1_phi        := diPhoton.leadingPhoton.phi",
+                      "pho1_energy     := diPhoton.leadingPhoton.energy",
+                      "pho1_eTrue      := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+                      "pho1_sigEOverE  := diPhoton.leadingPhoton().sigEOverE()",
+                      "pho1_full5x5_r9 := diPhoton.leadingPhoton.full5x5_r9",
+                      "pho1_idmva      := diPhoton.leadPhotonId",
+                      "pho1_genMatchType:=diPhoton.leadingPhoton.genMatchType",
+                      "pho2_pt         := diPhoton.subLeadingPhoton.pt",
+                      "pho2_eta        := diPhoton.subLeadingPhoton.eta",
+                      "pho2_phi        := diPhoton.subLeadingPhoton.phi",
+                      "pho2_energy     := diPhoton.subLeadingPhoton.energy",
+                      "pho2_full5x5_r9 := diPhoton.subLeadingPhoton.full5x5_r9",
+                      "pho2_idmva      := diPhoton.subLeadPhotonId",
+                      "pho2_genMatchType:=diPhoton.subLeadingPhoton.genMatchType",
+                      "pho2_eTrue      := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().energy():0",
+                      "pho2_sigEOverE  := diPhoton.subLeadingPhoton().sigEOverE()",
+]
+
+all_variables = diphoton_variables
+
+cfgTools.addCategories(process.diphotonDumper,
+                       [
+                           ("UntaggedTag","leadingPhoton.pt>0",0)
+                       ],
+                       variables  = all_variables,
+                       histograms = []
+)
+
+process.diphotonDumper.nameTemplate = "$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL"
+
+
+
+
+# Require standard diphoton trigger
+from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
+process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*",
+#                                                                "HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1",
+#                                                                "HLT_Diphoton30EB_18EB_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1"
+                                                                ))
+
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+
+# ee bad supercluster filter on data
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
+process.dataRequirements = cms.Sequence()
+if customize.processId == "Data":
+    process.dataRequirements += process.hltHighLevel
+    process.dataRequirements += process.eeBadScFilter
+    
+
+
+customize.setDefault("maxEvents" ,1000)    # max-number of events
+customize.setDefault("targetLumi",1e+3) # define integrated lumi
+customize(process)
+
+
+process.p1 = cms.Path(
+        process.dataRequirements*
+        process.flashggUpdatedIdMVADiPhotons*
+        #process.flashggDiPhotonSystematics*
+        process.flashggTagSequence*
+        process.diphotonDumper
+)
+
+print process.p1
