@@ -57,8 +57,9 @@ process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 # apply scale and smearing corrections
 useEGMTools(process)
 
+
 ## if data, apply only energy scale corrections, if MC apply only energy smearings
-if customize.processId == 'Data':
+if customize.processId == 'Data' or customize.processId == 'data':
     print 'data' 
     customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
 else:
@@ -73,6 +74,9 @@ else:
             pset.ApplyCentralValue = cms.bool(True)
             newvpset2D+= [pset]
     process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D       
+
+print 'syst 1D'
+printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
 print 'syst 2D'
 printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
 

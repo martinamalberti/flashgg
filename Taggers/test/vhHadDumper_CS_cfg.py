@@ -43,7 +43,7 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("vhHadDump.root"),
                                    closeFileFast = cms.untracked.bool(True))
 
-import flashgg customization to check if we have signal or background                                                                                               
+#import flashgg customization to check if we have signal or background                                                                                               
 from flashgg.MetaData.JobConfig import customize
 customize.parse()
 
@@ -56,10 +56,10 @@ process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 # apply scale and smearing corrections 
 useEGMTools(process)
 
-## if data, apply only energy scale corrections, if MC apply only energy smearings                                                                                    
-if customize.processId == 'Data':
+## if data, apply only energy scale corrections, if MC apply only energy smearings
+if customize.processId == 'Data' or customize.processId == 'data':
     print 'data'
-    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts                                                                               
+    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts
 else:
     print 'mc'
     customizePhotonSystematicsForMC(process)
@@ -67,7 +67,7 @@ else:
     vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
     newvpset2D = cms.VPSet()
     for pset in vpset2D:
-        pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)                           
+        pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
             pset.ApplyCentralValue = cms.bool(True)
             newvpset2D+= [pset]
