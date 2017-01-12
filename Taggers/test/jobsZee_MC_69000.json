@@ -1,0 +1,11 @@
+{	
+   "processes" : {
+
+   "DYJetsToLL" : [
+      	       ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/sethzenz-RunIISummer16-2_4_0-25ns_Moriond17-2_4_0-v0-RunIISummer16MiniAODv2-PUMoriond17_HCALDebug_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-bccf6e491278057086bbf5e37d2c672b/USER",{"args" : ["outputFile=output_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root"],"njobs":200}]
+	      ]
+    },
+
+    "cmdLine" : "campaign=RunIISummer16-2_4_0-25ns_Moriond17 targetLumi=1e+3 processType='mc' puTarget=2.39e+05,8.51e+05,2.32e+06,3.15e+06,4.5e+06,6.03e+06,7.05e+06,1.32e+07,3.61e+07,8.07e+07,1.82e+08,3.68e+08,6.14e+08,8.9e+08,1.19e+09,1.51e+09,1.78e+09,1.96e+09,2.06e+09,2.11e+09,2.14e+09,2.16e+09,2.13e+09,2.06e+09,1.96e+09,1.84e+09,1.7e+09,1.55e+09,1.39e+09,1.23e+09,1.08e+09,9.26e+08,7.81e+08,6.46e+08,5.25e+08,4.18e+08,3.27e+08,2.51e+08,1.88e+08,1.37e+08,9.68e+07,6.6e+07,4.33e+07,2.72e+07,1.64e+07,9.46e+06,5.2e+06,2.74e+06,1.37e+06,6.59e+05,3.04e+05,1.35e+05,5.98e+04,2.72e+04,1.38e+04,8.44e+03,6.28e+03,5.34e+03,4.83e+03,4.48e+03,4.17e+03,3.87e+03,3.57e+03,3.28e+03,2.99e+03,2.7e+03,2.43e+03,2.17e+03,1.93e+03,1.7e+03,1.48e+03,1.29e+03,1.11e+03,954,812"
+
+}

@@ -147,18 +147,18 @@ process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
         "HLT_Ele27_WPTight_Gsf_v5",
         "HLT_Ele27_WPTight_Gsf_v6",
         "HLT_Ele27_WPTight_Gsf_v7",
-        "HLT_Ele35_WPLoose_Gsf_v1",
-        "HLT_Ele35_WPLoose_Gsf_v2",
-        "HLT_Ele35_WPLoose_Gsf_v3",
-        "HLT_Ele35_WPLoose_Gsf_v4",
-        "HLT_Ele35_WPLoose_Gsf_v5",
-        "HLT_Ele35_WPLoose_Gsf_v6",
-        "HLT_Ele45_WPLoose_Gsf_v1",
-        "HLT_Ele45_WPLoose_Gsf_v2",
-        "HLT_Ele45_WPLoose_Gsf_v3",
-        "HLT_Ele45_WPLoose_Gsf_v4",
-        "HLT_Ele45_WPLoose_Gsf_v5",
-        "HLT_Ele45_WPLoose_Gsf_v6",
+        #"HLT_Ele35_WPLoose_Gsf_v1",
+        #"HLT_Ele35_WPLoose_Gsf_v2",
+        #"HLT_Ele35_WPLoose_Gsf_v3",
+        #"HLT_Ele35_WPLoose_Gsf_v4",
+        #"HLT_Ele35_WPLoose_Gsf_v5",
+        #"HLT_Ele35_WPLoose_Gsf_v6",
+        #"HLT_Ele45_WPLoose_Gsf_v1",
+        #"HLT_Ele45_WPLoose_Gsf_v2",
+        #"HLT_Ele45_WPLoose_Gsf_v3",
+        #"HLT_Ele45_WPLoose_Gsf_v4",
+        #"HLT_Ele45_WPLoose_Gsf_v5",
+        #"HLT_Ele45_WPLoose_Gsf_v6",
     )
 )
 
@@ -227,8 +227,8 @@ if customize.processId == 'Data':
             "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
             #SingleEG
             "HLT_Ele27_WPTight_Gsf_v*",
-            "HLT_Ele35_WPLoose_Gsf_v*",
-            "HLT_Ele45_WPLoose_Gsf_v*",
+            #"HLT_Ele35_WPLoose_Gsf_v*",
+            #"HLT_Ele45_WPLoose_Gsf_v*",
             ) )
 else:
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
