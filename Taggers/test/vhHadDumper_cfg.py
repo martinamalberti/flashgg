@@ -33,9 +33,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring(
 #MC
-#"/store//group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/161114_134042/0000/myMicroAODOutputFile_1.root"
+"/store//group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/161114_134042/0000/myMicroAODOutputFile_1.root"
+#"/store//group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/161114_103156/0000/myMicroAODOutputFile_1.root"
 #data
-"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/DoubleEG/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016E-23Sep2016-v1/161114_163114/0000/myMicroAODOutputFile_817.root"
+#"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/DoubleEG/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016E-23Sep2016-v1/161114_163114/0000/myMicroAODOutputFile_817.root"
 
 ))
 
@@ -65,6 +66,16 @@ if customize.processId == 'Data' or customize.processId == 'data':
 else:
     print 'mc'
     customizePhotonSystematicsForMC(process)
+    ##syst (1D) 
+    vpset   = process.flashggDiPhotonSystematics.SystMethods
+    newvpset = cms.VPSet()
+    for pset in vpset:
+        pset.NSigmas = cms.vint32() # no up/down syst shifts
+        pset.ApplyCentralValue = cms.bool(False) # no central value
+        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+            newvpset+= [pset]
+            process.flashggDiPhotonSystematics.SystMethods = newvpset  
     ##syst (2D) : smearings with EGMTool
     vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
     newvpset2D = cms.VPSet()
@@ -111,7 +122,6 @@ process.vhHadTagDumper.dumpWorkspace = False
 
 
 # get the variable list
-
 diphoton_variables = ["mass            := diPhoton.mass",
                       "diphoton_pt     := diPhoton.pt",
                       "diphoton_mva    := diPhotonMVA.result",
@@ -145,8 +155,15 @@ jet_variables      = ["jet1_pt      := leadingJet.pt()",
                       "jet2_bdisc   := subLeadingJet.bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')"
                      ]
 
-all_variables = diphoton_variables + jet_variables
+gen_variables = ["hasZ := tagTruth().associatedZ",
+                 "hasW := tagTruth().associatedW",
+                 ]
 
+
+all_variables = diphoton_variables + jet_variables
+if ( customize.processId != "Data" and customize.processId != "data"):
+    all_variables+=gen_variables
+    
 cfgTools.addCategories(process.vhHadTagDumper,
                        [
                            ("VHHadronicTag","leadingJet.pt>0",0)
@@ -173,7 +190,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 process.eeBadScFilter.EERecHitSource = cms.InputTag("reducedEgamma","reducedEERecHits") # Saved MicroAOD Collection (data only)
 process.dataRequirements = cms.Sequence()
-if customize.processId == "Data":
+if customize.processId == "Data" or customize.processId == "data":
     process.dataRequirements += process.hltHighLevel
     process.dataRequirements += process.eeBadScFilter
     
