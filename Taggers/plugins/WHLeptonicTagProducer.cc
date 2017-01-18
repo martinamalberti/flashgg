@@ -381,7 +381,8 @@ namespace flashgg {
             Ptr<flashgg::Met> theMET = METs->ptrAt( 0 );
 
             //has Nj<thresh; photonSelection; muons>=1||electrons>=1; metPt>thresh
-            if( (tagJets.size() < jetsNumberThreshold_) && photonSelection && theMET->getCorPt()>METThreshold_) {
+            if( (tagJets.size() < jetsNumberThreshold_) && photonSelection && theMET->getCorPt()>METThreshold_) { //why cut on njets?!?!
+                //if( photonSelection && goodElectrons.size() >=1 && goodMuons.size() >=1 && theMET->getCorPt()>METThreshold_ ){
                 whleptonictags_obj.setJets( tagJets );
                 whleptonictags_obj.setMuons( goodMuons );
                 whleptonictags_obj.setElectrons( goodElectrons );
