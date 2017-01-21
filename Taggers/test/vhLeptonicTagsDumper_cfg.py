@@ -97,8 +97,8 @@ process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs 
 massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
 
 #remove cut on jets
-process.flashggWHLeptonicTag.jetsNumberThreshold = cms.double(99999.)
-process.flashggVHLeptonicLooseTag.jetsNumberThreshold = cms.double(99999.)
+#process.flashggWHLeptonicTag.jetsNumberThreshold = cms.double(99999.)
+#process.flashggVHLeptonicLooseTag.jetsNumberThreshold = cms.double(99999.)
 
 # dumper
 from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
