@@ -154,7 +154,7 @@ leptons_variables = [ "mu1_pt         :=  ? muons.size()>0 ? muons[0].pt() : -10
                       "ele1_energy    :=  ? electrons.size()>0 ? electrons[0].energy() : -100 ",
                       "ele2_pt        :=  ? electrons.size()>1 ? electrons[1].pt() : -100 ",
                       "ele2_phi       :=  ? electrons.size()>1 ? electrons[1].phi() : -100 ",
-                      "ele2_eta       :=  ? electrons.size()>1 ? electrons[1].eta() : -100 "
+                      "ele2_eta       :=  ? electrons.size()>1 ? electrons[1].eta() : -100 ",
                       "ele2_energy    :=  ? electrons.size()>1 ? electrons[1].energy() : -100 "
                      ]
 
@@ -170,7 +170,7 @@ jets_variables = ["njets := jets.size()",
                   "jet3_pt     :=  ? jets.size()>2 ? jets[2].pt : -100 ",
                   "jet3_phi    :=  ? jets.size()>2 ? jets[2].phi : -100 ",
                   "jet3_eta    :=  ? jets.size()>2 ? jets[2].eta : -100 ",
-                  "jet3_energy :=  ? jets.size()>2 ? jets[2].energy : -100 ",
+                  "jet3_energy :=  ? jets.size()>2 ? jets[2].energy : -100 "
                   ]
 
 met_variables = ["met_pt  := met.corPt()",
