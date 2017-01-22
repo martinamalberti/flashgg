@@ -134,7 +134,7 @@
 	"WW_TuneCUETP8M1_13TeV-pythia8"                           : {"xs" : 63.21, "br" : 1.0},
 	"TTGG_0Jets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8"  : {"xs" : 0.01731, "br" : 1.0},
 	"TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8" : {"xs" : 3.697, "br" : 1.0},
-	"TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8"      : {"xs" : 2.967, "br" : 1.0},
+	"TGJets_TuneCUETP8M1_13TeV_amcatnlo_madspin_pythia8"      : {"xs" : 2.967, "br" : 1.0}
 
 
 }
