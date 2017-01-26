@@ -230,6 +230,7 @@ namespace flashgg {
         double idmva2 = 0.;
         bool isDiMuon = false;
         bool isDiElectron = false;
+
         for( unsigned int diphoIndex = 0; diphoIndex < diPhotons->size(); diphoIndex++ ) {
 
             if(useVertex0only_)
@@ -254,6 +255,7 @@ namespace flashgg {
             idmva2 = dipho->subLeadingPhoton()->phoIdMvaDWrtVtx( dipho->vtx() );
             if( idmva1 <= PhoMVAThreshold_ || idmva2 <= PhoMVAThreshold_ ) { continue; }
             if( mvares->result < MVAThreshold_ ) { continue; }
+
             photonSelection = true;
             tagMuonsTemp = selectMuons( theMuons->ptrs(), dipho, vertices->ptrs(), muonEtaThreshold_, leptonPtThreshold_, muPFIsoSumRelThreshold_,
                                            deltaRMuonPhoThreshold_, deltaRMuonPhoThreshold_ );
