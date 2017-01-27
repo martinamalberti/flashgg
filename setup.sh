@@ -121,6 +121,9 @@ git cms-merge-topic cms-met:METRecipe_8020
 echo "Setting up MET filters..."
 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
 
+echo "Setting up Bad muon filter..."
+git cms-merge-topic gpetruc:badMuonFilters_80X_v2
+
 echo "Setting up TnP tools..."
 git cms-merge-topic -u sethzenz:for-flashgg-egm_tnp-8_0_20
 
@@ -155,6 +158,9 @@ cp $CMSSW_BASE/src/flashgg/Systematics/data/Golden*.dat $CMSSW_BASE/src/EgammaAn
 cp $CMSSW_BASE/src/flashgg/Systematics/data/80X_DCS05July_plus_Golden22_s*.dat $CMSSW_BASE/src/EgammaAnalysis/ElectronTools/data
 cp $CMSSW_BASE/src/flashgg/Systematics/data/80X_ichepV1_2016_pho_s* $CMSSW_BASE/src/EgammaAnalysis/ElectronTools/data
 cp $CMSSW_BASE/src/flashgg/Systematics/data/80X_ichepV2_2016_pho_s* $CMSSW_BASE/src/EgammaAnalysis/ElectronTools/data
+cp $CMSSW_BASE/src/flashgg/Systematics/data/Winter_2016_reReco_v1_ele_scales.dat $CMSSW_BASE/src/EgammaAnalysis/ElectronTools/data
+cp $CMSSW_BASE/src/flashgg/Systematics/data/Winter_2016_reReco_v1_ele_smearings.dat $CMSSW_BASE/src/EgammaAnalysis/ElectronTools/data
+
 
 echo "adding hook for indentation"
 ln -s $CMSSW_BASE/src/flashgg/Validation/scripts/flashgg_indent_check.sh $CMSSW_BASE/src/flashgg/.git/hooks/pre-commit
