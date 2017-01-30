@@ -285,7 +285,6 @@ flashggVHTightTag = cms.EDProducer("FlashggVHTightTagProducer",
 )
 
 flashggVHMetTag = cms.EDProducer("FlashggVHMetTagProducer",
-<<<<<<< HEAD
                                  RECOfilters = cms.InputTag('TriggerResults::RECO'),
                                  PATfilters = cms.InputTag('TriggerResults::PAT'),
                                  FLASHfilters = cms.InputTag('TriggerResults::FLASHggMicroAOD'),
