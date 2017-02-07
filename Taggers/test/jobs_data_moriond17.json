@@ -19,8 +19,12 @@
 
 		[ "/DoubleEG/ferrif-RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016H-PromptReco-v2-531158c93170d8cd2bdb89d7c81ef33d/USER", { "args" : ["outputFile=output_DoubleEG_Run2016H-PromptReco-v2.root"], "njobs":100} ],      
 
-		[ "/DoubleEG/ferrif-RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016H-PromptReco-v3-531158c93170d8cd2bdb89d7c81ef33d/USER", { "args" : ["outputFile=output_DoubleEG_Run2016H-PromptReco-v3.root"], "njobs":100} ]
+		[ "/DoubleEG/ferrif-RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016H-PromptReco-v3-531158c93170d8cd2bdb89d7c81ef33d/USER", { "args" : ["outputFile=output_DoubleEG_Run2016H-PromptReco-v3.root"], "njobs":100} ],
 
+		["/DoubleEG/ferrif-RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2_p3-2_3_0-v0-Run2016B-23Sep2016-v3-b0a68ca6495dcf1771ba574653f4d95c/USER", { "args" : ["outputFile=output_DoubleEG_Run2016B-23Sep2016-v3_p3.root"], "njobs":1} ],
+
+		["/DoubleEG/ferrif-RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2_p3-2_3_0-v0-Run2016G-23Sep2016-v1-2e468837300ac1a7953c87d48f2376a1/USER", { "args" : ["outputFile=output_DoubleEG_Run2016G-23Sep2016-v1_p3.root"], "njobs":1} ]
+		
 	     ]		
 
      },

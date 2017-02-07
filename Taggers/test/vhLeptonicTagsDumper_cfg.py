@@ -99,6 +99,9 @@ massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpd
 #remove cut on jets
 #process.flashggWHLeptonicTag.jetsNumberThreshold = cms.double(99999.)
 #process.flashggVHLeptonicLooseTag.jetsNumberThreshold = cms.double(99999.)
+process.flashggZHLeptonicTag.MVAThreshold = cms.double(-1.)
+process.flashggWHLeptonicTag.MVAThreshold = cms.double(-1.)
+process.flashggVHLeptonicLooseTag.MVAThreshold = cms.double(-1.)
 
 # dumper
 from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
@@ -196,7 +199,7 @@ cfgTools.addCategories(process.WHLeptonicTagDumper,
 
 cfgTools.addCategories(process.VHLeptonicLooseTagDumper,
                        [
-                           ("VHLeptonicLooseTagDumper","diPhoton.leadingPhoton.pt>0",0)
+                           ("VHLeptonicLooseTag","diPhoton.leadingPhoton.pt>0",0)
                        ],
                        variables  = all_variables+met_variables+jets_variables,
                        histograms = []
