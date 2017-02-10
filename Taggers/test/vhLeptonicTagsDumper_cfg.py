@@ -99,6 +99,7 @@ massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpd
 #remove cut on jets
 #process.flashggWHLeptonicTag.jetsNumberThreshold = cms.double(99999.)
 #process.flashggVHLeptonicLooseTag.jetsNumberThreshold = cms.double(99999.)
+#loose cut on diphotonMVA
 process.flashggZHLeptonicTag.MVAThreshold = cms.double(-1.)
 process.flashggWHLeptonicTag.MVAThreshold = cms.double(-1.)
 process.flashggVHLeptonicLooseTag.MVAThreshold = cms.double(-1.)
