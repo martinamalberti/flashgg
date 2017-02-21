@@ -95,7 +95,7 @@ namespace flashgg {
                 if (new_obj->getLeadingPhoton().isEB()) {
                     if (this->debug_) {
                         std::cout << new_obj->getLeadingPhoton().full5x5_r9() << std::endl;
-                        std::cout << new_obj->getLeadingPhoton().r9() << std::endl;
+                        std::cout << new_obj->getLeadingPhoton().old_r9() << std::endl;
                     }
                     reco::Photon::ShowerShape newShowerShapes = new_obj->getLeadingPhoton().full5x5_showerShapeVariables();
                     newShowerShapes.e3x3 = corrections_[0]->Eval(new_obj->getLeadingPhoton().full5x5_r9())*new_obj->getLeadingPhoton().superCluster()->rawEnergy();
@@ -106,7 +106,7 @@ namespace flashgg {
 
                     if (this->debug_) {
                         std::cout << new_obj->getLeadingPhoton().full5x5_r9() << std::endl;
-                        std::cout << new_obj->getLeadingPhoton().r9() << std::endl;
+                        std::cout << new_obj->getLeadingPhoton().old_r9() << std::endl;
                     }
                 }
                 
@@ -122,7 +122,7 @@ namespace flashgg {
                 if (new_obj->getLeadingPhoton().isEE()) {
                     if (this->debug_) {
                         std::cout << new_obj->getLeadingPhoton().full5x5_r9() << std::endl;
-                        std::cout << new_obj->getLeadingPhoton().r9() << std::endl;
+                        std::cout << new_obj->getLeadingPhoton().old_r9() << std::endl;
                     }
                     reco::Photon::ShowerShape newShowerShapes = new_obj->getLeadingPhoton().full5x5_showerShapeVariables();
                     newShowerShapes.e3x3 = corrections_[3]->Eval(new_obj->getLeadingPhoton().full5x5_r9())*new_obj->getLeadingPhoton().superCluster()->rawEnergy();
@@ -133,7 +133,7 @@ namespace flashgg {
 
                     if (this->debug_) {
                         std::cout << new_obj->getLeadingPhoton().full5x5_r9() << std::endl;
-                        std::cout << new_obj->getLeadingPhoton().r9() << std::endl;
+                        std::cout << new_obj->getLeadingPhoton().old_r9() << std::endl;
                     }
                 }
                 
