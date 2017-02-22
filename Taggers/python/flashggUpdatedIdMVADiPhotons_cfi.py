@@ -24,8 +24,15 @@ flashggUpdatedIdMVADiPhotons = cms.EDProducer("FlashggDiPhotonWithUpdatedPhoIdMV
                                               photonIdMVAweightfile_EB_new = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_barrel_Moriond2017_wRhoRew.weights.xml"),
                                               photonIdMVAweightfile_EE_new = cms.FileInPath("flashgg/MicroAOD/data/HggPhoId_endcap_Moriond2017_wRhoRew.weights.xml"),
 
+
                                               # commenting out this parameter will disable all corrections performed by this module
-                                              #correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_80X_v4.root"),
-                                              correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_Moriond17_v1.root"),
-                                              Debug                    = cms.bool(False)
+                                              correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_Moriond17_AfterPreApr_v1.root"),
+                                              # To apply correction for non5x5 r9, sieie, sipip, sieip set this variable True. Default value False.
+                                              doNon5x5transformation   = cms.bool(False),
+                                              non5x5correctionFile     = cms.FileInPath("flashgg/MicroAOD/data/transformation_Moriond17_non5x5_v1.root"),
+
+                                              Debug                    = cms.bool(False),
+
+                                              doIsoCorrection = cms.bool(True),
+                                              isoCorrectionFile = cms.FileInPath("flashgg/Taggers/data/corrections_hybrid.root")
                                               )
