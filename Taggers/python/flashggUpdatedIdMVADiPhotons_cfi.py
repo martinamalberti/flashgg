@@ -26,6 +26,6 @@ flashggUpdatedIdMVADiPhotons = cms.EDProducer("FlashggDiPhotonWithUpdatedPhoIdMV
 
                                               # commenting out this parameter will disable all corrections performed by this module
                                               #correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_80X_v4.root"),
-                                              correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_Moriond17_v3.root"),
+                                              correctionFile           = cms.FileInPath("flashgg/MicroAOD/data/transformation_Moriond17_v1.root"),
                                               Debug                    = cms.bool(False)
                                               )
