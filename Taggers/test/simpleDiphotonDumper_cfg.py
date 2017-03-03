@@ -27,12 +27,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 ## input files
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(      
-        #data                    
-        #"/store/group/phys_higgs/cmshgg/ferriff/flashgg/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2/2_3_0/DoubleEG/RunIISpring16DR80X-2_3_0-25ns_Moriond17_MiniAODv2-2_3_0-v0-Run2016E-23Sep2016-v1/161114_163114/0000/myMicroAODOutputFile_817.root"
-        #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/ReMiniAOD-03Feb2017-2_5_1/2_5_1/SingleElectron/ReMiniAOD-03Feb2017-2_5_1-2_5_1-v0-Run2016D-03Feb2017-v1/170214_121515/0000/myMicroAODOutputFile_550.root"
         # mc
-        "/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_0-25ns_Moriond17/2_4_0/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-herwigpp_30M/RunIISummer16-2_4_0-25ns_Moriond17-2_4_0-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/161225_213425/0000/myMicroAODOutputFile_1.root"
-        #"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/DYJetsToEE_M-50_LTbinned_95To100_5f_LO_13TeV-madgraph_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170118_090503/0000/myMicroAODOutputFile_5.root"
+        "/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/GluGluHToGG_M90_13TeV_amcatnloFXFX_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170114_092039/0000/myMicroAODOutputFile_1.root"
         ))
 
 ## output file
@@ -98,9 +94,8 @@ printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
 
 
 
-## preselection Zee
+## preselection Hgg
 process.load("flashgg.Taggers.flashggPreselectedDiPhotons_cfi")
-process.flashggPreselectedDiPhotons.variables[-1] = "-(passElectronVeto - 1)"
 process.flashggPreselectedDiPhotons.src = "flashggDiPhotonSystematics"
 
 ## untagged tag dumper
@@ -137,32 +132,8 @@ process.diphotonDumper.nameTemplate ="tree_$SQRTS_$LABEL"
 process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
     tag = cms.InputTag("TriggerResults::HLT"),
     bits = cms.vstring(
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v2",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v3",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v4",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v5",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v6",
-        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v7",
-        "HLT_Ele27_WPTight_Gsf_v1",
-        "HLT_Ele27_WPTight_Gsf_v2",
-        "HLT_Ele27_WPTight_Gsf_v3",
-        "HLT_Ele27_WPTight_Gsf_v4",
-        "HLT_Ele27_WPTight_Gsf_v5",
-        "HLT_Ele27_WPTight_Gsf_v6",
-        "HLT_Ele27_WPTight_Gsf_v7",
-        #"HLT_Ele35_WPLoose_Gsf_v1",
-        #"HLT_Ele35_WPLoose_Gsf_v2",
-        #"HLT_Ele35_WPLoose_Gsf_v3",
-        #"HLT_Ele35_WPLoose_Gsf_v4",
-        #"HLT_Ele35_WPLoose_Gsf_v5",
-        #"HLT_Ele35_WPLoose_Gsf_v6",
-        #"HLT_Ele45_WPLoose_Gsf_v1",
-        #"HLT_Ele45_WPLoose_Gsf_v2",
-        #"HLT_Ele45_WPLoose_Gsf_v3",
-        #"HLT_Ele45_WPLoose_Gsf_v4",
-        #"HLT_Ele45_WPLoose_Gsf_v5",
-        #"HLT_Ele45_WPLoose_Gsf_v6",
+#        "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1"
+
     )
 )
 
@@ -260,9 +231,9 @@ if customize.processId == 'Data':
     process.dataRequirements += process.eeBadScFilter
     process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring(
             #DoubleEG
-            "HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
+            #"HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v*",
             #SingleEG
-            "HLT_Ele27_WPTight_Gsf_v*",
+            #"HLT_Ele27_WPTight_Gsf_v*",
             #"HLT_Ele35_WPLoose_Gsf_v*",
             #"HLT_Ele45_WPLoose_Gsf_v*",
             ) )
