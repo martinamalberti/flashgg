@@ -218,6 +218,14 @@ cfgTools.addCategories(process.diphotonDumper,
                                   "ele1_beforeShShTransf_regr_E :=diPhoton.leadingPhoton.userFloat('beforeShShTransf_regr_E')",
                                   "ele1_afterShShTransf_regr_E  :=diPhoton.leadingPhoton.userFloat('afterShShTransf_regr_E')",
 
+                                  #uncorrected shower shapes
+                                  "ele1_uncorr_full5x5_r9            :=diPhoton.leadingPhoton.userFloat('uncorr_r9')",
+                                  "ele1_uncorr_full5x5_sigmaIetaIeta :=diPhoton.leadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
+                                  "ele1_uncorr_etaWidth              :=diPhoton.leadingPhoton.userFloat('uncorr_etaWidth')",
+                                  "ele1_uncorr_s4                    :=diPhoton.leadingPhoton.userFloat('uncorr_s4')",
+ 
+
+
                                   "ele2_et            :=diPhoton.subLeadingPhoton.pt",
                                   "ele2_energy        :=diPhoton.subLeadingPhoton.energy",
                                   "ele2_rawEnergy     :=diPhoton.subLeadingPhoton.superCluster.rawEnergy",
@@ -248,6 +256,12 @@ cfgTools.addCategories(process.diphotonDumper,
                                   "ele2_reco_regr_E             :=diPhoton.subLeadingPhoton.userFloat('reco_regr_E')",
                                   "ele2_beforeShShTransf_regr_E :=diPhoton.subLeadingPhoton.userFloat('beforeShShTransf_regr_E')",
                                   "ele2_afterShShTransf_regr_E  :=diPhoton.subLeadingPhoton.userFloat('afterShShTransf_regr_E')",
+
+                                  #uncorrected shower shapes
+                                  "ele2_uncorr_full5x5_r9            :=diPhoton.subLeadingPhoton.userFloat('uncorr_r9')",
+                                  "ele2_uncorr_full5x5_sigmaIetaIeta :=diPhoton.subLeadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
+                                  "ele2_uncorr_etaWidth              :=diPhoton.subLeadingPhoton.userFloat('uncorr_etaWidth')",
+                                  "ele2_uncorr_s4                    :=diPhoton.subLeadingPhoton.userFloat('uncorr_s4')",
                                   ],
                        histograms=[]
                        )
