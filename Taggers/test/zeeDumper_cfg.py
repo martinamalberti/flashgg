@@ -56,7 +56,7 @@ customize.parse()
 
 ## import systs. customize
 from flashgg.Systematics.SystematicsCustomize import *
-#customize.processId = 'Data' # for test
+####customize.processId = 'Data' # for test
 
 ## load syst producer
 process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
@@ -167,6 +167,93 @@ process.diphotonDumper.globalVariables.addTriggerBits = cms.PSet(
     )
 )
 
+my_vars = ["mass               :=diPhoton.mass",
+           "pt                 :=diPhoton.pt",
+           "diphotonMVA        :=diPhotonMVA.result",
+           
+           "ele1_et            :=diPhoton.leadingPhoton.pt",
+           "ele1_energy        :=diPhoton.leadingPhoton.energy",
+           "ele1_rawEnergy     :=diPhoton.leadingPhoton.superCluster.rawEnergy",
+           "ele1_esEnergy      :=diPhoton.leadingPhoton.superCluster.preshowerEnergy",
+           "ele1_eTrue         := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
+           "ele1_scEta         :=diPhoton.leadingPhoton.superCluster.eta",
+           "ele1_scPhi         :=diPhoton.leadingPhoton.superCluster.phi",
+           "ele1_eta           :=diPhoton.leadingPhoton.eta",
+           "ele1_phi           :=diPhoton.leadingPhoton.phi",
+           "ele1_r9            :=diPhoton.leadingPhoton.old_r9()",
+           "ele1_full5x5_r9    :=diPhoton.leadingPhoton.full5x5_r9",
+           "ele1_etaWidth      :=diPhoton.leadingPhoton.superCluster.etaWidth",
+           "ele1_s4            :=diPhoton.leadingPhoton.s4",
+           "ele1_full5x5_sigmaIetaIeta := diPhoton.leadingPhoton.full5x5_sigmaIetaIeta",
+           "ele1_sigmaEoE      :=diPhoton.leadingPhoton.sigEOverE",
+           "ele1_pfPhoIso03    :=diPhoton.leadingPhoton.pfPhoIso03",
+           "ele1_chIsoRV       :=diPhoton.leadingView.pfChIso03WrtChosenVtx()",
+           "ele1_chIsoWV       :=diPhoton.leadingPhoton.pfChgIsoWrtWorstVtx03",
+           "ele1_ESoRawE       :=diPhoton.leadingPhoton.superCluster.preshowerEnergy()/diPhoton.leadingPhoton.superCluster.rawEnergy()",
+           "ele1_idmva         :=diPhoton.leadPhotonId",
+           "ele1_kHasSwitchToGain6 := diPhoton().leadingPhoton.checkStatusFlag('kHasSwitchToGain6')",
+           "ele1_kHasSwitchToGain1 := diPhoton().leadingPhoton.checkStatusFlag('kHasSwitchToGain1')",
+           
+           # additional vars for checks in regression 
+           "ele1_unsmearedSigmaEoE       :=diPhoton.leadingPhoton.userFloat('unsmearedSigmaEoE')",
+           "ele1_reco_E                  :=diPhoton.leadingPhoton.userFloat('reco_E')",
+           "ele1_reco_regr_E             :=diPhoton.leadingPhoton.userFloat('reco_regr_E')",
+           "ele1_beforeShShTransf_regr_E :=diPhoton.leadingPhoton.userFloat('beforeShShTransf_regr_E')",
+           "ele1_afterShShTransf_regr_E  :=diPhoton.leadingPhoton.userFloat('afterShShTransf_regr_E')",
+           
+           
+
+           "ele2_et            :=diPhoton.subLeadingPhoton.pt",
+           "ele2_energy        :=diPhoton.subLeadingPhoton.energy",
+           "ele2_rawEnergy     :=diPhoton.subLeadingPhoton.superCluster.rawEnergy",
+           "ele2_esEnergy      :=diPhoton.subLeadingPhoton.superCluster.preshowerEnergy",
+           "ele2_eTrue         := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().energy():0",
+           "ele2_scEta         :=diPhoton.subLeadingPhoton.superCluster.eta",
+           "ele2_scPhi         :=diPhoton.subLeadingPhoton.superCluster.phi",
+           "ele2_eta           :=diPhoton.subLeadingPhoton.eta",
+           "ele2_phi           :=diPhoton.subLeadingPhoton.phi",
+           "ele2_r9            :=diPhoton.subLeadingPhoton.old_r9()",
+           "ele2_full5x5_r9    :=diPhoton.subLeadingPhoton.full5x5_r9",
+           "ele2_etaWidth      :=diPhoton.subLeadingPhoton.superCluster.etaWidth",
+           "ele2_s4            :=diPhoton.subLeadingPhoton.s4",
+           "ele2_full5x5_sigmaIetaIeta := diPhoton.subLeadingPhoton.full5x5_sigmaIetaIeta",
+           "ele2_sigmaEoE      :=diPhoton.subLeadingPhoton.sigEOverE",
+           "ele2_pfPhoIso03    :=diPhoton.subLeadingPhoton.pfPhoIso03",
+           "ele2_chIsoRV       :=diPhoton.subLeadingView.pfChIso03WrtChosenVtx()",
+           "ele2_chIsoWV       :=diPhoton.subLeadingPhoton.pfChgIsoWrtWorstVtx03",
+           "ele2_ESoRawE       :=diPhoton.subLeadingPhoton.superCluster.preshowerEnergy()/diPhoton.subLeadingPhoton.superCluster.rawEnergy()",
+           "ele2_idmva         :=diPhoton.subLeadPhotonId",
+           "ele2_kHasSwitchToGain6 := diPhoton().subLeadingPhoton.checkStatusFlag('kHasSwitchToGain6')",
+           "ele2_kHasSwitchToGain1 := diPhoton().subLeadingPhoton.checkStatusFlag('kHasSwitchToGain1')",
+           
+           # additional vars for checks in regression 
+           "ele2_unsmearedSigmaEoE       :=diPhoton.subLeadingPhoton.userFloat('unsmearedSigmaEoE')",
+           "ele2_reco_E                  :=diPhoton.subLeadingPhoton.userFloat('reco_E')",
+           "ele2_reco_regr_E             :=diPhoton.subLeadingPhoton.userFloat('reco_regr_E')",
+           "ele2_beforeShShTransf_regr_E :=diPhoton.subLeadingPhoton.userFloat('beforeShShTransf_regr_E')",
+           "ele2_afterShShTransf_regr_E  :=diPhoton.subLeadingPhoton.userFloat('afterShShTransf_regr_E')",
+           ]
+
+additional_vars = [ #uncorrected shower shapes
+                    "ele1_uncorr_full5x5_r9            :=diPhoton.leadingPhoton.userFloat('uncorr_r9')",
+                    "ele1_uncorr_full5x5_sigmaIetaIeta :=diPhoton.leadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
+                    "ele1_uncorr_etaWidth              :=diPhoton.leadingPhoton.userFloat('uncorr_etaWidth')",
+                    "ele1_uncorr_s4                    :=diPhoton.leadingPhoton.userFloat('uncorr_s4')",
+                    #uncorrected shower shapes
+                    "ele2_uncorr_full5x5_r9            :=diPhoton.subLeadingPhoton.userFloat('uncorr_r9')",
+                    "ele2_uncorr_full5x5_sigmaIetaIeta :=diPhoton.subLeadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
+                    "ele2_uncorr_etaWidth              :=diPhoton.subLeadingPhoton.userFloat('uncorr_etaWidth')",
+                    "ele2_uncorr_s4                    :=diPhoton.subLeadingPhoton.userFloat('uncorr_s4')",
+]
+
+
+
+if customize.processId == 'Data':
+    all_vars = my_vars
+else:
+    all_vars = my_vars+additional_vars
+
+
 
 ## define categories and associated objects to dump
 cfgTools.addCategory(process.diphotonDumper,
@@ -184,87 +271,10 @@ cfgTools.addCategories(process.diphotonDumper,
                        ],
                        ## variables to be dumped in trees/datasets. Same variables for all categories
                        ## if different variables wanted for different categories, can add categorie one by one with cfgTools.addCategory
-                       variables=["mass               :=diPhoton.mass",
-                                  "pt                 :=diPhoton.pt",
-                                  "diphotonMVA        :=diPhotonMVA.result",
-
-                                  "ele1_et            :=diPhoton.leadingPhoton.pt",
-                                  "ele1_energy        :=diPhoton.leadingPhoton.energy",
-                                  "ele1_rawEnergy     :=diPhoton.leadingPhoton.superCluster.rawEnergy",
-                                  "ele1_esEnergy      :=diPhoton.leadingPhoton.superCluster.preshowerEnergy",
-                                  "ele1_eTrue         := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().energy():0",
-                                  "ele1_scEta         :=diPhoton.leadingPhoton.superCluster.eta",
-                                  "ele1_scPhi         :=diPhoton.leadingPhoton.superCluster.phi",
-                                  "ele1_eta           :=diPhoton.leadingPhoton.eta",
-                                  "ele1_phi           :=diPhoton.leadingPhoton.phi",
-                                  "ele1_r9            :=diPhoton.leadingPhoton.old_r9()",
-                                  "ele1_full5x5_r9    :=diPhoton.leadingPhoton.full5x5_r9",
-                                  "ele1_etaWidth      :=diPhoton.leadingPhoton.superCluster.etaWidth",
-                                  "ele1_s4            :=diPhoton.leadingPhoton.s4",
-                                  "ele1_full5x5_sigmaIetaIeta := diPhoton.leadingPhoton.full5x5_sigmaIetaIeta",
-                                  "ele1_sigmaEoE      :=diPhoton.leadingPhoton.sigEOverE",
-                                  "ele1_pfPhoIso03    :=diPhoton.leadingPhoton.pfPhoIso03",
-                                  "ele1_chIsoRV       :=diPhoton.leadingView.pfChIso03WrtChosenVtx()",
-                                  "ele1_chIsoWV       :=diPhoton.leadingPhoton.pfChgIsoWrtWorstVtx03",
-                                  "ele1_ESoRawE       :=diPhoton.leadingPhoton.superCluster.preshowerEnergy()/diPhoton.leadingPhoton.superCluster.rawEnergy()",
-                                  "ele1_idmva         :=diPhoton.leadPhotonId",
-                                  "ele1_kHasSwitchToGain6 := diPhoton().leadingPhoton.checkStatusFlag('kHasSwitchToGain6')",
-                                  "ele1_kHasSwitchToGain1 := diPhoton().leadingPhoton.checkStatusFlag('kHasSwitchToGain1')",
-
-                                  # additional vars for checks in regression 
-                                  "ele1_unsmearedSigmaEoE       :=diPhoton.leadingPhoton.userFloat('unsmearedSigmaEoE')",
-                                  "ele1_reco_E                  :=diPhoton.leadingPhoton.userFloat('reco_E')",
-                                  "ele1_reco_regr_E             :=diPhoton.leadingPhoton.userFloat('reco_regr_E')",
-                                  "ele1_beforeShShTransf_regr_E :=diPhoton.leadingPhoton.userFloat('beforeShShTransf_regr_E')",
-                                  "ele1_afterShShTransf_regr_E  :=diPhoton.leadingPhoton.userFloat('afterShShTransf_regr_E')",
-
-                                  #uncorrected shower shapes
-                                  "ele1_uncorr_full5x5_r9            :=diPhoton.leadingPhoton.userFloat('uncorr_r9')",
-                                  "ele1_uncorr_full5x5_sigmaIetaIeta :=diPhoton.leadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
-                                  "ele1_uncorr_etaWidth              :=diPhoton.leadingPhoton.userFloat('uncorr_etaWidth')",
-                                  "ele1_uncorr_s4                    :=diPhoton.leadingPhoton.userFloat('uncorr_s4')",
- 
-
-
-                                  "ele2_et            :=diPhoton.subLeadingPhoton.pt",
-                                  "ele2_energy        :=diPhoton.subLeadingPhoton.energy",
-                                  "ele2_rawEnergy     :=diPhoton.subLeadingPhoton.superCluster.rawEnergy",
-                                  "ele2_esEnergy      :=diPhoton.subLeadingPhoton.superCluster.preshowerEnergy",
-                                  "ele2_eTrue         := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().energy():0",
-                                  "ele2_scEta         :=diPhoton.subLeadingPhoton.superCluster.eta",
-                                  "ele2_scPhi         :=diPhoton.subLeadingPhoton.superCluster.phi",
-                                  "ele2_eta           :=diPhoton.subLeadingPhoton.eta",
-                                  "ele2_phi           :=diPhoton.subLeadingPhoton.phi",
-                                  "ele2_r9            :=diPhoton.subLeadingPhoton.old_r9()",
-                                  "ele2_full5x5_r9    :=diPhoton.subLeadingPhoton.full5x5_r9",
-                                  "ele2_etaWidth      :=diPhoton.subLeadingPhoton.superCluster.etaWidth",
-                                  "ele2_s4            :=diPhoton.subLeadingPhoton.s4",
-                                  "ele2_full5x5_sigmaIetaIeta := diPhoton.subLeadingPhoton.full5x5_sigmaIetaIeta",
-                                  "ele2_sigmaEoE      :=diPhoton.subLeadingPhoton.sigEOverE",
-                                  "ele2_pfPhoIso03    :=diPhoton.subLeadingPhoton.pfPhoIso03",
-                                  "ele2_chIsoRV       :=diPhoton.subLeadingView.pfChIso03WrtChosenVtx()",
-                                  "ele2_chIsoWV       :=diPhoton.subLeadingPhoton.pfChgIsoWrtWorstVtx03",
-                                  "ele2_ESoRawE       :=diPhoton.subLeadingPhoton.superCluster.preshowerEnergy()/diPhoton.subLeadingPhoton.superCluster.rawEnergy()",
-                                  "ele2_idmva         :=diPhoton.subLeadPhotonId",
-                                  "ele2_kHasSwitchToGain6 := diPhoton().subLeadingPhoton.checkStatusFlag('kHasSwitchToGain6')",
-                                  "ele2_kHasSwitchToGain1 := diPhoton().subLeadingPhoton.checkStatusFlag('kHasSwitchToGain1')",
-
-
-                                  # additional vars for checks in regression 
-                                  "ele2_unsmearedSigmaEoE       :=diPhoton.subLeadingPhoton.userFloat('unsmearedSigmaEoE')",
-                                  "ele2_reco_E                  :=diPhoton.subLeadingPhoton.userFloat('reco_E')",
-                                  "ele2_reco_regr_E             :=diPhoton.subLeadingPhoton.userFloat('reco_regr_E')",
-                                  "ele2_beforeShShTransf_regr_E :=diPhoton.subLeadingPhoton.userFloat('beforeShShTransf_regr_E')",
-                                  "ele2_afterShShTransf_regr_E  :=diPhoton.subLeadingPhoton.userFloat('afterShShTransf_regr_E')",
-
-                                  #uncorrected shower shapes
-                                  "ele2_uncorr_full5x5_r9            :=diPhoton.subLeadingPhoton.userFloat('uncorr_r9')",
-                                  "ele2_uncorr_full5x5_sigmaIetaIeta :=diPhoton.subLeadingPhoton.userFloat('uncorr_sigmaIetaIeta')",
-                                  "ele2_uncorr_etaWidth              :=diPhoton.subLeadingPhoton.userFloat('uncorr_etaWidth')",
-                                  "ele2_uncorr_s4                    :=diPhoton.subLeadingPhoton.userFloat('uncorr_s4')",
-                                  ],
+                       variables=all_vars,
                        histograms=[]
                        )
+
 
 
 ## HLT + EE bad supercluster filter on data
