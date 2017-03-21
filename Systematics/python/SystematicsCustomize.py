@@ -212,15 +212,15 @@ def customizeJetSystematicsForData(process):
 def useEGMTools(process):
     # remove old scales
     for isyst in [ process.MCScaleHighR9EB, process.MCScaleLowR9EB, process.MCScaleHighR9EE, process.MCScaleLowR9EE ]:
-        process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
+            process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
 
     # add EGM scales
     for isyst in [ process.MCScaleHighR9EB_EGM, process.MCScaleLowR9EB_EGM, process.MCScaleHighR9EE_EGM, process.MCScaleLowR9EE_EGM ]:
         process.flashggDiPhotonSystematics.SystMethods.insert(0, isyst)
 
     # remove old smearings
-    for isyst in [ process.MCSmearHighR9EE, process.MCSmearLowR9EE, process.MCSmearHighR9EB, process.MCSmearLowR9EB, process.SigmaEOverESmearing ]:
-        process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
+    for isyst in [ process.MCSmearHighR9EE, process.MCSmearLowR9EE, process.MCSmearHighR9EB, process.MCSmearLowR9EB, process.SigmaEOverESmearing, process.SigmaEOverEShift ]:
+            process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
 
     # add EGM smearings (2D)
     process.flashggDiPhotonSystematics.SystMethods2D.extend([
@@ -228,4 +228,8 @@ def useEGMTools(process):
             process.MCSmearLowR9EE_EGM,
             process.MCSmearHighR9EB_EGM,
             process.MCSmearLowR9EB_EGM,
-            process.SigmaEOverESmearing_EGM])
+            ])
+    
+    # add sigmaE/E correction and systematics
+    process.flashggDiPhotonSystematics.SystMethods.extend( [process.SigmaEOverESmearing_EGM, process.SigmaEOverEShift] )
+    

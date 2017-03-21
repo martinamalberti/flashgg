@@ -8,7 +8,7 @@ def addCategories(pset,cats,variables,histograms,mvas=None):
 
 # -----------------------------------------------------------------------
 def addCategory(pset,label,cutbased=None,subcats=0,variables=[],histograms=[],mvas=None,classname=None,binnedOnly=None,
-                dumpPdfWeights=None,nPdfWeights=None,nAlphaSWeights=None,nScaleWeights=None):
+                dumpPdfWeights=None,nPdfWeights=None,nAlphaSWeights=None,nScaleWeights=None,splitPdfByStage0Cat=None):
     
    
     if subcats >= 0:
@@ -23,6 +23,7 @@ def addCategory(pset,label,cutbased=None,subcats=0,variables=[],histograms=[],mv
         if nPdfWeights: catDef.nPdfWeights=cms.int32(nPdfWeights)
         if nAlphaSWeights: catDef.nAlphaSWeights=cms.int32(nAlphaSWeights)
         if nScaleWeights: catDef.nScaleWeights=cms.int32(nScaleWeights)
+        if splitPdfByStage0Cat is not None: catDef.splitPdfByStage0Cat=cms.bool(splitPdfByStage0Cat)
         
 
         addVariables( catDef.variables, variables )
@@ -71,7 +72,7 @@ def parseVariable(expr, name):
         var, bins, vals = expr.lstrip("map(").rstrip(")").split("::")
         bins = [ float(b) for b in bins.split(",") ]
         vals = [ float(v) for v in vals.split(",") ]
-        return name, [var,bins, vals], nbins, vmin, vmax
+        return name, [var,bins, vals], None, None, None
     else:
         return name, [expr], None, None, None
     

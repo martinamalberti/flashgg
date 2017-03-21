@@ -13,6 +13,7 @@ microAODDefaultOutputCommand = cms.untracked.vstring("drop *",
                                                      "keep recoGenParticles_flashggPrunedGenParticles_*_*", # this line, and preceding, drop unneded association object
                                                      "keep recoVertexs_offlineSlimmedPrimaryVertices_*_*", # leave out floatedmValueMap_offlineSlimmedPrimaryVertices__PAT
                                                      "keep *_reducedEgamma_reducedSuperClusters_*",
+                                                     "keep *CaloClusters_reducedEgamma_*_*",
                                                      "keep *_reducedEgamma_*PhotonCores_*",
                                                      "keep *_*Rho*_*_*",
                                                      "keep *_offlineBeamSpot_*_*",
@@ -27,6 +28,7 @@ microAODDefaultOutputCommand = cms.untracked.vstring("drop *",
                                                      "keep *GsfElectronCore*_reducedEgamma_*_*", # needed by at least one Tag
 
                                                      "keep *_flashggSelected*_*_*",
+                                                     "keep *_flashggMets*_*_*",
                                                      # Drop intermediate collections in favor of selected/final collections
                                                      "drop *_flashgg*Jet*_*_*",
                                                      "drop *_flashggMuons_*_*",

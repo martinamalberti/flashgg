@@ -367,12 +367,18 @@ namespace flashgg {
             hasGoodMuons = ( goodMuons.size() > 0 );
                         
             if( !hasGoodElec && !hasGoodMuons ) { continue; }
-            
+            //including SFs for leading muon or electron 
+            if(goodMuons.size()>0){
+                whleptonictags_obj.includeWeightsByLabel( *goodMuons.at(0), "MuonWeight");
+            } else if (goodElectrons.size() > 0){
+                whleptonictags_obj.includeWeights( *goodElectrons.at(0));
+            }
+
             for( unsigned int candIndex_outer = 0; candIndex_outer < Jets[jetCollectionIndex]->size() ; candIndex_outer++ ) 
                 {
                     bool keepJet=true;
                     edm::Ptr<flashgg::Jet> thejet = Jets[jetCollectionIndex]->ptrAt( candIndex_outer );
-                    if( ! thejet->passesPuJetId( dipho ) ) { keepJet=false; }
+                    if(!thejet->passesJetID  ( flashgg::Loose ) ) { continue; }
                     if( fabs( thejet->eta() ) > jetEtaThreshold_ ) { keepJet=false; }
                     if( thejet->pt() < jetPtThreshold_ ) { keepJet=false; }
                     float dRPhoLeadJet = deltaR( thejet->eta(), thejet->phi(), dipho->leadingPhoton()->superCluster()->eta(), dipho->leadingPhoton()->superCluster()->phi() ) ;

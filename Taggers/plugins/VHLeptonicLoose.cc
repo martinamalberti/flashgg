@@ -383,6 +383,12 @@ namespace flashgg {
 
         
             if( !(tagElectrons.size() > 0) && !(tagMuons.size()>0) ) { continue; }
+            //including SFs for leading muon or electron
+            if(tagMuons.size()>0){
+                VHLeptonicLooseTags_obj.includeWeightsByLabel( *tagMuons.at(0), "MuonWeight");
+            } else if (tagElectrons.size() > 0){
+                VHLeptonicLooseTags_obj.includeWeights( *tagElectrons.at(0));
+            }
             /*  
                 //uncomment if we want to keep track of lepton vs muon tagged event
             if( tagMuons.size() >= 1) 
@@ -399,7 +405,7 @@ namespace flashgg {
                 {
                     bool keepJet=true;
                     edm::Ptr<flashgg::Jet> thejet = Jets[jetCollectionIndex]->ptrAt( candIndex_outer );
-                    if( ! thejet->passesPuJetId( dipho ) ) { keepJet=false; }
+                    if(!thejet->passesJetID  ( flashgg::Loose ) ) { keepJet=false; }
                     if( fabs( thejet->eta() ) > jetEtaThreshold_ ) { keepJet=false; }
                     if( thejet->pt() < jetPtThreshold_ ) { keepJet=false; }
                     float dRPhoLeadJet = deltaR( thejet->eta(), thejet->phi(), dipho->leadingPhoton()->superCluster()->eta(), dipho->leadingPhoton()->superCluster()->phi() ) ;

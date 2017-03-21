@@ -332,7 +332,7 @@ namespace flashgg {
                     for( unsigned int candIndex_outer = 0; candIndex_outer < Jets[jetCollectionIndex]->size() ; candIndex_outer++ ) {
                         edm::Ptr<flashgg::Jet> thejet = Jets[jetCollectionIndex]->ptrAt( candIndex_outer );
 
-                        if( !thejet->passesPuJetId( dipho ) ) { continue; }
+                        if(!thejet->passesJetID  ( flashgg::Loose ) ) { continue; }
 
                         if( fabs( thejet->eta() ) > jetEtaThreshold_ ) { continue; }
 
@@ -507,13 +507,14 @@ namespace flashgg {
                 if( tagElectrons.size() > 0 && TTHLepTagElectron && tagMuons.size() > 0 && TTHLepTagMuon) {
                     //                    std::cout << "including lepton weights" << std::endl; 
                     if( tagMuons.at(0)->pt() > tagElectrons.at(0)->pt() ) {
-                        tthltags_obj.includeWeights( *tagMuons.at(0) ); 
+                        //tthltags_obj.includeWeights( *tagMuons.at(0) ); 
+                        tthltags_obj.includeWeightsByLabel( *tagMuons.at(0), "MuonMiniIsoWeight");
                     } else {
                         tthltags_obj.includeWeights( *tagElectrons.at(0) );
                     }
                 } else if( tagMuons.size() > 0 && TTHLepTagMuon ) {
                     //                    std::cout << "including muon weights" << std::endl; 
-                    tthltags_obj.includeWeights( *tagMuons.at(0) );
+                    tthltags_obj.includeWeightsByLabel( *tagMuons.at(0), "MuonMiniIsoWeight" );
                 } else if( tagElectrons.size() > 0 && TTHLepTagElectron) {
                     //                    std::cout << "including electron weights" << std::endl; 
                     tthltags_obj.includeWeights( *tagElectrons.at(0) );                    
