@@ -146,7 +146,13 @@
         "THQ_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1" : { "xs" : 0.07096,   "br" : 0.00227 },
         "THW_HToGG_13TeV-madgraph-pythia8_TuneCUETP8M1" : { "xs" : 0.01561,   "br" : 0.00227 },
         "bbHToGG_M-125_4FS_yb2_13TeV_amcatnlo" : { "xs" : 0.532892,   "br" : 0.00227 },
-        "bbHToGG_M-125_4FS_ybyt_13TeV_amcatnlo" : { "xs" : 0.0448916,   "br" : 0.00227 }
+        "bbHToGG_M-125_4FS_ybyt_13TeV_amcatnlo" : { "xs" : 0.0448916,   "br" : 0.00227 },
+	"ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"         : {"xs" : 117.864, "br" : 1.0},
+	"WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"        : {"xs" : 489.0, "br" : 1.0 },
+	"ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8"             : {"xs" : 3.38, "br" : 1.0},
+	"WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8"             : {"xs" : 5.52, "br" : 1.0},
+	"WW_TuneCUETP8M1_13TeV-pythia8"                           : {"xs" : 63.21, "br" : 1.0}
+
 
 
 }
