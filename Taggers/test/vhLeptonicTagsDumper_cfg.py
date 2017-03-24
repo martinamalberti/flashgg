@@ -33,9 +33,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring(
 #MC
-"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170114_094103/0000/myMicroAODOutputFile_1.root"
+#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170114_094103/0000/myMicroAODOutputFile_1.root"
 #data
-#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/ReMiniAOD-03Feb2017-2_5_4/2_5_1/DoubleEG/ReMiniAOD-03Feb2017-2_5_4-2_5_1-v0-Run2016E-03Feb2017-v1/170310_111722/0000/myMicroAODOutputFile_986.root"
+"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/ReMiniAOD-03Feb2017-2_5_4/2_5_1/DoubleEG/ReMiniAOD-03Feb2017-2_5_4-2_5_1-v0-Run2016E-03Feb2017-v1/170310_111722/0000/myMicroAODOutputFile_986.root"
 
 ))
 
@@ -50,56 +50,25 @@ customize.parse()
 
 ## import systs. customize
 from flashgg.Systematics.SystematicsCustomize import *
+jetSystematicsInputTags = createStandardSystematicsProducers(process)
+modifyTagSequenceForSystematics(process,jetSystematicsInputTags)
 
-# load syst producer
-process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
-
-# apply scale and smearing corrections
+# apply scale and smearing corrections usingEGMsmearer
 useEGMTools(process)
 
-## if data, apply only energy scale corrections, if MC apply only energy smearings
+## apply only 'central value' corrections for data and MC
 if customize.processId == 'Data' or customize.processId == 'data':
     print 'data' 
-    customizePhotonSystematicsForData(process)    # only central value, no syst. shifts 
+    customizeSystematicsForData(process)    # only central value, no syst. shifts 
 else:
     print 'mc'
-    customizePhotonSystematicsForMC(process)
-    ##syst (1D) 
-    vpset   = process.flashggDiPhotonSystematics.SystMethods
-    newvpset = cms.VPSet()
-    for pset in vpset:
-        pset.NSigmas = cms.vint32() # no up/down syst shifts
-        pset.ApplyCentralValue = cms.bool(False) # no central value
-        # energy smearing
-        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
-            pset.ApplyCentralValue = cms.bool(True)
-        # scale factors
-        if ( pset.Label.value().count("PreselSF") or pset.Label.value().count("electronVetoSF") or pset.Label.value().count("TriggerWeight") or pset.Label.value().count("LooseMvaSF") ):
-            pset.ApplyCentralValue = cms.bool(True)
-        newvpset+= [pset]
-    process.flashggDiPhotonSystematics.SystMethods = newvpset  
-    ##syst (2D) : smearings with EGMTool
-    vpset2D   = process.flashggDiPhotonSystematics.SystMethods2D
-    newvpset2D = cms.VPSet()
-    for pset in vpset2D:
-        pset.NSigmas = cms.PSet( firstVar = cms.vint32(), secondVar = cms.vint32() ) # only central value, no up/down syst shifts (2D case)
-        if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
-            pset.ApplyCentralValue = cms.bool(True)
-            newvpset2D+= [pset]
-    process.flashggDiPhotonSystematics.SystMethods2D = newvpset2D       
+    customizeSystematicsForBackground(process) # only central corrections, no up/down shifts
 
-print 'syst 1D'
-printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods])
-print 'syst 2D'
-printSystematicVPSet([process.flashggDiPhotonSystematics.SystMethods2D])
+print 'Printing systematics info...'
+printSystematicInfo(process)
 
-
-# load tag sequence
-process.load("flashgg.Taggers.flashggTagSequence_cfi")
-process.flashggTagSequence.remove(process.flashggUpdatedIdMVADiPhotons) # Needs to be run before systematics
-massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
-
-#remove cut on jets
+# tags configuration
+# remove cut on jets
 #process.flashggWHLeptonicTag.jetsNumberThreshold = cms.double(99999.)
 #process.flashggVHLeptonicLooseTag.jetsNumberThreshold = cms.double(99999.)
 #loose cut on diphotonMVA
@@ -107,7 +76,7 @@ process.flashggZHLeptonicTag.MVAThreshold = cms.double(-1.)
 process.flashggWHLeptonicTag.MVAThreshold = cms.double(-1.)
 process.flashggVHLeptonicLooseTag.MVAThreshold = cms.double(-1.)
 
-# dumper
+# tag dumper
 from flashgg.Taggers.tagsDumpers_cfi import createTagDumper
 import flashgg.Taggers.dumperConfigTools as cfgTools
 
@@ -229,7 +198,6 @@ process.ZHLeptonicTagDumper.nameTemplate = "$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
 process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90_v*"))
                                                                
-
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 # ee bad supercluster filter on data
@@ -256,6 +224,9 @@ process.p1 = cms.Path(
         process.dataRequirements*
         process.flashggUpdatedIdMVADiPhotons*
         process.flashggDiPhotonSystematics*
+        process.flashggMetSystematics*
+        process.flashggMuonSystematics*process.flashggElectronSystematics*
+        (process.flashggUnpackedJets*process.jetSystematicsSequence)*
         process.flashggTagSequence*
         process.WHLeptonicTagDumper*
         process.VHLeptonicLooseTagDumper*
