@@ -33,9 +33,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring(
 #MC
-#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170114_094103/0000/myMicroAODOutputFile_1.root"
+"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISummer16-2_4_1-25ns_Moriond17/2_4_1/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170114_094103/0000/myMicroAODOutputFile_1.root"
 #data
-"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/ReMiniAOD-03Feb2017-2_5_4/2_5_1/DoubleEG/ReMiniAOD-03Feb2017-2_5_4-2_5_1-v0-Run2016E-03Feb2017-v1/170310_111722/0000/myMicroAODOutputFile_986.root"
+#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/ReMiniAOD-03Feb2017-2_5_4/2_5_1/DoubleEG/ReMiniAOD-03Feb2017-2_5_4-2_5_1-v0-Run2016E-03Feb2017-v1/170310_111722/0000/myMicroAODOutputFile_986.root"
 
 ))
 
@@ -57,7 +57,6 @@ process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
 # apply scale and smearing corrections
 useEGMTools(process)
 
-
 ## if data, apply only energy scale corrections, if MC apply only energy smearings
 if customize.processId == 'Data' or customize.processId == 'data':
     print 'data' 
@@ -71,7 +70,11 @@ else:
     for pset in vpset:
         pset.NSigmas = cms.vint32() # no up/down syst shifts
         pset.ApplyCentralValue = cms.bool(False) # no central value
+        # energy smearing
         if ( pset.Label.value().count("MCSmear") or pset.Label.value().count("SigmaEOverESmearing")):
+            pset.ApplyCentralValue = cms.bool(True)
+        # scale factors
+        if ( pset.Label.value().count("PreselSF") or pset.Label.value().count("electronVetoSF") or pset.Label.value().count("TriggerWeight") or pset.Label.value().count("LooseMvaSF") ):
             pset.ApplyCentralValue = cms.bool(True)
         newvpset+= [pset]
     process.flashggDiPhotonSystematics.SystMethods = newvpset  
