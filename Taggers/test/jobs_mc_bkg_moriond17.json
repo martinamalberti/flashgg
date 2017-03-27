@@ -1,29 +1,28 @@
 {
    "processes" : {
 
-
    "diphoton" : [ 
-   	          ["/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", { "args" : ["outputFile=DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa.root"], "njobs": 100 } ],
-		  ["/DiPhotonJetsBox_M40_80-Sherpa/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", { "args" : ["outputFile=DiPhotonJetsBox_M40-80_13TeV-Sherpa.root"], "njobs": 10 } ]
+    	          ["/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", { "args" : ["outputFile=DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa.root"], "njobs": 200 } ],
+		  ["/DiPhotonJetsBox_M40_80-Sherpa/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", { "args" : ["outputFile=DiPhotonJetsBox_M40-80_13TeV-Sherpa.root"], "njobs": 25 } ]
        	        ],
 
 
    "gjet"     : [
 	          ["/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf.root"], "njobs":100}],
-		  ["/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf.root"], "njobs":100}],
-		  ["/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":50} ]
+		  ["/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf.root"], "njobs":200}],
+		  ["/GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":100} ]
 	    	],
 
 
    "qcd"      : [
-                  ["/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":50} ],
+                  ["/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80.root"], "njobs":100}  ],
                   ["/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8.root"], "njobs":50} ],
 		  ["/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER",{"args" : ["outputFile=QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf.root"], "njobs":50} ]
 		],
 
 
    "DYJetsToLL" : [
-		    ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1-74c0514daa3d87bd951f57782e8afcd5/USER", {"args" : ["outputFile=DYJetsToLL_M-50_amcatnlo.root"], "njobs":50} ]
+		    ["/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1-74c0514daa3d87bd951f57782e8afcd5/USER", {"args" : ["outputFile=DYJetsToLL_M-50_amcatnlo.root"], "njobs":300} ]
 		  ],
 
 
@@ -37,17 +36,17 @@
 
 
    "ZZTo2L2Q"   : [
-   		    ["/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER",{"args" : ["outputFile=ZZTo2L2Q.root"], "njobs":20} ]       
+   		    ["/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER",{"args" : ["outputFile=ZZTo2L2Q.root"], "njobs":50} ]       
 		    ],
 
 
    "WZTo2L2Q"   : [
-		   ["/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=WZTo2L2Q.root"], "njobs":10} ]
+		   ["/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=WZTo2L2Q.root"], "njobs":100} ]
 		],
 
 
    "WW"   : [
-     	     ["/WW_TuneCUETP8M1_13TeV-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=WW.root"], "njobs":1} ] 		
+     	     ["/WW_TuneCUETP8M1_13TeV-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=WW.root"], "njobs":3} ] 		
 	    ],
 
 
@@ -57,7 +56,7 @@
 
 
    "TTGJets"  : [
-   	      	  ["/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=TTGJets.root"], "njobs":10} ]
+   	      	  ["/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=TTGJets.root"], "njobs":15} ]
    	      	], 
 
 
@@ -66,7 +65,7 @@
    	      	],
 
    "TTJets"   :[
-		["/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=TTJets.root"], "njobs":10}]
+		["/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/sethzenz-RunIISummer16-2_4_1-25ns_Moriond17-2_4_1-v0-RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1-17c645750168c82731e0bcef4523b51c/USER", {"args" : ["outputFile=TTJets.root"], "njobs":150}]
 		]										     
 
 
