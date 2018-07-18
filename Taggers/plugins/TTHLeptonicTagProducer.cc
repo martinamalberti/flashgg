@@ -16,6 +16,8 @@
 #include "flashgg/DataFormats/interface/Met.h"
 #include "flashgg/DataFormats/interface/Photon.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 
 #include "DataFormats/TrackReco/interface/HitPattern.h"
 #include "flashgg/Taggers/interface/LeptonSelection2018.h"
@@ -66,6 +68,8 @@ namespace flashgg {
         EDGetTokenT<float> pTHToken_,pTVToken_;
         EDGetTokenT<double> rhoTag_;
         string systLabel_;
+        EDGetTokenT<edm::TriggerResults> triggerRECO_;
+
 
         typedef std::vector<edm::Handle<edm::View<flashgg::Jet> > > JetCollectionVector;
 
@@ -139,7 +143,8 @@ namespace flashgg {
         vertexToken_( consumes<View<reco::Vertex> >( iConfig.getParameter<InputTag> ( "VertexTag" ) ) ),
         genParticleToken_( consumes<View<reco::GenParticle> >( iConfig.getParameter<InputTag> ( "GenParticleTag" ) ) ),
         rhoTag_( consumes<double>( iConfig.getParameter<InputTag>( "rhoTag" ) ) ),
-        systLabel_( iConfig.getParameter<string> ( "SystLabel" ) )
+        systLabel_( iConfig.getParameter<string> ( "SystLabel" ) ),
+        triggerRECO_( consumes<edm::TriggerResults>(iConfig.getParameter<InputTag>("RECOfilters") ) )
     {
         leadPhoOverMassThreshold_ = iConfig.getParameter<double>( "leadPhoOverMassThreshold");
         subleadPhoOverMassThreshold_ = iConfig.getParameter<double>( "subleadPhoOverMassThreshold");
@@ -263,6 +268,29 @@ namespace flashgg {
         Handle<View<flashgg::Met> > theMet_;
         evt.getByToken( METToken_, theMet_ );
 
+        //Get trigger results relevant to MET filters
+        bool passMETfilters = 1;
+        edm::Handle<edm::TriggerResults> triggerBits;
+        evt.getByToken( triggerRECO_, triggerBits );
+
+        const edm::TriggerNames &triggerNames = evt.triggerNames( *triggerBits );
+        std::vector<std::string> flagList = {"Flag_goodVertices", "Flag_globalTightHalo2016Filter", "Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_BadPFMuonFilter", "Flag_BadChargedCandidateFilter","Flag_eeBadScFilter", "Flag_ecalBadCalibFilter"};
+        if( ! evt.isRealData() ) {
+            flagList = {"Flag_goodVertices", "Flag_globalTightHalo2016Filter", "Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_BadPFMuonFilter", "Flag_BadChargedCandidateFilter", "Flag_ecalBadCalibFilter"};
+        }
+        for( unsigned int i = 0; i < triggerNames.triggerNames().size(); i++ ) 
+            {
+                if(!triggerBits->accept(i)) {
+                    for(size_t j=0;j<flagList.size();j++)
+                        {
+                            if(flagList[j]==triggerNames.triggerName(i))
+                                {
+                                    passMETfilters=0;
+                                    break;
+                                }
+                        }
+                }
+            }
 
         std::unique_ptr<vector<TTHLeptonicTag> > tthltags( new vector<TTHLeptonicTag> );
         std::unique_ptr<vector<TagTruthBase> > truths( new vector<TagTruthBase> );
@@ -296,6 +324,9 @@ namespace flashgg {
 
             edm::Ptr<flashgg::DiPhotonCandidate> dipho = diPhotons->ptrAt( diphoIndex );
             edm::Ptr<flashgg::DiPhotonMVAResult> mvares = mvaResults->ptrAt( diphoIndex );
+
+            //skip events failing met filters
+            if(!passMETfilters)   {continue;}
 
             if( dipho->leadingPhoton()->pt() < ( dipho->mass() )*leadPhoOverMassThreshold_ ) { continue; }
             if( dipho->subLeadingPhoton()->pt() < ( dipho->mass() )*subleadPhoOverMassThreshold_ ) { continue; }
