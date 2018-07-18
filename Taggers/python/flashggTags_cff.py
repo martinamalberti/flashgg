@@ -162,6 +162,7 @@ flashggVHEtTag = cms.EDProducer("FlashggVHEtTagProducer",
 
 
 flashggTTHLeptonicTag = cms.EDProducer("FlashggTTHLeptonicTagProducer",
+                                       RECOfilters = cms.InputTag('TriggerResults::RECO'),
                                        DiPhotonTag=cms.InputTag('flashggPreselectedDiPhotons'),
                                        SystLabel=cms.string(""),
                                        MVAResultTag=cms.InputTag('flashggDiPhotonMVA'),
