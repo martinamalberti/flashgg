@@ -205,7 +205,8 @@ flashggTTHLeptonicTag = cms.EDProducer("FlashggTTHLeptonicTagProducer",
 )
 
 flashggTTHDiLeptonTag = cms.EDProducer("FlashggTTHDiLeptonTagProducer",
-                                        DiPhotonTag=cms.InputTag('flashggPreselectedDiPhotons'),
+                                       RECOfilters = cms.InputTag('TriggerResults::RECO'),
+                                       DiPhotonTag=cms.InputTag('flashggPreselectedDiPhotons'),
                                        SystLabel=cms.string(""),
                                        MVAResultTag=cms.InputTag('flashggDiPhotonMVA'),
                                        inputTagJets= UnpackedJetCollectionVInputTag,
