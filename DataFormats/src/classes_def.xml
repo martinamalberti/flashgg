@@ -381,4 +381,19 @@
 <class name="std::vector<flashgg::DoubleHTag>"/>
 <class name="edm::Wrapper<std::vector<flashgg::DoubleHTag> >"/>
 
+
+
+<class name="flashgg::DiElectronCandidate" ClassVersion="0">
+</class>
+<class name="std::vector<flashgg::DiElectronCandidate>"/>
+<class name="edm::Wrapper<std::vector<flashgg::DiElectronCandidate> >"/>
+<class name="edm::Ptr<flashgg::DiElectronCandidate>"/>
+<class name="edm::Wrapper<edm::Ptr<flashgg::DiElectronCandidate> >"/>
+<class name="std::vector<edm::Ptr<flashgg::DiElectronCandidate> >"/>
+<class name="edm::Wrapper<std::vector<edm::Ptr<flashgg::DiElectronCandidate> > >"/>
+
+<class name="flashgg::EleEleGammaCandidate" ClassVersion="0">
+</class>
+<class name="std::vector<flashgg::EleEleGammaCandidate>"/>                                                                                                                                                 <class name="edm::Wrapper<std::vector<flashgg::EleEleGammaCandidate> >"/>                                                                                                                                  <class name="edm::Ptr<flashgg::EleEleGammaCandidate>"/>                                                                                                                                                    <class name="edm::Wrapper<edm::Ptr<flashgg::EleEleGammaCandidate> >"/>                                                                                                                                     <class name="std::vector<edm::Ptr<flashgg::EleEleGammaCandidate> >"/>                                                                                                                                      <class name="edm::Wrapper<std::vector<edm::Ptr<flashgg::EleEleGammaCandidate> > >"/>            
+
 </lcgdict>
