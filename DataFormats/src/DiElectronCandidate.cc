@@ -7,7 +7,7 @@ DiElectronCandidate::DiElectronCandidate() {}
 
 DiElectronCandidate::~DiElectronCandidate() {}
 
-DiElectronCandidate::DiElectronCandidate( edm::Ptr<pat::Electron> electron1, edm::Ptr<pat::Electron> electron2 )
+DiElectronCandidate::DiElectronCandidate( edm::Ptr<flashgg::Electron> electron1, edm::Ptr<flashgg::Electron> electron2 )
 {
     addDaughter( *electron1 );
     addDaughter( *electron2 );
@@ -19,7 +19,7 @@ DiElectronCandidate::DiElectronCandidate( edm::Ptr<pat::Electron> electron1, edm
     addP4.set( *this );
 }
 
-DiElectronCandidate::DiElectronCandidate( const pat::Electron &electron1, const pat::Electron &electron2 )
+DiElectronCandidate::DiElectronCandidate( const flashgg::Electron &electron1, const flashgg::Electron &electron2 )
 {
     addDaughter( electron1 );
     addDaughter( electron2 );
@@ -31,21 +31,21 @@ DiElectronCandidate::DiElectronCandidate( const pat::Electron &electron1, const 
     addP4.set( *this );
 }
 
-const pat::Electron *DiElectronCandidate::leadingElectron() const
+const flashgg::Electron *DiElectronCandidate::leadingElectron() const
 {
     if( daughter( 0 )->pt() > daughter( 1 )->pt() ) {
-        return dynamic_cast<const pat::Electron *>( daughter( 0 ) );
+        return dynamic_cast<const flashgg::Electron *>( daughter( 0 ) );
     } else {
-        return dynamic_cast<const pat::Electron *>( daughter( 1 ) );
+        return dynamic_cast<const flashgg::Electron *>( daughter( 1 ) );
     }
 }
 
-const pat::Electron *DiElectronCandidate::subleadingElectron() const
+const flashgg::Electron *DiElectronCandidate::subleadingElectron() const
 {
     if( daughter( 0 )->pt() > daughter( 1 )->pt() ) {
-        return dynamic_cast<const pat::Electron *>( daughter( 1 ) );
+        return dynamic_cast<const flashgg::Electron *>( daughter( 1 ) );
     } else {
-        return dynamic_cast<const pat::Electron *>( daughter( 0 ) );
+        return dynamic_cast<const flashgg::Electron *>( daughter( 0 ) );
     }
 }
 

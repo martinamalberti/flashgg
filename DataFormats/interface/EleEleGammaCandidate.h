@@ -2,19 +2,20 @@
 #define FLASHgg_EleEleGammaCandidate_h
 
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
+#include "flashgg/DataFormats/interface/WeightedObject.h"
 #include "flashgg/DataFormats/interface/DiElectronCandidate.h"
+#include "flashgg/DataFormats/interface/Electron.h"
 #include "flashgg/DataFormats/interface/Photon.h"
 
 namespace flashgg {
-    class EleEleGammaCandidate : public reco::CompositeCandidate
+    class EleEleGammaCandidate : public reco::CompositeCandidate, public WeightedObject
     {
     public:
         EleEleGammaCandidate();
         EleEleGammaCandidate( edm::Ptr<flashgg::DiElectronCandidate>, edm::Ptr<flashgg::Photon>, edm::Ptr<reco::Vertex> );
-        EleEleGammaCandidate( edm::Ptr<flashgg::DiElectronCandidate>, const flashgg::Photon &, edm::Ptr<reco::Vertex> ); //mixed
+        EleEleGammaCandidate( edm::Ptr<flashgg::DiElectronCandidate>, const flashgg::Photon &, edm::Ptr<reco::Vertex> ); 
         ~EleEleGammaCandidate();
 
         const flashgg::DiElectronCandidate *EEG_DiEle() const;

@@ -2,19 +2,20 @@
 #define FLASHgg_DiElectronCandidate_h
 
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "flashgg/DataFormats/interface/Electron.h"
+#include "flashgg/DataFormats/interface/WeightedObject.h"
 
 namespace flashgg {
-    class DiElectronCandidate : public reco::CompositeCandidate
+    class DiElectronCandidate : public reco::CompositeCandidate, public WeightedObject
     {
     public:
         DiElectronCandidate();
-        DiElectronCandidate( edm::Ptr<pat::Electron>, edm::Ptr<pat::Electron> );
-        DiElectronCandidate( const pat::Electron &, const pat::Electron & );
+        DiElectronCandidate( edm::Ptr<flashgg::Electron>, edm::Ptr<flashgg::Electron> );
+        DiElectronCandidate( const flashgg::Electron &, const flashgg::Electron & );
         ~DiElectronCandidate();
 
-        const pat::Electron *leadingElectron() const;
-        const pat::Electron *subleadingElectron() const;
+        const flashgg::Electron *leadingElectron() const;
+        const flashgg::Electron *subleadingElectron() const;
 
     private:
 
