@@ -10,5 +10,6 @@ flashggRandomizedElectrons = cms.EDProducer("FlashggRandomizedElectronProducer",
                                     src = cms.InputTag("flashggElectrons"),
                                     # labels of various gaussian random numbers with mean=0, sigma=1
                                     # to be associated with the photon object
-                                    labels = cms.vstring("rnd_g_E")
+                                    labels = cms.vstring("rnd_g_E"),
+                                    pdf = cms.string("gaus")
                                     )

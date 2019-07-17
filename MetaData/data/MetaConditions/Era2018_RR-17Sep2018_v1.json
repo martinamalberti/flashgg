@@ -36,15 +36,12 @@
         ],        
         ".*DoubleMuon.*2018.*" :
         [
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*",
-            "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*",
             "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*",
             "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v*"
         ]
         ".*SingleMuon.*2018.*" :
         [
-            "HLT_IsoMu24*",
-            "HLT_IsoMu27*"
+            "HLT_IsoMu24_v*",
         ],
         ".*MuonEG.*2018.*" :
         [

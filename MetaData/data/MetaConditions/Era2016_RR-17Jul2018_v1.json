@@ -41,12 +41,14 @@
 	    "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ*", 
 	    "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL*",
 	    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ*", 
-	    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL*"        
+	    "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL*",        
+	    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*", 
+	    "HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*"
         ],
 	".*SingleMuon.*" :
 	[
 	    "HLT_IsoMu24*",
-	    "HLT_IsoMu27*"
+	    "HLT_IsoTkMu24_v*"
 	],
 	".*MuonEG.*" :
 	[
