@@ -46,7 +46,11 @@ process.RandomNumberGeneratorService.flashggRandomizedPhotons = cms.PSet(
           initialSeed = cms.untracked.uint32(16253245)
         )
 process.RandomNumberGeneratorService.flashggRandomizedElectrons = cms.PSet(
-          initialSeed = cms.untracked.uint32(16253245)
+          initialSeed = cms.untracked.uint32(13579246)
+        )
+
+process.RandomNumberGeneratorService.flashggRandomizedMuons = cms.PSet(
+          initialSeed = cms.untracked.uint32(19876543)
         )
 
 #process.GlobalTag = GlobalTag(process.GlobalTag,'92X_upgrade2017_realistic_v10','')
