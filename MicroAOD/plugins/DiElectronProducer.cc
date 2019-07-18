@@ -21,7 +21,7 @@ namespace flashgg {
         DiElectronProducer( const ParameterSet & );
     private:
         void produce( Event &, const EventSetup & ) override;
-        EDGetTokenT<View<pat::Electron> > electronToken_;
+        EDGetTokenT<View<flashgg::Electron> > electronToken_;
 
         double minElectronPt_;
         double maxElectronEta_;
@@ -29,7 +29,7 @@ namespace flashgg {
     };
     
     DiElectronProducer::DiElectronProducer( const ParameterSet &iConfig ) :
-        electronToken_( consumes<View<pat::Electron> >( iConfig.getParameter<InputTag> ( "ElectronTag" ) ) )
+        electronToken_( consumes<View<flashgg::Electron> >( iConfig.getParameter<InputTag> ( "ElectronTag" ) ) )
     {
         minElectronPt_ = iConfig.getParameter<double>( "minElectronPt" );
         maxElectronEta_ = iConfig.getParameter<double>( "maxElectronEta" );
