@@ -335,7 +335,8 @@
 <class name="std::vector<edm::Ptr<pat::MET> >"/>
 <class name="edm::Wrapper<std::vector<edm::Ptr<pat::MET> > >"/>
 
-<class name="flashgg::DiMuonCandidate" ClassVersion="10">
+<class name="flashgg::DiMuonCandidate" ClassVersion="11">
+ <version ClassVersion="11" checksum="4224713202"/>
   <version ClassVersion="10" checksum="1852293607"/>
 </class>
 <class name="std::vector<flashgg::DiMuonCandidate>"/>
@@ -345,7 +346,8 @@
 <class name="std::vector<edm::Ptr<flashgg::DiMuonCandidate> >"/>
 <class name="edm::Wrapper<std::vector<edm::Ptr<flashgg::DiMuonCandidate> > >"/>
 
-<class name="flashgg::MuMuGammaCandidate" ClassVersion="10">
+<class name="flashgg::MuMuGammaCandidate" ClassVersion="11">
+ <version ClassVersion="11" checksum="2293899797"/>
   <version ClassVersion="10" checksum="1087604778"/>
 </class>
 <class name="std::vector<flashgg::MuMuGammaCandidate>"/>
