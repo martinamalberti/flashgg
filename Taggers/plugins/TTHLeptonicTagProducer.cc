@@ -1274,13 +1274,25 @@ namespace flashgg {
 
                 if(leadMuPt>=leadElePt)
                 {
-                    lepton_leadPt_ = Muons[leadMuIndex]->pt();
-                    lepton_leadEta_ = Muons[leadMuIndex]->eta();
+                    if (leadMuPt>-1){
+                        lepton_leadPt_ = Muons[leadMuIndex]->pt();
+                        lepton_leadEta_ = Muons[leadMuIndex]->eta();
+                    }
+                    else{
+                        lepton_leadPt_ = -99;
+                        lepton_leadEta_ = -99;
+                    }
                 }
                 else
                 {
-                    lepton_leadPt_ = Electrons[leadEleIndex]->pt();
-                    lepton_leadEta_ = Electrons[leadEleIndex]->eta();
+                    if (leadElePt>-1){
+                        lepton_leadPt_ = Electrons[leadEleIndex]->pt();
+                        lepton_leadEta_ = Electrons[leadEleIndex]->eta();
+                    }
+                    else{
+                        lepton_leadPt_ = -99;
+                        lepton_leadEta_ = -99;
+                    }
                 }
 
                 float mvaValue = DiphotonMva_-> EvaluateMVA( "BDT" );
