@@ -47,7 +47,7 @@ treename['bkg'] = 'tagsDumper/trees/diphojets_1bjet_13TeV_DoubleHTag_0'
 ## Convert tree to pandas DataFrames
 import pandas as pd
 
-VARS = ['absCosTheta_gg','customLeadingPhotonIDMVA','weight'] # choose which vars to use 
+VARS = ['absCosTheta_bb','absCosTheta_gg','customLeadingPhotonIDMVA','weight'] # choose which vars to use 
 
 df = {}
 df['bkg'] = upfile['bkg'][treename['bkg']].pandas.df(branches=VARS)
@@ -57,9 +57,6 @@ df['sig'] = upfile['sig'][treename['sig']].pandas.df(branches=VARS)
 print 'Printing the first entry of the signal dataframe'
 print(df['sig'].iloc[:1])
 
-# add isSignal variable
-#df['sig']['isSignal'] = np.ones(len(df['sig'])) 
-#df['bkg']['isSignal'] = np.zeros(len(df['bkg']))
 
 ## Define the model
 # baseline keras model
@@ -69,16 +66,25 @@ from keras.layers import Input, Activation, Dense, Convolution2D, MaxPooling2D, 
 from keras.utils import np_utils
 
 NDIM = len(VARS[:-1])
-inputs = Input(shape=(NDIM,), name = 'input')  
-outputs = Dense(1, name = 'output', kernel_initializer='normal', activation='sigmoid')(inputs)
+#inputs = Input(shape=(NDIM,), name = 'input')  
+#outputs = Dense(1, name = 'output', kernel_initializer='normal', activation='sigmoid')(inputs)
+#
+## creae the model
+#model = Model(inputs=inputs, outputs=outputs)
+## compile the model
+#model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+## print the model summary
+#model.summary()
 
-# creae the model
-model = Model(inputs=inputs, outputs=outputs)
-# compile the model
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-# print the model summary
-model.summary()
+# build a model with one hidden layer
+model = Sequential()
+model.add(Dense(NDIM, input_dim=NDIM, activation='relu')) # first hidden layer: input_dim is the dimension of the row of data (variables). The first argument of Dense() is the number of nodes, activation is the activation function
+model.add(Dense(1, activation='sigmoid')) # this is the output layer. Chose sigmoid as activation function because this is a classification problem (0/1)
 
+#compile the model 
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])  
+# print the model summary                                                                                                                                               
+model.summary() 
 
 ## Divide in training and test dataset
 X_sig = df['sig'][VARS[:-1]].values
@@ -99,7 +105,8 @@ print X_train_val.shape
 print Y_train_val.shape
 
 
-# preprocessing: standard scalar
+## preprocessing: standard scalar
+# normalize features to have mean = 0, std dev = 1 (having features in the same range helps the net to converge more quickly)
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler().fit(X_train_val)
 X_train_val = scaler.transform(X_train_val)
@@ -108,7 +115,7 @@ X_test = scaler.transform(X_test)
 
 # early stopping callback
 from keras.callbacks import EarlyStopping
-early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+early_stopping = EarlyStopping(monitor='val_loss', patience=5) # stop the training when minimum loss is found; "patience" is used to add a delay to the trigger in terms of the number of epochs on which we would like to see no improvement
 
 # model checkpoint callback
 # this saves our model architecture + parameters into dense_model.h5
@@ -125,8 +132,8 @@ start_time = time.time()
 
 history = model.fit(X_train_val, 
                     Y_train_val, 
-                    epochs=100, 
-                    batch_size=1024, 
+                    epochs=1000, 
+                    batch_size=32, 
                     verbose=0, # switch to 1 for more verbosity 
                     callbacks=[early_stopping, model_checkpoint], 
                     validation_split=0.20)
