@@ -100,7 +100,7 @@ W = np.hstack([W_sig, W_bkg])
 
 from sklearn.model_selection import train_test_split
 # X = features for training, Y = expected outcome. In this case, Y = 0 (for signal) or 1 (for background)
-X_train_val, X_test, Y_train_val, Y_test, W_train_val, W_test = train_test_split(X, Y, W, test_size=0.2, random_state=7)
+X_train_val, X_test, Y_train_val, Y_test, W_train_val, W_test = train_test_split(X, Y, W, test_size=0.2, random_state=seed)
 print X_train_val.shape
 print Y_train_val.shape
 
@@ -142,9 +142,10 @@ print 'Training done. It took', time.time()-start_time, 'seconds.'
 
 
 # Evaluation
+pred = model.predict(X_test)
+
 print(">>> Computing AUC...")
 from sklearn.metrics import roc_auc_score, roc_curve
-pred = model.predict(X_test)
 roc_auc = roc_auc_score(Y_test,pred)
 fp, tp, th = roc_curve(Y_test, pred)
 print("AUC score: " + str(roc_auc))
